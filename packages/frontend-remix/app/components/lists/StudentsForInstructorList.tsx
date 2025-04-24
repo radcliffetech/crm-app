@@ -81,7 +81,7 @@ export function StudentsForInstructorList({ instructor_id }: { instructor_id: st
 
   return (
     <>
-      <h2 className="text-xl font-semibold mt-8 mb-2">Students</h2>
+
       <BasicTable table={table} />
     </>
   );

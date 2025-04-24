@@ -1,22 +1,20 @@
 import type { Course, Registration, Student } from "~/types";
 import { fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
 
-import type { Instructor } from "~/types";
-
 export async function getStudentsForInstructor(instructor_id: string): Promise<{
   students: Student[];
   registrations: Registration[];
   courses: Course[];
 }> {
-  const [courses, regs, students] = await Promise.all([
+  const [courses, registrations, students] = await Promise.all([
     fetchListData<Course>("courses", "/"), // all courses - eventually move this to the backend
     fetchListData<Registration>("registrations", "/",{instructor_id}),
-    fetchListData<Student>("students", "/",{instructor_id})
+    fetchListData<Student>("students", "/", {instructor_id })
   ]);
 
   return {
     students,
-    registrations: regs,
+    registrations,
     courses,
   };
 }
@@ -30,20 +28,17 @@ export async function getStudentPageData(id: string): Promise<{
     student: Student | null;
     registrations: Registration[];
     courses: Course[];
-    instructors: Instructor[];
 }> {
-  const [student, registrations, courses, instructors] = await Promise.all([
+  const [student, registrations, courses] = await Promise.all([
     fetchPageData("students", `/${id}/`),
-    fetchListData<Registration>("registrations", `/?student=${id}`),
+    fetchListData<Registration>("registrations", "/", { student_id: id}),
     fetchListData<Course>("courses", "/"),
-    fetchListData<Instructor>("instructors", "/"),
   ]);
 
   return {
     student,
     registrations,
     courses,
-    instructors,
   };
 }
 

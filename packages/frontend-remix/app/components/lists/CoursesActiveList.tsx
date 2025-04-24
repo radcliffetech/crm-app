@@ -20,7 +20,8 @@ export function CoursesActiveList({
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor("title", {
+      columnHelper.display({
+        id: "title",
         header: "Title",
         cell: ({ row }) => (
           <Link
@@ -31,21 +32,25 @@ export function CoursesActiveList({
           </Link>
         ),
       }),
-      columnHelper.accessor("instructor_name", {
+      columnHelper.display({
+        id: "instructor_name",
         header: "Instructor",
-        cell: ({ getValue }) => getValue(),
+        cell: ({ row }) => row.original.instructor_name,
       }),
-      columnHelper.accessor("start_date", {
+      columnHelper.display({
+        id: "start_date",
         header: "Start Date",
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+        cell: ({ row }) => new Date(row.original.start_date).toLocaleDateString(),
       }),
-      columnHelper.accessor("end_date", {
+      columnHelper.display({
+        id: "end_date",
         header: "End Date",
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
+        cell: ({ row }) => new Date(row.original.end_date).toLocaleDateString(),
       }),
-      columnHelper.accessor("enrollment_count", {          
-          header: "Enrolled",
-          cell: ({ getValue }) => getValue(),
+      columnHelper.display({
+        id: "enrollment_count",
+        header: "Enrolled",
+        cell: ({ row }) => row.original.enrollment_count,
       }),
     ],
     []
@@ -58,9 +63,6 @@ export function CoursesActiveList({
   });
 
   return (
-    <div className="bg-white shadow rounded-lg p-6 mt-6">
-      <h2 className="text-xl font-semibold mb-4">Current Courses</h2>
       <BasicTable table={table} />
-    </div>
   );
 }

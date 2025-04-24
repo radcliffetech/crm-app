@@ -48,7 +48,6 @@ export function CoursesForInstructorList({ courses }: { courses: Course[] }) {
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-2">Courses</h2>
       <BasicTable table={table} />
     </>
   );

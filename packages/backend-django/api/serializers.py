@@ -45,6 +45,20 @@ class StudentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RegistrationSerializer(serializers.ModelSerializer):
+    student_id = serializers.UUIDField(source="student.id", read_only=True)
+    course_id = serializers.UUIDField(source="course.id", read_only=True)
+    student_name = serializers.SerializerMethodField(read_only=True)
+    course_name = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Registration
-        fields = '__all__'
+        fields = [
+            "id", "student_id", "student_name", "course_id", "course_name",
+            "created_at", "updated_at", "registered_at", "registration_status", "payment_status"
+        ]
+
+    def get_student_name(self, obj):
+        return f"{obj.student.name_first} {obj.student.name_last}"
+
+    def get_course_name(self, obj):
+        return obj.course.title

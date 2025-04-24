@@ -1,16 +1,17 @@
+import { Link } from "@remix-run/react";
 import {
-  useReactTable,
-  getCoreRowModel,
   createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
-import { Link } from "@remix-run/react";
 import { useMemo } from "react";
+import { BasicTable } from "~/components/ui/BasicTable";
 import type { Student } from "~/types";
-import  { BasicTable } from "~/components/ui/BasicTable";
 
 const columnHelper = createColumnHelper<Student>();
+
+import { DropdownActions } from "~/components/ui/DropdownActions";
 
 export function StudentsList({
   students,
@@ -46,22 +47,10 @@ export function StudentsList({
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }) => (
-        <div className="text-right flex justify-end gap-2">
-          <button
-            onClick={() => onEdit(row.original)}
-            className="text-blue-600 hover:text-blue-800"
-            aria-label="Edit Student"
-          >
-            <PencilSquareIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => onDelete(row.original)}
-            className="text-red-600 hover:text-red-800"
-            aria-label="Delete Student"
-          >
-            <TrashIcon className="h-5 w-5" />
-          </button>
-        </div>
+        <DropdownActions
+          onEdit={() => onEdit(row.original)}
+          onDelete={() => onDelete(row.original)}
+        />
       ),
     }),
   ], [onEdit, onDelete]);

@@ -1,15 +1,16 @@
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { BasicTable } from "~/components/ui/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
+import { DropdownActions } from "~/components/ui/DropdownActions";
 import type { Instructor } from "~/types";
 import { Link } from "@remix-run/react";
-import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Instructor>();
 
@@ -46,22 +47,10 @@ export function InstructorsList({
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }) => (
-        <div className="text-right flex justify-end gap-2">
-          <button
-            onClick={() => onEdit(row.original)}
-            className="text-blue-600 hover:text-blue-800"
-            aria-label="Edit Instructor"
-          >
-            <PencilSquareIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => onDelete(row.original.id)}
-            className="text-red-600 hover:text-red-800"
-            aria-label="Delete Instructor"
-          >
-            <TrashIcon className="h-5 w-5" />
-          </button>
-        </div>
+        <DropdownActions
+          onEdit={() => onEdit(row.original)}
+          onDelete={() => onDelete(row.original.id)}
+        />
       ),
     }),
   ], [onEdit, onDelete]);

@@ -1,5 +1,6 @@
 import type { Course, Student } from "~/types"
 
+import PageSubheader from "../ui/PageSubheader";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
 export function RegisterCourseForStudentForm({
@@ -13,14 +14,13 @@ export function RegisterCourseForStudentForm({
 }) {
   return (
     <div className="mt-6 p-6 bg-gray-50 shadow-md rounded-md">
-      <h2 className="text-xl font-semibold mb-4">Registration</h2>
+      <PageSubheader>Registration</PageSubheader>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
           const form = e.target as HTMLFormElement;
           const student_id = form.student_id.value;
           if (student_id && course) {
-            console.log("Registering student to course", student_id, course.id);
             onRegister(student_id, course);
           }
         }}

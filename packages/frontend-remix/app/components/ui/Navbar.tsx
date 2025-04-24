@@ -1,4 +1,5 @@
 import { ArrowRightEndOnRectangleIcon, Cog6ToothIcon, HomeIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
+import { User, UserRole } from "~/types";
 import { useEffect, useRef, useState } from "react";
 
 import { Link } from "@remix-run/react";
@@ -7,9 +8,10 @@ export function Navbar({
   user,
   handleLogout,
 }: {
-  user: { displayName: string | null } | null;
+  user: User,
   handleLogin: () => void;
   handleLogout: () => void;
+  switchRole: (newRole: UserRole) => void;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,14 +50,13 @@ export function Navbar({
         )}
       </div>
       {user ? (
+        <>
         <div className="relative" ref={dropdownRef}>
           <button
             className="flex items-center gap-2 focus:outline-none"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
-            <span className="text-sm text-gray-200">
-              {user.displayName ?? "User"}
-            </span>
+                  <span className="text-sm text-gray-200">{user.name}</span>
             <svg className="w-4 h-4 text-gray-200 hover:text-white" fill="currentColor" viewBox="0 0 20 20">
               <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.1 1.02l-4.25 4.65a.75.75 0 01-1.1 0l-4.25-4.65a.75.75 0 01.02-1.06z" />
             </svg>
@@ -92,8 +93,10 @@ export function Navbar({
                 Log Out
               </button>
             </div>
+                   
           )}
         </div>
+        </>
       ) : (
 <>  </>  
       )}

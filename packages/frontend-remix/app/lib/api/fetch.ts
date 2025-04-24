@@ -1,7 +1,15 @@
-export async function getResults<T>(res: Response): Promise<T[]> {
-    const data = await res.json();
-    return Array.isArray(data) ? data : data.results;
-}
+/**
+ * API Fetch Utilities
+ *
+ * This module provides standardized utility functions for interacting with backend API endpoints.
+ * It includes support for paginated list fetching, single resource retrieval, and mutation actions.
+ *
+ * Usage:
+ *  - fetchListData: for paginated list endpoints
+ *  - fetchPageData: for fetching a single page/resource
+ *  - mutateData: for POST, PUT, DELETE actions
+ */
+
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const ENDPOINTS = {
@@ -14,6 +22,10 @@ export const ENDPOINTS = {
 };
 
 
+/**
+ * Fetches all paginated results from a list endpoint.
+ * Accepts optional query parameters and accumulates all pages into a single array.
+ */
 export async function fetchListData<T = any>(
     slug: keyof typeof ENDPOINTS,
     route: string,
@@ -52,7 +64,11 @@ export async function fetchListData<T = any>(
     return results;
 }
 
-export async function fetchData<T = any>(
+/**
+ * Core data fetcher used by all other functions.
+ * Supports method override and optional request body.
+ */
+async function fetchData<T = any>(
     url: string,
     method: string = "GET",
     data?: unknown
@@ -75,6 +91,9 @@ export async function fetchData<T = any>(
       return await res.json();
 }
 
+/**
+ * Fetches a single page or object from a named endpoint.
+ */
 export async function fetchPageData<T = any>(
     slug: keyof typeof ENDPOINTS,
     route: string,
@@ -89,6 +108,9 @@ export async function fetchPageData<T = any>(
     return res;
 }
 
+/**
+ * Sends a mutation request (POST, PUT, DELETE) to a named endpoint.
+ */
 export async function mutateData<I = any, O = any>(
     slug: keyof typeof ENDPOINTS,
     route: string,
@@ -101,4 +123,5 @@ export async function mutateData<I = any, O = any>(
     }
     const url = `${endpoint}${route}`;
     return await fetchData<O>(url, method, data);
-}
+
+  }

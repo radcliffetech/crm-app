@@ -1,11 +1,21 @@
-# CRM Project
+# CRM Project - Massaschussets Institute for Integrated Metaphysics
 
-A lightweight CRM (Customer Relationship Management) platform built with:
+An example of a lightweight CRM (Customer Relationship Management) platform built with:
 
 - **Django + Django REST Framework** for the backend API
 - **Remix + TypeScript + Tailwind CSS** for the frontend
 - Designed for managing students, courses, instructors, and registrations
 - Demo-friendly layout with modular, modern code structure
+
+### About the MiiM
+
+MiiM is a fictional institute created for the purpose of this project, a mix of MIT, Miskatonic U, and Hogwarts. It serves as an abstact placeholder for a real-world organization. 
+
+MiiM is a university located mostly in the New England of the US, and usually now. Go Flaming Eyes!
+
+### About this Repo
+
+This is a sample Customer Relationship Management (CRM) application developed as part of a software engineering portfolio. It demonstrates full-stack development skills using TypeScript, React, Remix, and Firebase.
 
 ---
 
@@ -14,9 +24,9 @@ A lightweight CRM (Customer Relationship Management) platform built with:
 ```
 crm-app/
 ├── packages/
-│   ├── backend-django/   # Django REST Framework API
+│   ├── backend-django/   # Django REST Framework API 
 │   └── frontend-remix/   # Remix frontend with React, Tailwind, and TS
-└── README.md             # You're here!
+└── README.md             
 ```
 
 ---
@@ -41,7 +51,6 @@ crm-app/
 
 4. Run migrations and load sample data:
    ```bash
-   cd src
    python manage.py migrate
    python manage.py reset_database
    ```
@@ -72,14 +81,9 @@ crm-app/
 
 ---
 
-## 🌐 Development Notes
+## To-Do List 
 
-- `.env` files control backend API URL and Remix environment.
-- Components are modular and grouped by domain: forms, lists, UI.
-- API logic lives in `app/lib/api/` and is fully abstracted from routes.
-
----
-
-## 🚀 License
-
-This project is licensed for portfolio and learning use.
+- Add multiple user types (Admin, Faculty, Students)
+- Simple Payments System
+- CRM Messaging
+- Course Materials -> Course Catalog

@@ -1,16 +1,17 @@
 import type { Course, Instructor, Registration, Student } from "~/types";
 import { Link, useParams } from "@remix-run/react";
+import { registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
 import { useEffect, useState } from "react";
 
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import PageSubheader from "~/components/ui/PageSubheader";
 import { RegisterCourseForStudentForm } from "~/components/registrations/RegisterCourseForStudentForm";
-import { StudentsForCourseList } from "~/components/lists/StudentsForCourseList";
+import { RegistrationsForCourseList } from "~/components/lists/RegistrationsForCourseList";
 import { getCoursePageData } from "~/loaders/courses";
 import { marked } from "marked";
-import { registerStudentToCourse } from "~/loaders/registrations";
 
 export const meta: MetaFunction = ({ params }) => {
   return [
@@ -24,9 +25,8 @@ export default function CourseDetailPage() {
   const { id } = useParams();
   const [course, setCourse] = useState<Course | null>(null);
   const [instructor, setInstructor] = useState<Instructor | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [unregisteredStudents, setUnregisteredStudents] = useState<Student[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [unregisteredStudents, setUnregisteredStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,11 +35,10 @@ export default function CourseDetailPage() {
       setLoading(true);
       setError(null);
       getCoursePageData(id)
-        .then(({ course, instructor, registrations, students, unregisteredStudents }) => {
+        .then(({ course, instructor, registrations, unregisteredStudents }) => {
           setCourse(course);
           setInstructor(instructor);
           setRegistrations(registrations);
-          setStudents(students);
           setUnregisteredStudents(unregisteredStudents);
         })
         .catch((err) => {
@@ -58,7 +57,6 @@ export default function CourseDetailPage() {
   const registerForCourse = (student_id: string, course: Course) => {
     registerStudentToCourse(student_id, course.id).then(() => reloadData());
   }
-
 
   return (
     <PageFrame>
@@ -91,14 +89,18 @@ export default function CourseDetailPage() {
           </p>
 
           <div className="py-4">
-            {students.length === 0 ? (
+            <PageSubheader>Registered Students</PageSubheader>
+            {registrations.length === 0 ? (
               <p className="text-gray-500 italic">No students registered.</p>
             ) : (
-              <StudentsForCourseList
+              <RegistrationsForCourseList
                 course={course}
-                students={students}
                 registrations={registrations}
-                onUnregister={reloadData}
+                unregisterAction={(reg: Registration) => {
+                  unregisterStudent(reg).then(() => {
+                    reloadData();
+                  })
+                }}
               />
             )}
           </div>

@@ -6,11 +6,12 @@ import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import PageSubheader from "~/components/ui/PageSubheader";
 import { StudentsForInstructorList } from "~/components/lists/StudentsForInstructorList";
 import { getInstructorPageData } from "~/loaders/instructors";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({ params }) => {
+export const meta: MetaFunction = ({ }) => {
   return [
     { title: `Instructor Detail – MiiM CRM` },
     { name: "description", content: "View instructor profile, biography, and course assignments." },
@@ -46,12 +47,14 @@ export default function InstructorDetailPage() {
       <p className="mb-4 text-gray-600">{instructor.email}</p>
       <p className="mb-8 italic">{instructor.bio}</p>
 
+      <PageSubheader>Courses Teaching</PageSubheader>
       {courses.length > 0 ? (
         <CoursesForInstructorList courses={courses} />
       ) : (
         <p className="text-gray-500 italic">No courses assigned.</p>
       )}
 
+    <PageSubheader>Active Students</PageSubheader>
       <StudentsForInstructorList instructor_id={instructor.id} />
       </>)}
     </PageFrame>

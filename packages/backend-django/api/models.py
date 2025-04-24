@@ -50,12 +50,18 @@ class Student(models.Model):
         return f"{self.name_first} {self.name_last}"
 
 
-# Registration model
+ 
 class Registration(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ("pending", "Pending"),
         ("completed", "Completed"),
         ("failed", "Failed"),
+    ]
+
+    REGISTRATION_STATUS_CHOICES = [
+        ("registered", "Registered"),
+        ("waitlisted", "Waitlisted"),
+        ("cancelled", "Cancelled"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -65,6 +71,8 @@ class Registration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     registered_at = models.DateTimeField(auto_now_add=True)
+    
+    registration_status = models.CharField(max_length=10, choices=REGISTRATION_STATUS_CHOICES, default="registered")
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default="pending")
 
     def __str__(self):

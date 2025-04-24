@@ -1,10 +1,11 @@
+import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createInstructor,
   deleteInstructor,
   getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
