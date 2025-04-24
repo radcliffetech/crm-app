@@ -20,7 +20,6 @@ export function RegisterCourseForStudentForm({
           const form = e.target as HTMLFormElement;
           const student_id = form.student_id.value;
           if (student_id && course) {
-            console.log("Registering student to course", student_id, course.id);
             onRegister(student_id, course);
           }
         }}

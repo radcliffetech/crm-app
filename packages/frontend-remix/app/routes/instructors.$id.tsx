@@ -10,7 +10,7 @@ import { StudentsForInstructorList } from "~/components/lists/StudentsForInstruc
 import { getInstructorPageData } from "~/loaders/instructors";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({ params }) => {
+export const meta: MetaFunction = ({ }) => {
   return [
     { title: `Instructor Detail – MiiM CRM` },
     { name: "description", content: "View instructor profile, biography, and course assignments." },

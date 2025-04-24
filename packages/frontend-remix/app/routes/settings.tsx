@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
@@ -13,8 +11,6 @@ export const meta: MetaFunction = () => {
 
 
 export default function SettingsPage() {
-  const [userName, setUserName] = useState<string | null>(null);
-
 
   return (
     <PageFrame>

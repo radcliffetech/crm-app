@@ -7,11 +7,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { useEffect, useState } from "react";
 
 import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";
+import { useState } from "react";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

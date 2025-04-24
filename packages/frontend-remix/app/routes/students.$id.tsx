@@ -1,5 +1,4 @@
 import type { Course, Registration, Student } from "~/types";
-import { getRegistrationsByStudent, registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
 import { getStudentPageData, updateStudent } from "~/loaders/students";
 import { useEffect, useState } from "react";
 
@@ -11,9 +10,10 @@ import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegisterStudentForCourseForm } from "~/components/registrations/RegisterStudentForCourseForm";
 import { RegistrationsForStudentList } from "~/components/lists/RegistrationsForStudentList";
 import { StudentForm } from "~/components/forms/StudentForm";
+import { unregisterStudent } from "~/loaders/registrations";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({ data }) => {
+export const meta: MetaFunction = ({  }) => {
   return [
     {
       title: "Student Detail – MiiM CRM",
@@ -123,7 +123,6 @@ export default function StudentDetailPage() {
         <RegistrationsForStudentList
           registrations={registrations}
           unregisterAction={async (reg: Registration) => {
-            console.log("Unregistering student from course", reg);
             await unregisterStudent(reg);
             reloadData();
           }}

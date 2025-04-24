@@ -1,8 +1,6 @@
 import type { Course, Registration, Student } from "~/types";
 import { fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
 
-import type { Instructor } from "~/types";
-
 export async function getStudentsForInstructor(instructor_id: string): Promise<{
   students: Student[];
   registrations: Registration[];

@@ -1,4 +1,4 @@
-import type { Course, Instructor, Registration } from "~/types"
+import type { Course, Instructor } from "~/types"
 import { createCourse, deleteCourse, getCoursesPageData, updateCourse } from "~/loaders/courses";
 import { useEffect, useState } from "react";
 
@@ -69,7 +69,6 @@ export default function CoursesPage() {
             reloadData();
             setEditingCourse(null);
         } else {
-            const now = "2025-04-01";
             const newCourse = await createCourse({
                 ...formData,
                 syllabus_url: formData.syllabus_url,

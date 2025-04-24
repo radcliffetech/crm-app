@@ -1,4 +1,3 @@
-import type { Course, Registration } from "~/types";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -8,6 +7,7 @@ import {
 import { BasicTable } from "~/components/ui/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
+import type { Registration } from "~/types";
 import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Registration>();
@@ -59,7 +59,6 @@ export function RegistrationsForStudentList({
               onClick={async () => {
                 if (window.confirm("Are you sure you want to unregister this student from the course?")) {
                   let reg = row.original;
-                  console.log("_________ Unregistering student...", reg);
                   await unregisterAction(reg);
                 }
               }}

@@ -56,9 +56,7 @@ export function RegistrationsForCourseList({
             <button
               onClick={async () => {
                 if (window.confirm("Are you sure you want to unregister this student from the course?")) {
-                  let reg = row.original;
-                  console.log("_________ Unregistering student...", reg);
-                  await unregisterAction(reg);
+                  await unregisterAction(row.original);
                 }
               }}
               className="text-red-600 hover:text-red-800 text-sm"

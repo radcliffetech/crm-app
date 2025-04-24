@@ -12,10 +12,6 @@ export async function getRegistrationsForCourse(course_id: string): Promise<{
     fetchListData<Student>("students", "/")
   ]);
 
-  console.log("course", course);
-  console.log("registrations", registrations);
-  console.log("students", students);
-
   const studentMap = new Map<string, Student>();
   students.forEach(s => studentMap.set(s.id, s));
   const filteredStudents = registrations.map(r => studentMap.get(r.student_id)).filter(Boolean) as Student[];
@@ -28,13 +24,10 @@ export async function getRegistrationsByStudent(student_id: string): Promise<Reg
 }
 
 export async function registerStudentToCourse(student_id: string, course_id: string) {
-  console.log("registering", student_id, course_id);
   return mutateData("registrations", "/register/", "POST", { student_id, course_id });
 }
 
 export async function unregisterStudent(reg: Registration) {
-  console.log("unregistering", reg);
-
   return mutateData("registrations", "/unregister/", "POST", { student_id: reg.student_id, 
     course_id: reg.course_id });
 }

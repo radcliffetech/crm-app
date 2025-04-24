@@ -53,7 +53,6 @@ export async function getCoursePageData(id: string): Promise<{
     : null;
 
   const output = { course, instructor, registrations, unregisteredStudents };
-  console.log("getCoursePageData output", output);
   return output;
 }
 
