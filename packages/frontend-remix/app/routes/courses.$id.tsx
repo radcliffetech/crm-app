@@ -7,6 +7,7 @@ import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import PageSubheader from "~/components/ui/PageSubheader";
 import { RegisterCourseForStudentForm } from "~/components/registrations/RegisterCourseForStudentForm";
 import { RegistrationsForCourseList } from "~/components/lists/RegistrationsForCourseList";
 import { getCoursePageData } from "~/loaders/courses";
@@ -88,6 +89,7 @@ export default function CourseDetailPage() {
           </p>
 
           <div className="py-4">
+            <PageSubheader>Registered Students</PageSubheader>
             {registrations.length === 0 ? (
               <p className="text-gray-500 italic">No students registered.</p>
             ) : (

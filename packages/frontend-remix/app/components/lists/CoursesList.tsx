@@ -1,4 +1,3 @@
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createColumnHelper,
   getCoreRowModel,
@@ -8,6 +7,7 @@ import {
 import { BasicTable } from "~/components/ui/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Course } from "~/types";
+import { DropdownActions } from "~/components/ui/DropdownActions";
 import { Link } from "@remix-run/react";
 import { useMemo } from "react";
 
@@ -32,14 +32,16 @@ export function CoursesList({
         </Link>
       ),
     }),
-    columnHelper.accessor("instructor_name", {
+    columnHelper.display({
+      id: "instructor_name",
       header: "Instructor",
-      cell: ({ getValue }) => getValue(),
+      cell: ({ row }) => row.original.instructor_name,
     }),
-    columnHelper.accessor("enrollment_count", {          
+    columnHelper.display({
+      id: "enrollment_count",
       header: "Enrolled",
-      cell: ({ getValue }) => getValue(),
-  }),
+      cell: ({ row }) => row.original.enrollment_count,
+    }),
     columnHelper.display({
       id: "start_date",
       header: "Start Date",
@@ -54,22 +56,10 @@ export function CoursesList({
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
       cell: info => (
-        <div className="text-right flex justify-end gap-2">
-          <button
-            onClick={() => onEdit(info.row.original)}
-            className="text-blue-600 hover:text-blue-800"
-            aria-label="Edit Course"
-          >
-            <PencilSquareIcon className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => onDelete(info.row.original.id)}
-            className="text-red-600 hover:text-red-800"
-            aria-label="Delete Course"
-          >
-            <TrashIcon className="h-5 w-5" />
-          </button>
-        </div>
+        <DropdownActions
+          onEdit={() => onEdit(info.row.original)}
+          onDelete={() => onDelete(info.row.original.id)}
+        />
       ),
     }),
   ], [onEdit, onDelete]);

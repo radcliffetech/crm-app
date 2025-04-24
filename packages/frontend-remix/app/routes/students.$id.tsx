@@ -6,6 +6,7 @@ import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import PageSubheader from "~/components/ui/PageSubheader";
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegisterStudentForCourseForm } from "~/components/registrations/RegisterStudentForCourseForm";
 import { RegistrationsForStudentList } from "~/components/lists/RegistrationsForStudentList";
@@ -110,6 +111,8 @@ export default function StudentDetailPage() {
       <p className="mb-2"><strong>Email:</strong> {student.email}</p>
       <p className="mb-2"><strong>Notes:</strong> {student.notes || "—"}</p>
 
+
+      <PageSubheader>Registration</PageSubheader>
       <RegisterStudentForCourseForm
         student_id={student.id}
         courses={courses}
@@ -120,6 +123,7 @@ export default function StudentDetailPage() {
       />
 
       <div className="py-4">
+        <PageSubheader>Registered Courses</PageSubheader>
         <RegistrationsForStudentList
           registrations={registrations}
           unregisterAction={async (reg: Registration) => {

@@ -77,9 +77,6 @@ export function RegistrationsForCourseList({
   });
 
   return (
-    <>
-      <h2 className="text-xl font-semibold mb-2">Registered Students</h2>
       <BasicTable table={table} />
-    </>
   );
 }

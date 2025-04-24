@@ -6,15 +6,15 @@ export async function getStudentsForInstructor(instructor_id: string): Promise<{
   registrations: Registration[];
   courses: Course[];
 }> {
-  const [courses, regs, students] = await Promise.all([
+  const [courses, registrations, students] = await Promise.all([
     fetchListData<Course>("courses", "/"), // all courses - eventually move this to the backend
     fetchListData<Registration>("registrations", "/",{instructor_id}),
-    fetchListData<Student>("students", "/",{instructor_id})
+    fetchListData<Student>("students", "/", {instructor_id })
   ]);
 
   return {
     students,
-    registrations: regs,
+    registrations,
     courses,
   };
 }

@@ -86,6 +86,19 @@ class StudentViewSet(viewsets.ModelViewSet):
             else:
                 queryset = queryset.filter(id__in=registered_ids)
 
+        instructor_id = self.request.query_params.get("instructor_id")
+
+        if instructor_id:
+            registered_ids = Registration.objects.filter(
+                registration_status="registered",
+                course__instructor_id=instructor_id
+            ).values_list("student_id", flat=True)
+            if eligible == "true":
+                queryset = queryset.exclude(id__in=registered_ids)
+            else:
+                queryset = queryset.filter(id__in=registered_ids)
+
+
         return queryset
 
 

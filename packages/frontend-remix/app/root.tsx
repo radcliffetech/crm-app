@@ -7,11 +7,24 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import type { User, UserRole } from "./types";
+import { createContext, useContext } from "react";
 
 import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";
 import { useState } from "react";
+
+export const mockUser: User = {
+  id: "123",
+  email: "admin@miim.edu",
+  role: "admin", // try switching to "faculty" or "student"
+  name: "Admin User",
+};
+
+export const AuthContext = createContext(mockUser);
+export const useAuth = () => useContext(AuthContext);
+
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -46,11 +59,11 @@ function LandingPage({
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-
+  const [user, setUser] = useState(mockUser);
   const [isLoggedIn, setIsLoggedIn] = useState(true)
-  
 
-const handleLogin = () => {
+
+  const handleLogin = () => {
     console.log("Logging in...");
     setIsLoggedIn(true);
   };
@@ -60,33 +73,41 @@ const handleLogin = () => {
     setIsLoggedIn(false);
   };
 
+  const switchRole = (newRole: UserRole) => {
+    setUser({ ...user, role: newRole });
+  };
+
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body className="min-h-screen flex flex-col">
-        {isLoggedIn ? (
-          <>
-            <Navbar handleLogin={handleLogin} handleLogout={handleLogout} user={{ displayName: "Demo User" }} />
-            <div className="flex-grow">
-              {children}
-            </div>
-            <Footer />
-          </>
-        ) : (
-          <LandingPage handleLogin={handleLogin} />
-        )}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
+    <AuthContext.Provider value={user}>
+      <html lang="en">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <Meta />
+          <Links />
+        </head>
+        <body className="min-h-screen flex flex-col">
+          {isLoggedIn ? (
+            <>
+              <Navbar handleLogin={handleLogin} handleLogout={handleLogout} user={user} switchRole={switchRole} />
+              <div className="flex-grow">
+                {children}
+              </div>
+              <Footer />
+            </>
+          ) : (
+            <LandingPage handleLogin={handleLogin} />
+          )}
+          <ScrollRestoration />
+          <Scripts />
+        </body>
+      </html>
+    </AuthContext.Provider>
   );
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <Outlet />
+  )
 }

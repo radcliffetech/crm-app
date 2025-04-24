@@ -16,7 +16,6 @@ export function RegisterStudentForCourseForm({
 }) {
   return (
     <div className="mt-6 p-6 bg-gray-50 shadow-md rounded-md">
-      <h2 className="text-xl font-semibold mb-4">Registration</h2>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
