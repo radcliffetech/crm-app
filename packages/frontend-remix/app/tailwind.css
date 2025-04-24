@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+
+
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[rgb(33,74,55)] text-white rounded px-4 py-2 hover:bg-[rgb(28,64,47)];
+  }
+}

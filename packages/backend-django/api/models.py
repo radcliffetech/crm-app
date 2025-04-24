@@ -1,0 +1,72 @@
+import uuid
+from django.db import models
+
+
+class Instructor(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    name_first = models.CharField(max_length=100)
+    name_last = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    bio = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name_first} {self.name_last}"
+
+
+class Course(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    description_full = models.TextField()
+    instructor = models.ForeignKey("Instructor", on_delete=models.CASCADE, related_name="courses")
+    start_date = models.DateField()
+    end_date = models.DateField()
+    course_fee = models.DecimalField(max_digits=8, decimal_places=2)
+    prerequisites = models.JSONField(blank=True, null=True)
+    syllabus_url = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+class Student(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    name_first = models.CharField(max_length=100)
+    name_last = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    company = models.CharField(max_length=200, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name_first} {self.name_last}"
+
+
+# Registration model
+class Registration(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    student = models.ForeignKey("Student", on_delete=models.CASCADE, related_name="registrations")
+    course = models.ForeignKey("Course", on_delete=models.CASCADE, related_name="registrations")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    registered_at = models.DateTimeField(auto_now_add=True)
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default="pending")
+
+    def __str__(self):
+        return f"{self.student} → {self.course} ({self.payment_status})"
+    
