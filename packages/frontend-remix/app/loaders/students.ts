@@ -30,20 +30,17 @@ export async function getStudentPageData(id: string): Promise<{
     student: Student | null;
     registrations: Registration[];
     courses: Course[];
-    instructors: Instructor[];
 }> {
-  const [student, registrations, courses, instructors] = await Promise.all([
+  const [student, registrations, courses] = await Promise.all([
     fetchPageData("students", `/${id}/`),
-    fetchListData<Registration>("registrations", `/?student=${id}`),
+    fetchListData<Registration>("registrations", "/", { student_id: id}),
     fetchListData<Course>("courses", "/"),
-    fetchListData<Instructor>("instructors", "/"),
   ]);
 
   return {
     student,
     registrations,
     courses,
-    instructors,
   };
 }
 

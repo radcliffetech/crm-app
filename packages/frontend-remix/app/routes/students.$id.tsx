@@ -1,15 +1,15 @@
-import type { Course, Instructor, Registration, Student } from "~/types";
-import { getRegistrationsByStudent, unregisterStudentByregistration_id } from "~/loaders/registrations";
+import type { Course, Registration, Student } from "~/types";
+import { getRegistrationsByStudent, registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
 import { getStudentPageData, updateStudent } from "~/loaders/students";
 import { useEffect, useState } from "react";
 
-import { CoursesForStudentList } from "~/components/lists/CoursesForStudentList";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegisterStudentForCourseForm } from "~/components/registrations/RegisterStudentForCourseForm";
+import { RegistrationsForStudentList } from "~/components/lists/RegistrationsForStudentList";
 import { StudentForm } from "~/components/forms/StudentForm";
 import { useParams } from "@remix-run/react";
 
@@ -28,7 +28,6 @@ export const meta: MetaFunction = ({ data }) => {
 export default function StudentDetailPage() {
   const { id } = useParams();
   const [student, setStudent] = useState<Student | null>(null);
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     name_first: "",
@@ -48,9 +47,6 @@ export default function StudentDetailPage() {
     reloadData();
   }, [id]);
 
-  const registeredCourses = courses.filter(course =>
-    registrations.some(r => r.course_id === course.id)
-  );
   if (!student) return <div className="p-8"><DataLoaderState loading={loading} error={error} /></div>;
 
   if (editing) {
@@ -77,7 +73,7 @@ export default function StudentDetailPage() {
       setLoading(true);
       setError(null);
       getStudentPageData(id)
-        .then(({ student, registrations, courses, instructors }) => {
+        .then(({ student, registrations, courses }) => {
           setStudent(student);
           if (student) {
             setFormData({
@@ -91,7 +87,6 @@ export default function StudentDetailPage() {
           }
           setRegistrations(registrations);
           setCourses(courses);
-          setInstructors(instructors);
         })
         .catch((err) => {
           console.error(err);
@@ -101,10 +96,6 @@ export default function StudentDetailPage() {
     }
   }
 
-  function getInstructorName(id: string): string {
-    const instructor = instructors.find(i => i.id === id);
-    return instructor ? `${instructor.name_first} ${instructor.name_last} (${instructor.email})` : id;
-  }
 
   return (
     <PageFrame>
@@ -124,21 +115,19 @@ export default function StudentDetailPage() {
         courses={courses}
         registrations={registrations}
         onRegister={async () => {
-          const newRegs = await getRegistrationsByStudent(student.id);
-          setRegistrations(newRegs);
+          reloadData()
         }}
       />
+
       <div className="py-4">
-        <CoursesForStudentList
-          registeredCourses={registeredCourses}
+        <RegistrationsForStudentList
           registrations={registrations}
-          student_id={student.id}
-          getInstructorName={getInstructorName}
-          unregisterAction={async (regId: string) => {
-            await unregisterStudentByregistration_id(regId, student.id);
+          unregisterAction={async (reg: Registration) => {
+            console.log("Unregistering student from course", reg);
+            await unregisterStudent(reg);
             reloadData();
           }}
-        />
+        /> 
       </div>
     </PageFrame>
   );

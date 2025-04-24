@@ -25,36 +25,36 @@ export async function getCoursesForInstructor(instructor_id: string): Promise<{
 export async function getCoursesPageData(): Promise<{
   courses: Course[];
   instructors: Instructor[];
+  registrations: Registration[];
 }> {
-  const [courses, instructors] = await Promise.all([
+  const [courses, instructors, registrations] = await Promise.all([
     fetchListData<Course>("courses", "/"),
     fetchListData<Instructor>("instructors", "/"),
+    fetchListData<Registration>("registrations", "/"),
   ]);
 
-  return { courses, instructors };
+  return { courses, instructors , registrations };
 }
 
 export async function getCoursePageData(id: string): Promise<{
   course: Course | null;
   instructor: Instructor | null;
   registrations: Registration[];
-  students: Student[];
   unregisteredStudents: Student[];
 }> {
-  const [course, allStudents, registrations] = await Promise.all([
+  const [course, registrations, unregisteredStudents] = await Promise.all([
     fetchPageData<Course>("courses", `/${id}/`),
-    fetchListData<Student>("students", "/"),
-    fetchListData<Registration>("registrations", "/", { course: id })
+    fetchListData<Registration>("registrations", "/", { course_id: id }),
+    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true})
   ]);
 
-  const students = allStudents.filter(s => registrations.some(r => r.student_id === s.id));
-  const unregisteredStudents = allStudents.filter(s => !registrations.some(r => r.student_id === s.id));
-
-  const instructor = course?.instructor_id
+    const instructor = course?.instructor_id
     ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
     : null;
 
-  return { course, instructor, registrations, students, unregisteredStudents };
+  const output = { course, instructor, registrations, unregisteredStudents };
+  console.log("getCoursePageData output", output);
+  return output;
 }
 
 export async function createCourse(data: Omit<Course, "id">): Promise<Course> {

@@ -2,7 +2,7 @@ from .models import Instructor, Course, Student, Registration
 from .serializers import InstructorSerializer, CourseSerializer, StudentSerializer, RegistrationSerializer, CourseListSerializer
 from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.utils.timezone import now
 
@@ -71,14 +71,76 @@ class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
     pagination_class = StandardResultsSetPagination
 
-    # def get_queryset(self):
-    #     TODO - Filter students who are in an active by the instructor
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        course_id = self.request.query_params.get("course_id")
+        eligible = self.request.query_params.get("eligible_for_course")
+
+        if course_id:
+            registered_ids = Registration.objects.filter(
+                registration_status="registered",
+                course_id=course_id
+            ).values_list("student_id", flat=True)
+            if eligible == "true":
+                queryset = queryset.exclude(id__in=registered_ids)
+            else:
+                queryset = queryset.filter(id__in=registered_ids)
+
+        return queryset
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):
     queryset = Registration.objects.all().order_by("-created_at")
     serializer_class = RegistrationSerializer
     pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        student_id = self.request.query_params.get("student_id")
+        course_id = self.request.query_params.get("course_id")
+        if student_id:
+            queryset = queryset.filter(student_id=student_id)
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
+        return queryset
+
+    @action(detail=False, methods=["post"], url_path="unregister")
+    def unregister_student_from_course(self, request):
+        student_id = request.data.get("student_id")
+        course_id = request.data.get("course_id")
+        print("Post data:", request.data)
+
+        if not student_id or not course_id:
+            return Response({"error": "student_id and course_id are required"}, status=400)
+
+        try:
+            registration = Registration.objects.get(student_id=student_id, course_id=course_id)
+            registration.registration_status = "cancelled"
+            registration.save()
+            return Response({"message": "Student unregistered successfully."})
+        except Registration.DoesNotExist:
+            return Response({"error": "Registration not found."}, status=404)
+
+
+    @action(detail=False, methods=["post"], url_path="register")
+    def register_student_for_course(self, request):
+        student_id = request.data.get("student_id")
+        course_id = request.data.get("course_id")
+        print("Post data:", request.data)
+
+        if not student_id or not course_id:
+            return Response({"error": "student_id and course_id are required"}, status=400)
+
+        try:
+            _ = Registration.objects.create(
+                student_id=student_id,
+                course_id=course_id,
+                registration_status="registered",
+                payment_status="pending"
+            )
+            return Response({"message": "Student registered successfully."})
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
 @api_view(["GET"])
 def dashboard_summary(request):
