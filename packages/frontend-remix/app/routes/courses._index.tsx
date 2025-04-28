@@ -7,6 +7,7 @@ import { CourseForm } from "~/components/forms/CourseForm";
 import { CoursesList } from "~/components/lists/CoursesList";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
+import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { Spinner } from "~/components/ui/Spinner";
@@ -129,7 +130,23 @@ export default function CoursesPage() {
                 </AddButton>
             )}
 
-            {showForm && (
+            <Modal
+                isOpen={showForm}
+                onClose={() => {
+                    setFormData({
+                        title: "",
+                        description: "",
+                        description_full: "",
+                        instructor_id: "",
+                        start_date: "",
+                        end_date: "",
+                        syllabus_url: "",
+                        course_fee: "",
+                    });
+                    setEditingCourse(null);
+                    setShowForm(false);
+                }}
+            >
                 <CourseForm
                     formData={formData}
                     setFormData={setFormData}
@@ -151,7 +168,7 @@ export default function CoursesPage() {
                         setShowForm(false);
                     }}
                 />
-            )}
+            </Modal>
 
             <DataLoaderState loading={loading} error={error} />
 

@@ -27,22 +27,8 @@ export function CourseForm({
   if (!instructors || instructors.length === 0) {
     return <div className="text-red-500">No instructors available</div>;
   }
-  
   return (
-    <div className="mb-6 p-6 bg-gray-50 shadow-md rounded-md">
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-semibold">
-          {editingCourse ? `Edit ${formData.title}` : "Create New Course"}
-        </h3>
-        <button
-          onClick={onCancel}
-          className="text-gray-500 hover:text-gray-700 text-3xl"
-          aria-label="Cancel"
-        >
-          &times;
-        </button>
-      </div>
-      <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col">
           <span className="flex items-center gap-1">
             Title <span className="text-red-500">*</span>
@@ -146,7 +132,6 @@ export function CourseForm({
         <button type="submit" className="btn-primary py-2 px-4 rounded">
           {editingCourse ? "Update" : "Save"}
         </button>
-      </form>
-    </div>
+    </form>
   );
 }

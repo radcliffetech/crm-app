@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
+import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import PageSubheader from "~/components/ui/PageSubheader";
@@ -52,31 +53,6 @@ export default function StudentDetailPage() {
 
   if (!student) return <div className="p-8"><DataLoaderState loading={loading} error={error} /></div>;
 
-  if (editing) {
-    return (
-      <div className="p-8">
-        <StudentForm
-          formData={formData} 
-          setFormData={setFormData}
-          onSubmit={async (e) => {
-            e.preventDefault();
-            try {
-              await updateStudent(student.id, formData);
-              toast.success("Student updated successfully!");
-              reloadData();
-              setEditing(false);
-            } catch (err) {
-              console.error(err);
-              toast.error("Failed to update student.");
-            }
-          }}
-          editingstudent_id={student.id}
-          onCancel={() => setEditing(false)}
-        />
-      </div>
-    );
-  }
-
   function reloadData() {
     if (id) {
       setLoading(true);
@@ -120,6 +96,28 @@ export default function StudentDetailPage() {
       <p className="mb-2"><strong>Email:</strong> {student.email}</p>
       <p className="mb-2"><strong>Notes:</strong> {student.notes || "—"}</p>
 
+      {editing && (
+        <Modal isOpen={editing} onClose={() => setEditing(false)}>
+          <StudentForm
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                await updateStudent(student.id, formData);
+                toast.success("Student updated successfully!");
+                reloadData();
+                setEditing(false);
+              } catch (err) {
+                console.error(err);
+                toast.error("Failed to update student.");
+              }
+            }}
+            editingstudent_id={student.id}
+            onCancel={() => setEditing(false)}
+          />
+        </Modal>
+      )}
 
       <PageSubheader>Registration</PageSubheader>
       <RegisterStudentForCourseForm

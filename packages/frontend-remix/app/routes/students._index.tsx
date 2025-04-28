@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
+import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import type { Student } from "~/types";
@@ -96,7 +97,14 @@ export default function StudentsPage() {
         </AddButton>
       )}
 
-      {showForm && (
+      <Modal
+        isOpen={showForm}
+        onClose={() => {
+          setFormData(initialFormData);
+          setEditingstudent_id(null);
+          setShowForm(false);
+        }}
+      >
         <StudentForm
           formData={formData}
           setFormData={setFormData}
@@ -116,8 +124,8 @@ export default function StudentsPage() {
               toast.error("Failed to create student.");
             } finally {
               setSaving(false);
+              setShowForm(false);
             }
-            setShowForm(false);
           }}
           editingstudent_id={editingstudent_id}
           onCancel={() => {
@@ -126,7 +134,7 @@ export default function StudentsPage() {
             setShowForm(false);
           }}
         />
-      )}
+      </Modal>
 
       <DataLoaderState loading={loading} error={error} />
 
