@@ -19,12 +19,14 @@ export function CoursesList({
   onDelete,
   canEdit,
   canDelete,
+  deletingId,
 }: {
   courses: Course[];
   onEdit: (course: Course) => void;
   onDelete: (id: string) => void;
   canEdit: boolean;
   canDelete: boolean;
+  deletingId: string | null;
 }) {
   const columns = useMemo<ColumnDef<Course, unknown>[]>(() => [
     columnHelper.display({
@@ -60,15 +62,21 @@ export function CoursesList({
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
       cell: info => (
-        <DropdownActions
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onEdit={() => onEdit(info.row.original)}
-          onDelete={() => onDelete(info.row.original.id)}
-        />
+        deletingId === info.row.original.id ? (
+          <div className="flex justify-center p-2">
+            <div className="h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <DropdownActions
+            canEdit={canEdit}
+            canDelete={canDelete}
+            onEdit={() => onEdit(info.row.original)}
+            onDelete={() => onDelete(info.row.original.id)}
+          />
+        )
       ),
     }),
-  ], [onEdit, onDelete, canEdit, canDelete]);
+  ], [onEdit, onDelete, canEdit, canDelete, deletingId]);
 
   const table = useReactTable({
     data: courses,

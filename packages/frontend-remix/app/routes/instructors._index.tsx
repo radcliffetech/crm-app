@@ -1,11 +1,10 @@
-import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createInstructor,
   deleteInstructor,
   getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -28,6 +27,7 @@ export const meta: MetaFunction = () => {
 
 
 export default function InstructorsPage() {
+  const user  = useAuth();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
@@ -39,6 +39,7 @@ export default function InstructorsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   function reloadData() {
     setLoading(true);
@@ -108,6 +109,7 @@ export default function InstructorsPage() {
       <DataLoaderState loading={loading} error={error} />
       <InstructorsList
         instructors={instructors}
+        deletingId={deletingId}
         onEdit={(instructor) => {
           setEditingInstructor(instructor);
           setFormData({
@@ -122,14 +124,19 @@ export default function InstructorsPage() {
           const instructor = instructors.find(i => i.id === id);
           if (instructor && window.confirm(`Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`)) {
             try {
+              setDeletingId(id);
               await deleteInstructor(id);
               reloadData();
             } catch (err) {
               console.error(err);
               setError("Failed to delete instructor " + err);
+            } finally {
+              setDeletingId(null);
             }
           }
         }}
+        canEdit={canAccessAdmin(user)}
+        canDelete={canAccessAdmin(user)}
       />
     </PageFrame>
   );

@@ -43,6 +43,8 @@ export default function StudentsPage() {
   const [editingstudent_id, setEditingstudent_id] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   function reloadData() {
     setLoading(true);
@@ -97,17 +99,20 @@ export default function StudentsPage() {
           setFormData={setFormData}
           onSubmit={async (e) => {
             e.preventDefault();
-            if (editingstudent_id) {
-              await handleUpdateStudent(editingstudent_id);
-            } else {
-              try {
+            setSaving(true);
+            try {
+              if (editingstudent_id) {
+                await handleUpdateStudent(editingstudent_id);
+              } else {
                 const newStudent = await createStudent(formData);
                 setStudents((prev) => [...prev, newStudent]);
                 toast.success("Student created successfully!");
-              } catch (err) {
-                console.error(err);
-                toast.error("Failed to create student.");
               }
+            } catch (err) {
+              console.error(err);
+              toast.error("Failed to create student.");
+            } finally {
+              setSaving(false);
             }
             setShowForm(false);
           }}
@@ -120,6 +125,7 @@ export default function StudentsPage() {
 
       <StudentsList
         students={students}
+        deletingId={deletingId}
         onEdit={(student) => {
           setEditingstudent_id(student.id);
           setFormData({
@@ -134,17 +140,22 @@ export default function StudentsPage() {
         }}
         onDelete={async (student) => {
           if (window.confirm(`Are you sure you want to delete ${student.name_first} ${student.name_last}?`)) {
+            setDeletingId(student.id);
             try {
-            await deleteStudent(student.id);
-            reloadData();
-            toast.success("Student deleted successfully!");
+              await deleteStudent(student.id);
+              reloadData();
+              toast.success("Student deleted successfully!");
             } catch (err) {
               console.error(err);
               setError("Failed to delete student " + err);
               toast.error("Failed to delete student.");
+            } finally {
+              setDeletingId(null);
             }
           }
         }}
+        canDelete={canAccessAdmin(useAuth())}
+        canEdit={canAccessAdmin(useAuth())}
       />
     </PageFrame>
   );
