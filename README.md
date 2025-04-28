@@ -1,4 +1,4 @@
-![Build Status](https://img.shields.io/github/actions/workflow/status/radcliffetech/crm-app/backend-ci.yml?branch=main)
+![Build Status](https://img.shields.io/github/actions/workflow/status/radcliffetech/crm-app/ci.yml?branch=main)
 ![License](https://img.shields.io/github/license/radcliffetech/crm-app)
 ![Tech Stack](https://img.shields.io/badge/stack-Remix%20%7C%20Django%20%7C%20PostgreSQL-blue)
 
