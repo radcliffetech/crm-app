@@ -1,3 +1,9 @@
+![Build Status](https://img.shields.io/github/actions/workflow/status/radcliffetech/crm-app/backend-ci.yml?branch=main)
+![License](https://img.shields.io/github/license/radcliffetech/crm-app)
+![Tech Stack](https://img.shields.io/badge/stack-Remix%20%7C%20Django%20%7C%20PostgreSQL-blue)
+
+<br/>
+
 # CRM Project - Massachusetts Institute for Integrated Metaphysics
 
 An example of a lightweight CRM (Customer Relationship Management) platform built with:
@@ -113,11 +119,12 @@ crm-app/
 
 ---
 
-## To-Do List 
+## 🛣️ Roadmap
 
-- Add multiple user types (Admin, Faculty, Students)
-- Simple Payments System
-- CRM Messaging
-- Course Materials -> Course Catalog
-- Add screenshots of the running app to this README
-- Add GitHub Topics/Tags: django, remix, crm, typescript, portfolio
+Planned future enhancements for the CRM:
+
+- [ ] Support multiple user roles: Admin, Faculty, and Students
+- [ ] Implement a simple payment processing system
+- [ ] Add a messaging system for CRM users
+- [ ] Build a dynamic course catalog with materials
+- [ ] Enhance README with additional live screenshots

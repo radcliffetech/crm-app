@@ -12,6 +12,7 @@ import type { Instructor } from "~/types";
 import { InstructorForm } from "~/components/forms/InstructorForm";
 import { InstructorsList } from "~/components/lists/InstructorsList";
 import type { MetaFunction } from "@remix-run/node";
+import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
@@ -99,7 +100,14 @@ export default function InstructorsPage() {
         </AddButton>
       )}
 
-      {showForm && (
+      <Modal
+        isOpen={showForm}
+        onClose={() => {
+          setFormData({ name_first: "", name_last: "", email: "", bio: "" });
+          setEditingInstructor(null);
+          setShowForm(false);
+        }}
+      >
         <InstructorForm
           formData={formData}
           setFormData={setFormData}
@@ -111,7 +119,7 @@ export default function InstructorsPage() {
           }}
           editingInstructor={editingInstructor}
         />
-      )}
+      </Modal>
       <DataLoaderState loading={loading} error={error} />
       <InstructorsList
         instructors={instructors}
