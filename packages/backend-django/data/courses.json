@@ -1,6 +1,7 @@
 [
   {
     "id": "132ba3d0-3279-4adf-ad2a-0186b6a44b4a",
+    "course_code": "MYST-101",
     "title": "Advanced Unicorn Grooming",
     "description": "Master the art of caring for mythical beasts.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering advanced unicorn grooming.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of advanced unicorn grooming.",
@@ -13,6 +14,7 @@
   },
   {
     "id": "56f7ecb3-64d7-479f-901c-2c70df255272",
+    "course_code": "YODE-101",
     "title": "Meditative Yodeling",
     "description": "Harness your inner harmony through alpine tones.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering meditative yodeling.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of meditative yodeling.",
@@ -25,6 +27,7 @@
   },
   {
     "id": "f8026d00-fb9c-48a0-8ef9-d4b3d340c404",
+    "course_code": "CLOUD-101",
     "title": "Cloud Shaping Fundamentals",
     "description": "Learn how to form shapes in clouds using guided intention.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering cloud shaping fundamentals.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of cloud shaping fundamentals.",
@@ -37,6 +40,7 @@
   },
   {
     "id": "51a1f42d-1399-4134-ace8-6941a0cb3a2f",
+    "course_code": "POTION-101",
     "title": "Potion Brewing for Beginners",
     "description": "Mix mystical ingredients for mundane problems.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering potion brewing for beginners.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of potion brewing for beginners.",
@@ -49,6 +53,7 @@
   },
   {
     "id": "96d89673-fcf2-4bd8-ae3d-968bf897d6e3",
+    "course_code": "WIND-101",
     "title": "Whistle Wind Cartography",
     "description": "Chart the skies by listening to the breeze.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering whistle wind cartography.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of whistle wind cartography.",
@@ -61,6 +66,7 @@
   },
   {
     "id": "a05bb6b4-364e-4b4c-bf1f-4527d62720cc",
+    "course_code": "BASKET-201",
     "title": "Underwater Basket Reading",
     "description": "Interpret messages woven beneath the sea.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering underwater basket reading.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of underwater basket reading.",
@@ -73,6 +79,7 @@
   },
   {
     "id": "87e32e9f-45e7-412f-bf88-00cfa2e6b6c3",
+    "course_code": "LUNAR-201",
     "title": "Lunar Logic Lab",
     "description": "Use the phases of the moon to guide critical thinking.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering lunar logic lab.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of lunar logic lab.",
@@ -85,6 +92,7 @@
   },
   {
     "id": "bbaaf1cf-1c00-4e32-bb4e-70f292cc1b3d",
+    "course_code": "FIREFLY-101",
     "title": "Firefly Communication 101",
     "description": "Master morse-code blinking with bioluminescence.",
     "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering firefly communication 101.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of firefly communication 101.",

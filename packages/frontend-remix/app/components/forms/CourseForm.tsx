@@ -17,6 +17,7 @@ export function CourseForm({
     end_date: string;
     syllabus_url: string;
     course_fee: string;
+    course_code: string;
   };
   setFormData: React.Dispatch<React.SetStateAction<typeof formData>>;
   editingCourse: Course | null;
@@ -29,6 +30,23 @@ export function CourseForm({
   }
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label className="flex flex-col">
+          <span className="flex items-center gap-1">
+            Course Code <span className="text-red-500">*</span>
+          </span>
+          <input
+            type="text"
+            value={formData.course_code}
+            onChange={(e) => {
+              const raw = e.target.value.toUpperCase();
+              const cleaned = raw.replace(/[^A-Z0-9-]/g, "");
+              setFormData({ ...formData, course_code: cleaned });
+            }}
+            className="border p-2"
+            required
+            disabled={!!editingCourse}
+          />
+        </label>
         <label className="flex flex-col">
           <span className="flex items-center gap-1">
             Title <span className="text-red-500">*</span>
@@ -129,7 +147,7 @@ export function CourseForm({
             required
           />
         </label>
-        <button type="submit" className="btn-primary py-2 px-4 rounded">
+        <button type="submit" className="btn-primary py-2 px-4 rounded w-full">
           {editingCourse ? "Update" : "Save"}
         </button>
     </form>

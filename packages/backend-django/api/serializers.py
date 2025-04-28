@@ -6,18 +6,31 @@ class InstructorSerializer(serializers.ModelSerializer):
         model = Instructor
         fields = '__all__'
 
+from rest_framework import serializers
+from .models import Course, Instructor
+
 class CourseSerializer(serializers.ModelSerializer):
-    instructor_id = serializers.UUIDField(source="instructor.id", read_only=True)
+    instructor_id = serializers.UUIDField(write_only=True)
 
     class Meta:
         model = Course
         fields = [
-            "id", "title", "description", "description_full",
-            "instructor_id",
-            "start_date", "end_date", "syllabus_url", "course_fee",
-            "created_at", "updated_at"
+            "id", "course_code", "title", "description", "description_full",
+            "instructor", "instructor_id", "start_date", "end_date", "course_fee",
+            "syllabus_url", "prerequisites", "created_at", "updated_at", "is_active"
         ]
+        read_only_fields = ["id", "instructor", "created_at", "updated_at", "is_active"]
 
+    def create(self, validated_data):
+        instructor_id = validated_data.pop("instructor_id")
+        instructor = Instructor.objects.get(id=instructor_id)
+        course = Course.objects.create(instructor=instructor, **validated_data)
+        return course
+
+    def update(self, instance, validated_data):
+        validated_data.pop("instructor_id", None)  # Don't allow instructor_id to change during update
+        return super().update(instance, validated_data)
+    
 class CourseListSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField(read_only=True)
     enrollment_count = serializers.SerializerMethodField(read_only=True)
@@ -30,7 +43,7 @@ class CourseListSerializer(serializers.ModelSerializer):
             "instructor_id",
             "start_date", "end_date", "syllabus_url", "course_fee",
             "created_at", "updated_at",
-            "instructor_name", "enrollment_count"
+            "instructor_name", "enrollment_count", "course_code"
         ]
 
     def get_instructor_name(self, obj):

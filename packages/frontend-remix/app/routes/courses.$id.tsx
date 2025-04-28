@@ -68,7 +68,14 @@ export default function CourseDetailPage() {
 
   return (
     <PageFrame>
-      <PageHeader>{course?.title}</PageHeader>
+      <PageHeader>
+        {course?.title}
+        {course?.course_code && (
+          <span className="block text-base text-gray-500 mt-1">
+            {course.course_code}
+          </span>
+        )}
+      </PageHeader>
       {course && (
         <p className="mb-4 text-sm text-gray-500">
           {new Date(course.start_date).toLocaleDateString()} – {new Date(course.end_date).toLocaleDateString()}

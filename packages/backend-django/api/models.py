@@ -49,7 +49,7 @@ class Instructor(models.Model):
 
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
+    course_code = models.CharField(max_length=20, unique=True)
     title = models.CharField(max_length=200)
     description = models.TextField()
     description_full = models.TextField()
@@ -57,11 +57,18 @@ class Course(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     course_fee = models.DecimalField(max_digits=8, decimal_places=2)
-    prerequisites = models.JSONField(blank=True, null=True)
     syllabus_url = models.URLField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    prerequisites = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        blank=True,
+        related_name='required_for',
+        help_text='Courses that must be completed before enrolling in this course.'
+    )
+
 
     def __str__(self):
         return self.title
@@ -112,3 +119,6 @@ class Registration(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.course} ({self.payment_status})"
+    
+
+    

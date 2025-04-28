@@ -6,6 +6,7 @@ type CourseAdditionalFields = {
 
 export type Course = {
     id: string;
+    course_code: string;
     title: string;
     description: string;
     description_full: string;

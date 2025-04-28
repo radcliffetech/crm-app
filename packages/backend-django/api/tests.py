@@ -1,6 +1,8 @@
 
 
 from django.test import TestCase
+from api.serializers import CourseSerializer
+from api.models import Instructor
 
 class CRMTests(TestCase):
     def test_instructors_endpoint(self):
@@ -57,3 +59,35 @@ class CRMTests(TestCase):
         self.assertIn("instructors", response.json())
         self.assertIn("courses", response.json())
         self.assertIn("students", response.json())
+
+
+
+
+class CourseSerializerTests(TestCase):
+    def setUp(self):
+        self.instructor = Instructor.objects.create(
+            name_first="Test",
+            name_last="Instructor",
+            email="test.instructor@example.com"
+        )
+
+    def test_create_course_with_serializer(self):
+        """Test that a course can be created using the CourseSerializer with instructor_id."""
+        data = {
+            "course_code": "TEST-101",
+            "title": "Test Course",
+            "description": "Short description",
+            "description_full": "Full detailed description",
+            "instructor_id": str(self.instructor.id),
+            "start_date": "2025-05-01",
+            "end_date": "2025-05-15",
+            "course_fee": "1000.00",
+            "syllabus_url": "",
+        }
+        serializer = CourseSerializer(data=data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        course = serializer.save()
+
+        self.assertEqual(course.course_code, "TEST-101")
+        self.assertEqual(course.instructor, self.instructor)
+        self.assertEqual(course.title, "Test Course")

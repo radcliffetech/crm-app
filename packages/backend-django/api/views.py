@@ -67,6 +67,18 @@ class CourseViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(instructor_id=instructor_id)
         return queryset
 
+    def perform_create(self, serializer):
+        prerequisites_data = self.request.data.get("prerequisites", [])
+        course = serializer.save()
+        if prerequisites_data:
+            course.prerequisites.set(prerequisites_data)
+
+    def perform_update(self, serializer):
+        prerequisites_data = self.request.data.get("prerequisites", [])
+        course = serializer.save()
+        if prerequisites_data:
+            course.prerequisites.set(prerequisites_data)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         # Check for existing registrations (active or otherwise)
@@ -80,28 +92,10 @@ class CourseViewSet(viewsets.ModelViewSet):
         instance.save()
         return Response(status=204)
 
-def create(self, validated_data):
-    instructor_id = validated_data.pop("instructor_id")
-    instructor = Instructor.objects.get(id=instructor_id)
-    return Course.objects.create(instructor=instructor, **validated_data)
-
-def update(self, instance, validated_data):
-    print("Incoming course data:", self.request.data)
-    instructor_id = validated_data.pop("instructor_id", None)
-    if instructor_id:
-        instance.instructor = Instructor.objects.get(id=instructor_id)
-
-    # Check to see if the instrcutor has changed...
-    if instance.instructor != instructor_id:
-        print("Instructor has changed")
-        # Perform any additional logic here if needed
-    # Check to see if the course fee has changed...
-    if instance.course_fee != validated_data.get("course_fee", instance.course_fee):
-        print("Course fee has changed")
-        # Perform any additional logic here if needed
-
-    return super().update(instance, validated_data)    
-
+    def create(self, request, *args, **kwargs):
+        print("Incoming data:", request.data)
+        return super().create(request, *args, **kwargs)
+    
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by("-created_at")
     serializer_class = StudentSerializer
@@ -345,4 +339,3 @@ def search_all(request):
         "courses": CourseSerializer(courses.distinct(), many=True).data,
         "registrations": RegistrationSerializer(registrations.distinct(), many=True).data,
     })
-
