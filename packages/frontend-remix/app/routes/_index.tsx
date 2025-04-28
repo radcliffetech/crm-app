@@ -39,7 +39,7 @@ export default function Index() {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to load dashboard data.");
+        setError("Failed to load dashboard data " + err);
       })
       .finally(() => setLoading(false));
   }

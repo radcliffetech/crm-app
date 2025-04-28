@@ -2,13 +2,44 @@ import uuid
 from django.db import models
 
 
+class Department(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Address(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.street}, {self.city}, {self.state} {self.postal_code}, {self.country}"
+
+
 class Instructor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    department = models.ForeignKey("Department", on_delete=models.SET_NULL, null=True, blank=True, related_name="instructors")
+    address = models.ForeignKey("Address", on_delete=models.SET_NULL, null=True, blank=True, related_name="instructors")
 
     name_first = models.CharField(max_length=100)
     name_last = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     bio = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -28,6 +59,7 @@ class Course(models.Model):
     course_fee = models.DecimalField(max_digits=8, decimal_places=2)
     prerequisites = models.JSONField(blank=True, null=True)
     syllabus_url = models.URLField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -43,6 +75,8 @@ class Student(models.Model):
     phone = models.CharField(max_length=20, blank=True, null=True)
     company = models.CharField(max_length=200, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    address = models.ForeignKey("Address", on_delete=models.SET_NULL, null=True, blank=True, related_name="students")
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,6 +101,7 @@ class Registration(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey("Student", on_delete=models.CASCADE, related_name="registrations")
     course = models.ForeignKey("Course", on_delete=models.CASCADE, related_name="registrations")
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -77,4 +112,3 @@ class Registration(models.Model):
 
     def __str__(self):
         return f"{self.student} → {self.course} ({self.payment_status})"
-    

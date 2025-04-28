@@ -23,6 +23,21 @@ export const mockUser: User = {
   name: "Admin User",
 };
 
+
+// export const mockUser: User = {
+//   id: "123",
+//   email: "student@miim.edu",
+//   role: "student", // try switching to "faculty" or "student"
+//   name: "Student User",
+// };
+
+// export const mockUser: User = {
+//   id: "123",
+//   email: "facutly@miim.edu",
+//   role: "faculty", // try switching to "faculty" or "student"
+//   name: "Faculty User",
+// };
+
 export const AuthContext = createContext(mockUser);
 export const useAuth = () => useContext(AuthContext);
 

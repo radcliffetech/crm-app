@@ -36,7 +36,7 @@ export function CoursesForInstructorList({ courses }: { courses: Course[] }) {
     columnHelper.display({
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
-      cell: () => <div className="text-right">—</div>,
+      cell: () => <div className="text-right"></div>,
     }),
   ], []);
 

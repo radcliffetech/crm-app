@@ -1,4 +1,4 @@
-# CRM Project - Massaschussets Institute for Integrated Metaphysics
+# CRM Project - Massachusetts Institute for Integrated Metaphysics
 
 An example of a lightweight CRM (Customer Relationship Management) platform built with:
 
@@ -15,9 +15,41 @@ MiiM is a university located mostly in the New England of the US, and usually no
 
 ### About this Repo
 
-This is a sample Customer Relationship Management (CRM) application developed as part of a software engineering portfolio. It demonstrates full-stack development skills using TypeScript, React, Remix, and Firebase.
+This is a sample Customer Relationship Management (CRM) application developed as part of a software engineering portfolio. It demonstrates full-stack development skills using TypeScript, React, and Remix.
 
 ---
+
+## 📸 Screenshots
+
+### Dashboard View
+![Dashboard Screenshot](./public/images/miim-1.png)
+
+### Student Registration
+![Student Registration Screenshot](./public/images/miim-2.png)
+
+
+---
+
+## 🛠️ Tech Stack
+
+- Backend: Django 5, Django REST Framework
+- Frontend: Remix, TypeScript, Tailwind CSS
+- Database: SQLite (for local development)
+- Hosting: Localhost (dev only)
+
+---
+
+## ✨ Features
+
+- User management (Students, Faculty, Admins)
+- Course creation and registration
+- RESTful API backend
+- Full-featured React frontend
+- Modular, scalable project structure
+
+---
+
+## 🚀 Setup Instructions
 
 ## 📦 Project Structure
 
@@ -87,3 +119,5 @@ crm-app/
 - Simple Payments System
 - CRM Messaging
 - Course Materials -> Course Catalog
+- Add screenshots of the running app to this README
+- Add GitHub Topics/Tags: django, remix, crm, typescript, portfolio
