@@ -10,6 +10,7 @@ import {
 import type { User, UserRole } from "./types";
 import { createContext, useContext } from "react";
 
+import { ConfirmDialogProvider } from "./lib/ConfirmDialogProvider";
 import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";
@@ -127,6 +128,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <Outlet />
+    <ConfirmDialogProvider>
+        <Outlet />
+    </ConfirmDialogProvider>
   )
 }

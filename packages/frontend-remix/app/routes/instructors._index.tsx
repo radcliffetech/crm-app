@@ -17,6 +17,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
+import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
   return [
@@ -28,6 +29,7 @@ export const meta: MetaFunction = () => {
 
 export default function InstructorsPage() {
   const user  = useAuth();
+  const confirm = useConfirmDialog();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
@@ -126,9 +128,19 @@ export default function InstructorsPage() {
         }}
         onDelete={async (id) => {
           const instructor = instructors.find(i => i.id === id);
-          if (instructor && window.confirm(`Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`)) {
+          if (instructor) {
+            setDeletingId(id);
+            const confirmed = await confirm({
+              title: "Delete Instructor",
+              description: `Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`,
+              confirmText: "Delete",
+              cancelText: "Cancel",
+            });
+            if (!confirmed) {
+              setDeletingId(null);
+              return;
+            }
             try {
-              setDeletingId(id);
               await deleteInstructor(id);
               reloadData();
               toast.success("Instructor deleted successfully!");

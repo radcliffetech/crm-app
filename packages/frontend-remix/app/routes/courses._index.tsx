@@ -13,6 +13,7 @@ import { Spinner } from "~/components/ui/Spinner";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
+import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -44,6 +45,8 @@ export default function CoursesPage() {
 
     const [saving, setSaving] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const confirm = useConfirmDialog();
 
     function reloadData() {
         setLoading(true);
@@ -147,9 +150,7 @@ export default function CoursesPage() {
                         setEditingCourse(null);
                         setShowForm(false);
                     }}
-                >
-                    {saving ? <Spinner /> : <button type="submit" className="btn-primary">Save</button>}
-                </CourseForm>
+                />
             )}
 
             <DataLoaderState loading={loading} error={error} />
@@ -173,8 +174,18 @@ export default function CoursesPage() {
                 }}
                 onDelete={async (id) => {
                     const course = courses.find(c => c.id === id);
-                    if (course && window.confirm(`Are you sure you want to delete the course "${course.title}"?`)) {
+                    if (course) {
                         setDeletingId(id);
+                        const confirmed = await confirm({
+                            title: "Delete Course",
+                            description: `Are you sure you want to delete the course "${course.title}"?`,
+                            confirmText: "Delete",
+                            cancelText: "Cancel",
+                        });
+                        if (!confirmed) {
+                            setDeletingId(null);
+                            return;
+                        }
                         try {
                             await deleteCourse(id);
                             reloadData();
@@ -185,7 +196,6 @@ export default function CoursesPage() {
                             setDeletingId(null);
                         }
                     }
-
                 }}
                 canDelete={canAccessAdmin(useAuth())}
                 canEdit={canAccessAdmin(useAuth())}

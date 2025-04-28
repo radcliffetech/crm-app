@@ -63,7 +63,7 @@ export function InstructorForm({
           onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
           className="border p-2 md:col-span-2"
         />
-          <button type="submit" className="btn-primary py-2 px-4 rounded">
+        <button type="submit" className="btn-primary py-2 px-4 rounded">
           {editingInstructor ? "Update" : "Save"}
         </button>
       </form>

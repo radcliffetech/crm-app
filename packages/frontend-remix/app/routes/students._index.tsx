@@ -12,6 +12,7 @@ import { StudentsList } from "~/components/lists/StudentsList";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
+import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
   return [
@@ -45,6 +46,8 @@ export default function StudentsPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const confirm = useConfirmDialog();
 
   function reloadData() {
     setLoading(true);
@@ -143,19 +146,27 @@ export default function StudentsPage() {
           setShowForm(true);
         }}
         onDelete={async (student) => {
-          if (window.confirm(`Are you sure you want to delete ${student.name_first} ${student.name_last}?`)) {
-            setDeletingId(student.id);
-            try {
-              await deleteStudent(student.id);
-              reloadData();
-              toast.success("Student deleted successfully!");
-            } catch (err) {
-              console.error(err);
-              setError("Failed to delete student " + err);
-              toast.error("Failed to delete student.");
-            } finally {
-              setDeletingId(null);
-            }
+          setDeletingId(student.id);
+          const confirmed = await confirm({
+            title: "Delete Student",
+            description: `Are you sure you want to delete ${student.name_first} ${student.name_last}?`,
+            confirmText: "Delete",
+            cancelText: "Cancel",
+          });
+          if (!confirmed) {
+            setDeletingId(null);
+            return;
+          }
+          try {
+            await deleteStudent(student.id);
+            reloadData();
+            toast.success("Student deleted successfully!");
+          } catch (err) {
+            console.error(err);
+            setError("Failed to delete student " + err);
+            toast.error("Failed to delete student.");
+          } finally {
+            setDeletingId(null);
           }
         }}
         canDelete={canAccessAdmin(useAuth())}
