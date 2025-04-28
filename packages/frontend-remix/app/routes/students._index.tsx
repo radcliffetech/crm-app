@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
+import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import type { Student } from "~/types";
@@ -12,6 +13,7 @@ import { StudentsList } from "~/components/lists/StudentsList";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
+import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
   return [
@@ -43,6 +45,10 @@ export default function StudentsPage() {
   const [editingstudent_id, setEditingstudent_id] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const confirm = useConfirmDialog();
 
   function reloadData() {
     setLoading(true);
@@ -91,35 +97,50 @@ export default function StudentsPage() {
         </AddButton>
       )}
 
-      {showForm && (
+      <Modal
+        isOpen={showForm}
+        onClose={() => {
+          setFormData(initialFormData);
+          setEditingstudent_id(null);
+          setShowForm(false);
+        }}
+      >
         <StudentForm
           formData={formData}
           setFormData={setFormData}
           onSubmit={async (e) => {
             e.preventDefault();
-            if (editingstudent_id) {
-              await handleUpdateStudent(editingstudent_id);
-            } else {
-              try {
+            setSaving(true);
+            try {
+              if (editingstudent_id) {
+                await handleUpdateStudent(editingstudent_id);
+              } else {
                 const newStudent = await createStudent(formData);
                 setStudents((prev) => [...prev, newStudent]);
                 toast.success("Student created successfully!");
-              } catch (err) {
-                console.error(err);
-                toast.error("Failed to create student.");
               }
+            } catch (err) {
+              console.error(err);
+              toast.error("Failed to create student.");
+            } finally {
+              setSaving(false);
+              setShowForm(false);
             }
-            setShowForm(false);
           }}
           editingstudent_id={editingstudent_id}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setFormData(initialFormData);
+            setEditingstudent_id(null);
+            setShowForm(false);
+          }}
         />
-      )}
+      </Modal>
 
       <DataLoaderState loading={loading} error={error} />
 
       <StudentsList
         students={students}
+        deletingId={deletingId}
         onEdit={(student) => {
           setEditingstudent_id(student.id);
           setFormData({
@@ -133,18 +154,31 @@ export default function StudentsPage() {
           setShowForm(true);
         }}
         onDelete={async (student) => {
-          if (window.confirm(`Are you sure you want to delete ${student.name_first} ${student.name_last}?`)) {
-            try {
+          setDeletingId(student.id);
+          const confirmed = await confirm({
+            title: "Delete Student",
+            description: `Are you sure you want to delete ${student.name_first} ${student.name_last}?`,
+            confirmText: "Delete",
+            cancelText: "Cancel",
+          });
+          if (!confirmed) {
+            setDeletingId(null);
+            return;
+          }
+          try {
             await deleteStudent(student.id);
             reloadData();
             toast.success("Student deleted successfully!");
-            } catch (err) {
-              console.error(err);
-              setError("Failed to delete student " + err);
-              toast.error("Failed to delete student.");
-            }
+          } catch (err) {
+            console.error(err);
+            setError("Failed to delete student " + err);
+            toast.error("Failed to delete student.");
+          } finally {
+            setDeletingId(null);
           }
         }}
+        canDelete={canAccessAdmin(useAuth())}
+        canEdit={canAccessAdmin(useAuth())}
       />
     </PageFrame>
   );

@@ -1,11 +1,10 @@
-import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createInstructor,
   deleteInstructor,
   getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -18,6 +17,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
+import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
   return [
@@ -28,6 +28,8 @@ export const meta: MetaFunction = () => {
 
 
 export default function InstructorsPage() {
+  const user  = useAuth();
+  const confirm = useConfirmDialog();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
@@ -39,6 +41,7 @@ export default function InstructorsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   function reloadData() {
     setLoading(true);
@@ -101,13 +104,18 @@ export default function InstructorsPage() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setFormData({ name_first: "", name_last: "", email: "", bio: "" });
+            setEditingInstructor(null);
+            setShowForm(false);
+          }}
           editingInstructor={editingInstructor}
         />
       )}
       <DataLoaderState loading={loading} error={error} />
       <InstructorsList
         instructors={instructors}
+        deletingId={deletingId}
         onEdit={(instructor) => {
           setEditingInstructor(instructor);
           setFormData({
@@ -120,16 +128,33 @@ export default function InstructorsPage() {
         }}
         onDelete={async (id) => {
           const instructor = instructors.find(i => i.id === id);
-          if (instructor && window.confirm(`Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`)) {
+          if (instructor) {
+            setDeletingId(id);
+            const confirmed = await confirm({
+              title: "Delete Instructor",
+              description: `Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`,
+              confirmText: "Delete",
+              cancelText: "Cancel",
+            });
+            if (!confirmed) {
+              setDeletingId(null);
+              return;
+            }
             try {
               await deleteInstructor(id);
               reloadData();
+              toast.success("Instructor deleted successfully!");
             } catch (err) {
               console.error(err);
               setError("Failed to delete instructor " + err);
+              toast.error("Failed to delete instructor.");
+            } finally {
+              setDeletingId(null);
             }
           }
         }}
+        canEdit={canAccessAdmin(user)}
+        canDelete={canAccessAdmin(user)}
       />
     </PageFrame>
   );

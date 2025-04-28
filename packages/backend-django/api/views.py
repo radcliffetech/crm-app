@@ -183,18 +183,23 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         if not student_id or not course_id:
             return Response({"error": "student_id and course_id are required"}, status=400)
 
-        try:
-            registration = Registration.objects.get(student_id=student_id, course_id=course_id)
-            registration.registration_status = "cancelled"
-            registration.save()
-
-            self.email_service.send_unregistration_email(
-                student=Student.objects.get(id=student_id),
-                course=Course.objects.get(id=course_id)
-            )
-            return Response({"message": "Student unregistered successfully."})
-        except Registration.DoesNotExist:
+        registration = Registration.objects.filter(
+            student_id=student_id,
+            course_id=course_id,
+            registration_status="registered",
+            is_active=True
+        ).first()
+        if not registration:
             return Response({"error": "Registration not found."}, status=404)
+
+        registration.registration_status = "cancelled"
+        registration.save()
+
+        self.email_service.send_unregistration_email(
+            student=Student.objects.get(id=student_id),
+            course=Course.objects.get(id=course_id)
+        )
+        return Response({"message": "Student unregistered successfully."})
 
 
     @transaction.atomic

@@ -7,11 +7,14 @@ import { CourseForm } from "~/components/forms/CourseForm";
 import { CoursesList } from "~/components/lists/CoursesList";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
+import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { Spinner } from "~/components/ui/Spinner";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
+import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -41,6 +44,11 @@ export default function CoursesPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [saving, setSaving] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const confirm = useConfirmDialog();
+
     function reloadData() {
         setLoading(true);
         setError(null);
@@ -62,6 +70,7 @@ export default function CoursesPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setSaving(true);
         try {
             if (editingCourse) {
                 await updateCourse(editingCourse.id, {
@@ -95,6 +104,7 @@ export default function CoursesPage() {
             course_fee: "",
         });
         setShowForm(false);
+        setSaving(false);
     };
 
     return (
@@ -120,21 +130,51 @@ export default function CoursesPage() {
                 </AddButton>
             )}
 
-            {showForm && (
+            <Modal
+                isOpen={showForm}
+                onClose={() => {
+                    setFormData({
+                        title: "",
+                        description: "",
+                        description_full: "",
+                        instructor_id: "",
+                        start_date: "",
+                        end_date: "",
+                        syllabus_url: "",
+                        course_fee: "",
+                    });
+                    setEditingCourse(null);
+                    setShowForm(false);
+                }}
+            >
                 <CourseForm
                     formData={formData}
                     setFormData={setFormData}
                     editingCourse={editingCourse}
                     instructors={instructors}
                     onSubmit={handleSubmit}
-                    onCancel={() => setShowForm(false)}
+                    onCancel={() => {
+                        setFormData({
+                            title: "",
+                            description: "",
+                            description_full: "",
+                            instructor_id: "",
+                            start_date: "",
+                            end_date: "",
+                            syllabus_url: "",
+                            course_fee: "",
+                        });
+                        setEditingCourse(null);
+                        setShowForm(false);
+                    }}
                 />
-            )}
+            </Modal>
 
             <DataLoaderState loading={loading} error={error} />
 
             <CoursesList
                 courses={courses}
+                deletingId={deletingId}
                 onEdit={(course) => {
                     setEditingCourse(course);
                     setFormData({
@@ -151,16 +191,31 @@ export default function CoursesPage() {
                 }}
                 onDelete={async (id) => {
                     const course = courses.find(c => c.id === id);
-                    if (course && window.confirm(`Are you sure you want to delete the course "${course.title}"?`)) {
+                    if (course) {
+                        setDeletingId(id);
+                        const confirmed = await confirm({
+                            title: "Delete Course",
+                            description: `Are you sure you want to delete the course "${course.title}"?`,
+                            confirmText: "Delete",
+                            cancelText: "Cancel",
+                        });
+                        if (!confirmed) {
+                            setDeletingId(null);
+                            return;
+                        }
                         try {
                             await deleteCourse(id);
                             reloadData();
                         } catch (error: any) {
                             console.error(error);
                             setError(error.message || "Cannot delete course: it has active student registrations.");
+                        } finally {
+                            setDeletingId(null);
                         }
                     }
                 }}
+                canDelete={canAccessAdmin(useAuth())}
+                canEdit={canAccessAdmin(useAuth())}
             />
         </PageFrame>
     );
