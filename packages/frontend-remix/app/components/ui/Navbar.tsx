@@ -26,12 +26,6 @@ export function Navbar({
 
     document.addEventListener("mousedown", handleClickOutside);
 
-    const params = new URLSearchParams(location.search);
-    const q = params.get("q");
-    if (q) {
-      setSearchQuery(q);
-    }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };

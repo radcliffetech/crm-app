@@ -1,14 +1,27 @@
-import type { Course, Instructor, Registration, Student } from "~/types";
+import type { Course, Instructor, Student } from "~/types";
 
 import { fetchPageData } from "~/lib/api/fetch";
 
 export async function searchLoader(query: string) {
-  const response = await fetchPageData("org", `/search?q=${query}`);
+  const response = await fetchPageData<any>("org", `/search?q=${query}`);
 
-  return {
-    students: response.students as Student[],
-    instructors: response.instructors as Instructor[],
-    courses: response.courses as Course[],
-    registrations: response.registrations as Registration[],
-  };
+  const results = [
+    ...response.students.map((student: Student) => ({
+      type: "Student",
+      label: `${student.name_first} ${student.name_last}`,
+      link: `/students/${student.id}`,
+    })),
+    ...response.instructors.map((instructor: Instructor) => ({
+      type: "Instructor",
+      label: `${instructor.name_first} ${instructor.name_last}`,
+      link: `/instructors/${instructor.id}`,
+    })),
+    ...response.courses.map((course: Course) => ({
+      type: "Course",
+      label: course.title,
+      link: `/courses/${course.id}`,
+    })),
+  ];
+
+  return results;
 }

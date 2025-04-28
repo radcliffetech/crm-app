@@ -237,16 +237,10 @@ def search_all(request):
         description__icontains=query
     )
 
-    registrations = Registration.objects.filter(
-        is_active=True,
-        registration_status__icontains=query
-    )
-
     return Response({
         "students": StudentSerializer(students.distinct(), many=True).data,
         "instructors": InstructorSerializer(instructors.distinct(), many=True).data,
         "courses": CourseSerializer(courses.distinct(), many=True).data,
-        "registrations": RegistrationSerializer(registrations.distinct(), many=True).data,
     })
 
 @api_view(["GET"])
