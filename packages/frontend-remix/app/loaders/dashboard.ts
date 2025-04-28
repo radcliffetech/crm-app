@@ -8,15 +8,19 @@ export async function getDashboardData(): Promise<{
   instructorCount: number;
   courses: Course[];
 }> {
-  const [summary, courses] = await Promise.all([
-    fetchPageData("org", "/dashboard-summary/"),
-    fetchListData<Course>("courses", "/", { active_courses: "true" }),
-  ]);
+  try {
+    const [summary, courses] = await Promise.all([
+      fetchPageData("org", "/dashboard-summary/"),
+      fetchListData<Course>("courses", "/", { active_courses: "true" }),
+    ]);
 
-  return {
-    studentCount: summary.studentCount,
-    courseCount: summary.courseCount,
-    instructorCount: summary.instructorCount,
-    courses,
-  };
+    return {
+      studentCount: summary.studentCount,
+      courseCount: summary.courseCount,
+      instructorCount: summary.instructorCount,
+      courses,
+    };
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to fetch dashboard data.");
+  }
 }

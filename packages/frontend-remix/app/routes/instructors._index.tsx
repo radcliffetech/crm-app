@@ -1,11 +1,10 @@
-import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createInstructor,
   deleteInstructor,
   getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -15,6 +14,8 @@ import { InstructorsList } from "~/components/lists/InstructorsList";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { canAccessAdmin } from "~/lib/permissions";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -25,6 +26,7 @@ export const meta: MetaFunction = () => {
 
 
 export default function InstructorsPage() {
+  const user = useAuth();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
@@ -46,7 +48,7 @@ export default function InstructorsPage() {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to load instructors.");
+        setError("Failed to load instructors " + err);
       })
       .finally(() => setLoading(false));
   }
@@ -56,27 +58,30 @@ export default function InstructorsPage() {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingInstructor) {
-      await updateInstructor(editingInstructor.id, {
-        ...formData,
-        created_at: editingInstructor.created_at,
-        updated_at: new Date().toISOString(),
-      });
-      setEditingInstructor(null);
-    } else {
-      const now = new Date().toISOString();
-      await createInstructor({ ...formData, created_at: now, updated_at: now });
+    try {
+      e.preventDefault();
+      if (editingInstructor) {
+        await updateInstructor(editingInstructor.id, {
+          ...formData,
+        });
+        setEditingInstructor(null);
+      } else {
+        const now = new Date().toISOString();
+        await createInstructor({ ...formData, created_at: now, updated_at: now });
+      }
+      reloadData();
+      setFormData({ name_first: "", name_last: "", email: "", bio: "" });
+      setShowForm(false);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save instructor " + err);
     }
-    reloadData();
-    setFormData({ name_first: "", name_last: "", email: "", bio: "" });
-    setShowForm(false);
   };
 
   return (
     <PageFrame>
       <PageHeader>Instructors</PageHeader>
-      {!showForm && (
+      {canAccessAdmin(user) && !showForm && (
         <AddButton
           onClick={() => {
             setShowForm(true);
@@ -88,7 +93,7 @@ export default function InstructorsPage() {
         </AddButton>
       )}
 
-      {showForm && (
+      {canAccessAdmin(user) && showForm && (
         <InstructorForm
           formData={formData}
           setFormData={setFormData}
@@ -113,10 +118,18 @@ export default function InstructorsPage() {
         onDelete={async (id) => {
           const instructor = instructors.find(i => i.id === id);
           if (instructor && window.confirm(`Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`)) {
-            await deleteInstructor(id);
-            reloadData();
+            try {
+              await deleteInstructor(id);
+              reloadData();
+            } catch (err) {
+              console.error(err);
+              setError("Failed to delete instructor " + err);
+            }
           }
+
         }}
+        canDelete={canAccessAdmin(user)}
+        canEdit={canAccessAdmin(user)}
       />
     </PageFrame>
   );

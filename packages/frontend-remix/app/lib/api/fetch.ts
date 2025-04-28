@@ -92,7 +92,7 @@ async function fetchData<T = any>(
 }
 
 /**
- * Fetches a single page or object from a named endpoint.
+ * Fetches a single page or object from a named endpoint using a GET request.
  */
 export async function fetchPageData<T = any>(
     slug: keyof typeof ENDPOINTS,

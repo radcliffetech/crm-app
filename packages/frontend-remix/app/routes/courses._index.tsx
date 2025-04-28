@@ -9,6 +9,8 @@ import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { canAccessAdmin } from "~/lib/permissions";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
     return [
@@ -19,6 +21,7 @@ export const meta: MetaFunction = () => {
 
 
 export default function CoursesPage() {
+    const user = useAuth();
     const [courses, setCourses] = useState<Course[]>([]);
 
     // we need instructors for the form
@@ -48,7 +51,7 @@ export default function CoursesPage() {
             })
             .catch((err) => {
                 console.error(err);
-                setError("Failed to load courses.");
+                setError("Failed to load courses. " + err);
             })
             .finally(() => setLoading(false));
     }
@@ -63,8 +66,6 @@ export default function CoursesPage() {
             await updateCourse(editingCourse.id, {
                 ...formData,
                 course_fee: Number(formData.course_fee),
-                created_at: editingCourse.created_at,
-                updated_at: new Date().toISOString(),
             });
             reloadData();
             setEditingCourse(null);
@@ -95,7 +96,7 @@ export default function CoursesPage() {
         <PageFrame>
 
             <PageHeader>Courses</PageHeader>
-            {!showForm && (
+            {canAccessAdmin(user) && !showForm && (
                 <AddButton onClick={() => {
                     setFormData({
                         title: "",
@@ -114,7 +115,7 @@ export default function CoursesPage() {
                 </AddButton>
             )}
 
-            {showForm && (
+            {canAccessAdmin(user) && showForm && (
                 <CourseForm
                     formData={formData}
                     setFormData={setFormData}
@@ -130,6 +131,7 @@ export default function CoursesPage() {
             <CoursesList
                 courses={courses}
                 onEdit={(course) => {
+                    if (!canAccessAdmin(user)) return;
                     setEditingCourse(course);
                     setFormData({
                         title: course.title,
@@ -144,12 +146,20 @@ export default function CoursesPage() {
                     setShowForm(true);
                 }}
                 onDelete={async (id) => {
+                    if (!canAccessAdmin(user)) return;
                     const course = courses.find(c => c.id === id);
                     if (course && window.confirm(`Are you sure you want to delete the course "${course.title}"?`)) {
-                        await deleteCourse(id);
-                        reloadData();
+                        try {
+                            await deleteCourse(id);
+                            reloadData();
+                        } catch (error: any) {
+                            console.error(error);
+                            setError(error.message || "Cannot delete course: it has active student registrations.");
+                        }
                     }
                 }}
+                canDelete={canAccessAdmin(user)}
+                canEdit={canAccessAdmin(user)}
             />
         </PageFrame>
     );

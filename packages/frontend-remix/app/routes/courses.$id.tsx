@@ -32,6 +32,7 @@ export default function CourseDetailPage() {
 
   function reloadData() {
     if (id) {
+      console.log("Reloading course data for ID:", id);
       setLoading(true);
       setError(null);
       getCoursePageData(id)
@@ -43,19 +44,23 @@ export default function CourseDetailPage() {
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to load course data.");
+          setError("Failed to load course data" + err);
         })
         .finally(() => setLoading(false));
     }
   }
 
   useEffect(() => {
+    console.log("Fetching course data for ID:", id);
     reloadData();
 
   }, [id]);
 
   const registerForCourse = (student_id: string, course: Course) => {
-    registerStudentToCourse(student_id, course.id).then(() => reloadData());
+    registerStudentToCourse(student_id, course.id).then(() => reloadData()).catch((err) => {
+      console.error(err);
+      setError("Failed to register student for course: " + err);
+    });
   }
 
   return (
@@ -99,8 +104,11 @@ export default function CourseDetailPage() {
                 unregisterAction={(reg: Registration) => {
                   unregisterStudent(reg).then(() => {
                     reloadData();
-                  })
-                }}
+                  }).catch((err) => {
+                    console.error(err);
+                    setError("Failed to unregister student: " + err);
+                  });
+                }}  
               />
             )}
           </div>
