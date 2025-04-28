@@ -94,7 +94,7 @@ export default function StudentDetailPage() {
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to load student data.");
+          setError("Failed to load student data " + err);
         })
         .finally(() => setLoading(false));
     }
@@ -132,8 +132,13 @@ export default function StudentDetailPage() {
         <RegistrationsForStudentList
           registrations={registrations}
           unregisterAction={async (reg: Registration) => {
+            try {
             await unregisterStudent(reg);
             reloadData();
+            } catch (err) {
+              console.error(err);
+              setError("Failed to unregister student from course: " + err);
+            }
           }}
         /> 
       </div>

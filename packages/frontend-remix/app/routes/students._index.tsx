@@ -51,7 +51,7 @@ export default function StudentsPage() {
       .then(setStudents)
       .catch((err) => {
         console.error(err);
-        setError("Failed to load students.");
+        setError("Failed to load students " + err);
       })
       .finally(() => setLoading(false));
   }
@@ -65,9 +65,14 @@ export default function StudentsPage() {
   }
 
   const handleUpdateStudent = async (id: string) => {
+    try {
     await updateStudent(id, formData);
     reloadData();
     resetForm();
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update student " + err);
+    }
   };
 
   return (
@@ -121,8 +126,13 @@ export default function StudentsPage() {
         }}
         onDelete={async (student) => {
           if (window.confirm(`Are you sure you want to delete ${student.name_first} ${student.name_last}?`)) {
+            try {
             await deleteStudent(student.id);
             reloadData();
+            } catch (err) {
+              console.error(err);
+              setError("Failed to delete student " + err);
+            }
           }
         }}
       />

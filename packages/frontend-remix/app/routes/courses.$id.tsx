@@ -57,7 +57,10 @@ export default function CourseDetailPage() {
   }, [id]);
 
   const registerForCourse = (student_id: string, course: Course) => {
-    registerStudentToCourse(student_id, course.id).then(() => reloadData());
+    registerStudentToCourse(student_id, course.id).then(() => reloadData()).catch((err) => {
+      console.error(err);
+      setError("Failed to register student for course: " + err);
+    });
   }
 
   return (
@@ -101,8 +104,11 @@ export default function CourseDetailPage() {
                 unregisterAction={(reg: Registration) => {
                   unregisterStudent(reg).then(() => {
                     reloadData();
-                  })
-                }}
+                  }).catch((err) => {
+                    console.error(err);
+                    setError("Failed to unregister student: " + err);
+                  });
+                }}  
               />
             )}
           </div>

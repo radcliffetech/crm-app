@@ -51,7 +51,7 @@ export default function CoursesPage() {
             })
             .catch((err) => {
                 console.error(err);
-                setError("Failed to load courses.");
+                setError("Failed to load courses. " + err);
             })
             .finally(() => setLoading(false));
     }
@@ -149,8 +149,13 @@ export default function CoursesPage() {
                     if (!canAccessAdmin(user)) return;
                     const course = courses.find(c => c.id === id);
                     if (course && window.confirm(`Are you sure you want to delete the course "${course.title}"?`)) {
-                        await deleteCourse(id);
-                        reloadData();
+                        try {
+                            await deleteCourse(id);
+                            reloadData();
+                        } catch (error: any) {
+                            console.error(error);
+                            setError(error.message || "Cannot delete course: it has active student registrations.");
+                        }
                     }
                 }}
             />

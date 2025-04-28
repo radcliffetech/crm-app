@@ -33,7 +33,7 @@ export async function getCoursesPageData(): Promise<{
     fetchListData<Registration>("registrations", "/"),
   ]);
 
-  return { courses, instructors , registrations };
+  return { courses, instructors, registrations };
 }
 
 export async function getCoursePageData(id: string): Promise<{
@@ -46,11 +46,11 @@ export async function getCoursePageData(id: string): Promise<{
   const [course, registrations, unregisteredStudents] = await Promise.all([
     fetchPageData<Course>("courses", `/${id}/`),
     fetchListData<Registration>("registrations", "/", { course_id: id }),
-    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true})
+    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true })
   ]);
 
-    console.log("Course data fetched:", course);
-    const instructor = course?.instructor_id
+  console.log("Course data fetched:", course);
+  const instructor = course?.instructor_id
     ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
     : null;
 
@@ -59,13 +59,25 @@ export async function getCoursePageData(id: string): Promise<{
 }
 
 export async function createCourse(data: Omit<Course, "id">): Promise<Course> {
-  return await mutateData("courses", "/", "POST", data);
+  try {
+    return await mutateData("courses", "/", "POST", data);
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to create course.");
+  }
 }
 
-export async function updateCourse(id: string, data: Omit<Course,  "id" | "created_at" | "updated_at">): Promise<void> {
-  await mutateData("courses", `/${id}/`, "PUT", data);
+export async function updateCourse(id: string, data: Omit<Course, "id" | "created_at" | "updated_at">): Promise<void> {
+  try {
+    await mutateData("courses", `/${id}/`, "PUT", data);
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to update course.");
+  }
 }
 
 export async function deleteCourse(id: string): Promise<void> {
-  await mutateData("courses", `/${id}/`, "DELETE", {});
+  try {
+    await mutateData("courses", `/${id}/`, "DELETE", {});
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to delete course.");
+  }
 }

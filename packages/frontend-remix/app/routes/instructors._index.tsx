@@ -48,7 +48,7 @@ export default function InstructorsPage() {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to load instructors.");
+        setError("Failed to load instructors " + err);
       })
       .finally(() => setLoading(false));
   }
@@ -58,19 +58,24 @@ export default function InstructorsPage() {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingInstructor) {
-      await updateInstructor(editingInstructor.id, {
-        ...formData,
-      });
-      setEditingInstructor(null);
-    } else {
-      const now = new Date().toISOString();
-      await createInstructor({ ...formData, created_at: now, updated_at: now });
+    try {
+      e.preventDefault();
+      if (editingInstructor) {
+        await updateInstructor(editingInstructor.id, {
+          ...formData,
+        });
+        setEditingInstructor(null);
+      } else {
+        const now = new Date().toISOString();
+        await createInstructor({ ...formData, created_at: now, updated_at: now });
+      }
+      reloadData();
+      setFormData({ name_first: "", name_last: "", email: "", bio: "" });
+      setShowForm(false);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save instructor " + err);
     }
-    reloadData();
-    setFormData({ name_first: "", name_last: "", email: "", bio: "" });
-    setShowForm(false);
   };
 
   return (
@@ -113,8 +118,13 @@ export default function InstructorsPage() {
         onDelete={async (id) => {
           const instructor = instructors.find(i => i.id === id);
           if (instructor && window.confirm(`Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`)) {
-            await deleteInstructor(id);
-            reloadData();
+            try {
+              await deleteInstructor(id);
+              reloadData();
+            } catch (err) {
+              console.error(err);
+              setError("Failed to delete instructor " + err);
+            }
           }
         }}
       />
