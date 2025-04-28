@@ -32,6 +32,17 @@ class InstructorViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        # Check for active or upcoming courses before marking inactive
+        active_courses = Course.objects.filter(
+            instructor=instance,
+            is_active=True,
+            end_date__gte=now().date()
+        )
+        if active_courses.exists():
+            return Response(
+                {"error": "Cannot delete instructor with active or upcoming courses."},
+                status=400
+            )
         instance.is_active = False
         instance.save()
         return Response(status=204)
@@ -58,6 +69,13 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        # Check for existing registrations (active or otherwise)
+        existing_registrations = Registration.objects.filter(course=instance, is_active=True)
+        if existing_registrations.exists():
+            return Response(
+                {"error": "Cannot delete course with existing student registrations."},
+                status=400
+            )
         instance.is_active = False
         instance.save()
         return Response(status=204)
@@ -122,6 +140,17 @@ class StudentViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         print("Destroying student:", self.request.data)
         instance = self.get_object()
+        # Check for active or upcoming registrations before marking inactive
+        active_registrations = Registration.objects.filter(
+            student=instance,
+            registration_status="registered",
+            course__end_date__gte=now().date()
+        )
+        if active_registrations.exists():
+            return Response(
+                {"error": "Cannot delete student with active or upcoming course registrations."},
+                status=400
+            )
         instance.is_active = False
         instance.save()
         return Response(status=204)
