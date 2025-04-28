@@ -133,7 +133,20 @@ export default function CoursesPage() {
                     editingCourse={editingCourse}
                     instructors={instructors}
                     onSubmit={handleSubmit}
-                    onCancel={() => setShowForm(false)}
+                    onCancel={() => {
+                        setFormData({
+                            title: "",
+                            description: "",
+                            description_full: "",
+                            instructor_id: "",
+                            start_date: "",
+                            end_date: "",
+                            syllabus_url: "",
+                            course_fee: "",
+                        });
+                        setEditingCourse(null);
+                        setShowForm(false);
+                    }}
                 >
                     {saving ? <Spinner /> : <button type="submit" className="btn-primary">Save</button>}
                 </CourseForm>

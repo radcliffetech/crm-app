@@ -117,7 +117,11 @@ export default function StudentsPage() {
             setShowForm(false);
           }}
           editingstudent_id={editingstudent_id}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setFormData(initialFormData);
+            setEditingstudent_id(null);
+            setShowForm(false);
+          }}
         />
       )}
 

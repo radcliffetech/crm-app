@@ -102,7 +102,11 @@ export default function InstructorsPage() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setFormData({ name_first: "", name_last: "", email: "", bio: "" });
+            setEditingInstructor(null);
+            setShowForm(false);
+          }}
           editingInstructor={editingInstructor}
         />
       )}
@@ -127,9 +131,11 @@ export default function InstructorsPage() {
               setDeletingId(id);
               await deleteInstructor(id);
               reloadData();
+              toast.success("Instructor deleted successfully!");
             } catch (err) {
               console.error(err);
               setError("Failed to delete instructor " + err);
+              toast.error("Failed to delete instructor.");
             } finally {
               setDeletingId(null);
             }
