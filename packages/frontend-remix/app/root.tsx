@@ -6,6 +6,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
+  useRouteError,
 } from "@remix-run/react";
 import type { User, UserRole } from "./types";
 import { createContext, useContext } from "react";
@@ -15,6 +17,7 @@ import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";
 import { Toaster } from "react-hot-toast";
+import { loadVitePluginContext } from "@remix-run/dev/dist/vite/plugin";
 import { useState } from "react";
 
 export const mockUser: User = {
@@ -129,7 +132,44 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <ConfirmDialogProvider>
-        <Outlet />
+      <Outlet />
     </ConfirmDialogProvider>
-  )
+  );
+}
+
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <html lang="en">
+        <head>
+          <title>{`${error.status} ${error.statusText}`}</title>
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          <h1>{error.status} - {error.statusText}</h1>
+          <p>Sorry, an unexpected error occurred.</p>
+          <Scripts />
+        </body>
+      </html>
+    );
+  }
+
+  return (
+    <html lang="en">
+      <head>
+        <title>Unknown Error</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <h1>Unknown Error</h1>
+        <p>Sorry, an unknown error occurred.</p>
+        <Scripts />
+      </body>
+    </html>
+  );
 }
