@@ -1,10 +1,11 @@
+import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createInstructor,
   deleteInstructor,
   getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -15,6 +16,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
@@ -26,7 +28,6 @@ export const meta: MetaFunction = () => {
 
 
 export default function InstructorsPage() {
-  const user = useAuth();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
@@ -48,7 +49,7 @@ export default function InstructorsPage() {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to load instructors " + err);
+        setError("Failed to load instructors.");
       })
       .finally(() => setLoading(false));
   }
@@ -72,16 +73,18 @@ export default function InstructorsPage() {
       reloadData();
       setFormData({ name_first: "", name_last: "", email: "", bio: "" });
       setShowForm(false);
+      toast.success("Instructor saved successfully!");
     } catch (err) {
       console.error(err);
       setError("Failed to save instructor " + err);
+      toast.error("Failed to save instructor.");
     }
   };
 
   return (
     <PageFrame>
       <PageHeader>Instructors</PageHeader>
-      {canAccessAdmin(user) && !showForm && (
+      {!showForm && (
         <AddButton
           onClick={() => {
             setShowForm(true);
@@ -93,7 +96,7 @@ export default function InstructorsPage() {
         </AddButton>
       )}
 
-      {canAccessAdmin(user) && showForm && (
+      {showForm && (
         <InstructorForm
           formData={formData}
           setFormData={setFormData}
@@ -126,10 +129,7 @@ export default function InstructorsPage() {
               setError("Failed to delete instructor " + err);
             }
           }
-
         }}
-        canDelete={canAccessAdmin(user)}
-        canEdit={canAccessAdmin(user)}
       />
     </PageFrame>
   );

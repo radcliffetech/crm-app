@@ -12,6 +12,7 @@ import { RegisterCourseForStudentForm } from "~/components/registrations/Registe
 import { RegistrationsForCourseList } from "~/components/lists/RegistrationsForCourseList";
 import { getCoursePageData } from "~/loaders/courses";
 import { marked } from "marked";
+import { toast } from "react-hot-toast";
 
 export const meta: MetaFunction = ({ params }) => {
   return [
@@ -32,7 +33,6 @@ export default function CourseDetailPage() {
 
   function reloadData() {
     if (id) {
-      console.log("Reloading course data for ID:", id);
       setLoading(true);
       setError(null);
       getCoursePageData(id)
@@ -44,22 +44,25 @@ export default function CourseDetailPage() {
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to load course data" + err);
+          setError("Failed to load course data.");
         })
         .finally(() => setLoading(false));
     }
   }
 
   useEffect(() => {
-    console.log("Fetching course data for ID:", id);
     reloadData();
 
   }, [id]);
 
   const registerForCourse = (student_id: string, course: Course) => {
-    registerStudentToCourse(student_id, course.id).then(() => reloadData()).catch((err) => {
+    registerStudentToCourse(student_id, course.id).then(() => {
+      toast.success("Student registered successfully!");
+      reloadData();
+    }).catch((err) => {
       console.error(err);
       setError("Failed to register student for course: " + err);
+      toast.error("Failed to register student for course.");
     });
   }
 
@@ -103,6 +106,7 @@ export default function CourseDetailPage() {
                 registrations={registrations}
                 unregisterAction={(reg: Registration) => {
                   unregisterStudent(reg).then(() => {
+                    toast.success("Student unregistered successfully!");
                     reloadData();
                   }).catch((err) => {
                     console.error(err);

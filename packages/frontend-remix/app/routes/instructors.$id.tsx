@@ -1,5 +1,4 @@
 import type { Course, Instructor } from "~/types";
-import { getInstructorPageData, updateInstructor } from "~/loaders/instructors";
 import { useEffect, useState } from "react";
 
 import { CoursesForInstructorList } from "~/components/lists/CoursesForInstructorList";
@@ -8,9 +7,9 @@ import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import PageSubheader from "~/components/ui/PageSubheader";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { StudentsForInstructorList } from "~/components/lists/StudentsForInstructorList";
 import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useParams } from "@remix-run/react";
 
@@ -24,40 +23,21 @@ export const meta: MetaFunction = ({ }) => {
 
 export default function InstructorDetailPage() {
   const { id } = useParams();
-  const user = useAuth();
   const [instructor, setInstructor] = useState<Instructor | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formState, setFormState] = useState({
-    name_first: "",
-    name_last: "",
-    email: "",
-    bio: "",
-  });
 
   function reloadData() {
     if (id) {
-      getInstructorPageData(id).then(({ instructor, courses }) => {
-        setInstructor(instructor);
-        setCourses(courses);
-        setFormState({
-          name_first: instructor.name_first,
-          name_last: instructor.name_last,
-          email: instructor.email,
-          bio: instructor.bio || "",
-        });
-      });
-    }
+    getInstructorPageData(id).then(({ instructor, courses }) => {
+      setInstructor(instructor);
+      setCourses(courses);
+    });
+  }
   }
   useEffect(() => {
     reloadData();
   }, [id]);
 
-
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target;
-    setFormState(prev => ({ ...prev, [name]: value }));
-  }
 
   return (
     <PageFrame>
@@ -102,9 +82,14 @@ export default function InstructorDetailPage() {
             />
             <button
               onClick={async (e) => {
-                await updateInstructor(instructor.id, formState);
-                reloadData();
-                setIsEditing(false);
+                try {
+                  await updateInstructor(instructor.id, formState);
+                  reloadData();
+                  setIsEditing(false);
+                  toast.success("Instructor updated successfully!");
+                } catch (error) {
+                  toast.error("Failed to update instructor.");
+                }
               }}
               className="px-4 py-2 btn-primary"
             >
@@ -141,12 +126,9 @@ export default function InstructorDetailPage() {
           )}
         </div>
 
-        <div className="pt-4" >
-          <PageSubheader>Active Students</PageSubheader>
-          <StudentsForInstructorList instructor_id={instructor.id} />
-        </div>
-      </>)
-      }
-    </PageFrame >
+    <PageSubheader>Active Students</PageSubheader>
+      <StudentsForInstructorList instructor_id={instructor.id} />
+      </>)}
+    </PageFrame>
   );
 }

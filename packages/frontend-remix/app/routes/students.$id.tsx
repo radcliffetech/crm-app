@@ -12,8 +12,8 @@ import { RegisterStudentForCourseForm } from "~/components/registrations/Registe
 import { RegistrationsForStudentList } from "~/components/lists/RegistrationsForStudentList";
 import { StudentForm } from "~/components/forms/StudentForm";
 import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
 import { unregisterStudent } from "~/loaders/registrations";
-import { useAuth } from "~/root";
 import { useParams } from "@remix-run/react";
 
 export const meta: MetaFunction = ({  }) => {
@@ -30,7 +30,6 @@ export const meta: MetaFunction = ({  }) => {
 
 export default function StudentDetailPage() {
   const { id } = useParams();
-  const user = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -61,9 +60,15 @@ export default function StudentDetailPage() {
           setFormData={setFormData}
           onSubmit={async (e) => {
             e.preventDefault();
-            await updateStudent(student.id, formData);
-            reloadData();
-            setEditing(false);
+            try {
+              await updateStudent(student.id, formData);
+              toast.success("Student updated successfully!");
+              reloadData();
+              setEditing(false);
+            } catch (err) {
+              console.error(err);
+              toast.error("Failed to update student.");
+            }
           }}
           editingstudent_id={student.id}
           onCancel={() => setEditing(false)}
@@ -94,7 +99,8 @@ export default function StudentDetailPage() {
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to load student data " + err);
+          setError("Failed to load student data.");
+          toast.error("Failed to load student data.");
         })
         .finally(() => setLoading(false));
     }
@@ -104,15 +110,13 @@ export default function StudentDetailPage() {
   return (
     <PageFrame>
       <PageHeader>{student.name_first} {student.name_last}</PageHeader>
-      {canAccessAdmin(user) && (
-        <button
-          onClick={() => setEditing(true)}
-          className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
-        >
-          <PencilSquareIcon className="h-5 w-5" />
-          Edit
-        </button>
-      )}
+      <button
+        onClick={() => setEditing(true)}
+        className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
+      >
+        <PencilSquareIcon className="h-5 w-5" />
+        Edit
+      </button>
       <p className="mb-2"><strong>Email:</strong> {student.email}</p>
       <p className="mb-2"><strong>Notes:</strong> {student.notes || "—"}</p>
 
@@ -123,7 +127,13 @@ export default function StudentDetailPage() {
         courses={courses}
         registrations={registrations}
         onRegister={async () => {
-          reloadData()
+          try {
+            reloadData();
+            toast.success("Student registered successfully!");
+          } catch (err) {
+            console.error(err);
+            toast.error("Failed to register student.");
+          }
         }}
       />
 
@@ -133,14 +143,16 @@ export default function StudentDetailPage() {
           registrations={registrations}
           unregisterAction={async (reg: Registration) => {
             try {
-            await unregisterStudent(reg);
-            reloadData();
+              await unregisterStudent(reg);
+              toast.success("Student unregistered successfully!");
+              reloadData();
             } catch (err) {
               console.error(err);
+              toast.error("Failed to unregister student.");
               setError("Failed to unregister student from course: " + err);
             }
           }}
-        /> 
+        />
       </div>
     </PageFrame>
   );

@@ -10,6 +10,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
@@ -21,7 +22,6 @@ export const meta: MetaFunction = () => {
 
 
 export default function CoursesPage() {
-    const user = useAuth();
     const [courses, setCourses] = useState<Course[]>([]);
 
     // we need instructors for the form
@@ -51,7 +51,7 @@ export default function CoursesPage() {
             })
             .catch((err) => {
                 console.error(err);
-                setError("Failed to load courses. " + err);
+                setError("Failed to load courses.");
             })
             .finally(() => setLoading(false));
     }
@@ -62,22 +62,27 @@ export default function CoursesPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (editingCourse) {
-            await updateCourse(editingCourse.id, {
-                ...formData,
-                course_fee: Number(formData.course_fee),
-            });
-            reloadData();
-            setEditingCourse(null);
-        } else {
-            const newCourse = await createCourse({
-                ...formData,
-                syllabus_url: formData.syllabus_url,
-                course_fee: Number(formData.course_fee),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            });
-            setCourses((prev) => [...prev, newCourse]);
+        try {
+            if (editingCourse) {
+                await updateCourse(editingCourse.id, {
+                    ...formData,
+                    course_fee: Number(formData.course_fee),
+                });
+                reloadData();
+                setEditingCourse(null);
+            } else {
+                const newCourse = await createCourse({
+                    ...formData,
+                    syllabus_url: formData.syllabus_url,
+                    course_fee: Number(formData.course_fee),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                });
+                setCourses((prev) => [...prev, newCourse]);
+            }
+            toast.success("Course saved successfully!");
+        } catch {
+            toast.error("Failed to save course.");
         }
         setFormData({
             title: "",
@@ -96,7 +101,7 @@ export default function CoursesPage() {
         <PageFrame>
 
             <PageHeader>Courses</PageHeader>
-            {canAccessAdmin(user) && !showForm && (
+            {!showForm && (
                 <AddButton onClick={() => {
                     setFormData({
                         title: "",
@@ -115,7 +120,7 @@ export default function CoursesPage() {
                 </AddButton>
             )}
 
-            {canAccessAdmin(user) && showForm && (
+            {showForm && (
                 <CourseForm
                     formData={formData}
                     setFormData={setFormData}
@@ -131,7 +136,6 @@ export default function CoursesPage() {
             <CoursesList
                 courses={courses}
                 onEdit={(course) => {
-                    if (!canAccessAdmin(user)) return;
                     setEditingCourse(course);
                     setFormData({
                         title: course.title,
@@ -146,7 +150,6 @@ export default function CoursesPage() {
                     setShowForm(true);
                 }}
                 onDelete={async (id) => {
-                    if (!canAccessAdmin(user)) return;
                     const course = courses.find(c => c.id === id);
                     if (course && window.confirm(`Are you sure you want to delete the course "${course.title}"?`)) {
                         try {
@@ -158,8 +161,6 @@ export default function CoursesPage() {
                         }
                     }
                 }}
-                canDelete={canAccessAdmin(user)}
-                canEdit={canAccessAdmin(user)}
             />
         </PageFrame>
     );
