@@ -17,10 +17,14 @@ export function CoursesList({
   courses,
   onEdit,
   onDelete,
+  canEdit,
+  canDelete,
 }: {
   courses: Course[];
   onEdit: (course: Course) => void;
   onDelete: (id: string) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }) {
   const columns = useMemo<ColumnDef<Course, unknown>[]>(() => [
     columnHelper.display({
@@ -57,12 +61,14 @@ export function CoursesList({
       header: () => <div className="text-right">Actions</div>,
       cell: info => (
         <DropdownActions
+          canEdit={canEdit}
+          canDelete={canDelete}
           onEdit={() => onEdit(info.row.original)}
           onDelete={() => onDelete(info.row.original.id)}
         />
       ),
     }),
-  ], [onEdit, onDelete]);
+  ], [onEdit, onDelete, canEdit, canDelete]);
 
   const table = useReactTable({
     data: courses,

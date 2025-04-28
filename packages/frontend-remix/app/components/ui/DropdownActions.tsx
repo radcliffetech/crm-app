@@ -2,9 +2,13 @@ import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/re
 import { useEffect, useRef, useState } from "react";
 
 export function DropdownActions({
+    canEdit,
+    canDelete,
     onEdit,
     onDelete,
   }: {
+    canEdit: boolean;
+    canDelete: boolean;
     onEdit: () => void;
     onDelete: () => void;
   }) {
@@ -23,6 +27,10 @@ export function DropdownActions({
       };
     }, []);
   
+    if (!canEdit && !canDelete) {
+      return null;
+    }
+    
     return (
       <div className="relative text-right" ref={dropdownRef}>
         <button
@@ -34,6 +42,7 @@ export function DropdownActions({
         </button>
         {open && (
           <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-10">
+            {canEdit && (
             <button
               onClick={() => {
                 onEdit();
@@ -44,6 +53,8 @@ export function DropdownActions({
               <PencilSquareIcon className="h-4 w-4 text-gray-600" />
               Edit
             </button>
+            )}
+            {canDelete && (
             <button
               onClick={() => {
                 onDelete();
@@ -54,6 +65,7 @@ export function DropdownActions({
               <TrashIcon className="h-4 w-4" />
               Delete
             </button>
+            )}
           </div>
         )}
       </div>

@@ -126,7 +126,10 @@ export default function InstructorsPage() {
               setError("Failed to delete instructor " + err);
             }
           }
+
         }}
+        canDelete={canAccessAdmin(user)}
+        canEdit={canAccessAdmin(user)}
       />
     </PageFrame>
   );

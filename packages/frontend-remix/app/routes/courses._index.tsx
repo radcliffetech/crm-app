@@ -158,6 +158,8 @@ export default function CoursesPage() {
                         }
                     }
                 }}
+                canDelete={canAccessAdmin(user)}
+                canEdit={canAccessAdmin(user)}
             />
         </PageFrame>
     );

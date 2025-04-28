@@ -124,6 +124,8 @@ export default function StudentsPage() {
           });
           setShowForm(true);
         }}
+        canDelete={canAccessAdmin(user)}
+        canEdit={canAccessAdmin(user)}  
         onDelete={async (student) => {
           if (window.confirm(`Are you sure you want to delete ${student.name_first} ${student.name_last}?`)) {
             try {
