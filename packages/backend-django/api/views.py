@@ -207,6 +207,17 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         if not student_id or not course_id:
             return Response({"error": "student_id and course_id are required"}, status=400)
 
+        # Check for existing registration
+        existing_registration = Registration.objects.filter(
+            student_id=student_id,
+            course_id=course_id,
+            registration_status="registered",
+            is_active=True
+        ).first()
+
+        if existing_registration:
+            return Response({"error": "Student is already registered for this course."}, status=400)
+
         try:
             _ = Registration.objects.create(
                 student_id=student_id,
@@ -216,7 +227,7 @@ class RegistrationViewSet(viewsets.ModelViewSet):
             )
 
             self.email_service.send_registration_email(
-               student=Student.objects.get(id=student_id),
+                student=Student.objects.get(id=student_id),
                 course=Course.objects.get(id=course_id)
             )
             return Response({"message": "Student registered successfully."})
