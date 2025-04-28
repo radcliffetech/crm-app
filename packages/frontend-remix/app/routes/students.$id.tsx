@@ -100,6 +100,7 @@ export default function StudentDetailPage() {
         .catch((err) => {
           console.error(err);
           setError("Failed to load student data.");
+          toast.error("Failed to load student data.");
         })
         .finally(() => setLoading(false));
     }
@@ -126,7 +127,13 @@ export default function StudentDetailPage() {
         courses={courses}
         registrations={registrations}
         onRegister={async () => {
-          reloadData()
+          try {
+            reloadData();
+            toast.success("Student registered successfully!");
+          } catch (err) {
+            console.error(err);
+            toast.error("Failed to register student.");
+          }
         }}
       />
 
