@@ -9,6 +9,9 @@ import { DataLoaderState } from "~/components/ui/DataLoaderState";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
     return [
@@ -59,24 +62,27 @@ export default function CoursesPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (editingCourse) {
-            await updateCourse(editingCourse.id, {
-                ...formData,
-                course_fee: Number(formData.course_fee),
-                created_at: editingCourse.created_at,
-                updated_at: new Date().toISOString(),
-            });
-            reloadData();
-            setEditingCourse(null);
-        } else {
-            const newCourse = await createCourse({
-                ...formData,
-                syllabus_url: formData.syllabus_url,
-                course_fee: Number(formData.course_fee),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            });
-            setCourses((prev) => [...prev, newCourse]);
+        try {
+            if (editingCourse) {
+                await updateCourse(editingCourse.id, {
+                    ...formData,
+                    course_fee: Number(formData.course_fee),
+                });
+                reloadData();
+                setEditingCourse(null);
+            } else {
+                const newCourse = await createCourse({
+                    ...formData,
+                    syllabus_url: formData.syllabus_url,
+                    course_fee: Number(formData.course_fee),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                });
+                setCourses((prev) => [...prev, newCourse]);
+            }
+            toast.success("Course saved successfully!");
+        } catch {
+            toast.error("Failed to save course.");
         }
         setFormData({
             title: "",
@@ -146,8 +152,13 @@ export default function CoursesPage() {
                 onDelete={async (id) => {
                     const course = courses.find(c => c.id === id);
                     if (course && window.confirm(`Are you sure you want to delete the course "${course.title}"?`)) {
-                        await deleteCourse(id);
-                        reloadData();
+                        try {
+                            await deleteCourse(id);
+                            reloadData();
+                        } catch (error: any) {
+                            console.error(error);
+                            setError(error.message || "Cannot delete course: it has active student registrations.");
+                        }
                     }
                 }}
             />

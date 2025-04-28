@@ -12,6 +12,7 @@ import { RegisterCourseForStudentForm } from "~/components/registrations/Registe
 import { RegistrationsForCourseList } from "~/components/lists/RegistrationsForCourseList";
 import { getCoursePageData } from "~/loaders/courses";
 import { marked } from "marked";
+import { toast } from "react-hot-toast";
 
 export const meta: MetaFunction = ({ params }) => {
   return [
@@ -55,7 +56,14 @@ export default function CourseDetailPage() {
   }, [id]);
 
   const registerForCourse = (student_id: string, course: Course) => {
-    registerStudentToCourse(student_id, course.id).then(() => reloadData());
+    registerStudentToCourse(student_id, course.id).then(() => {
+      toast.success("Student registered successfully!");
+      reloadData();
+    }).catch((err) => {
+      console.error(err);
+      setError("Failed to register student for course: " + err);
+      toast.error("Failed to register student for course.");
+    });
   }
 
   return (
@@ -98,9 +106,13 @@ export default function CourseDetailPage() {
                 registrations={registrations}
                 unregisterAction={(reg: Registration) => {
                   unregisterStudent(reg).then(() => {
+                    toast.success("Student unregistered successfully!");
                     reloadData();
-                  })
-                }}
+                  }).catch((err) => {
+                    console.error(err);
+                    setError("Failed to unregister student: " + err);
+                  });
+                }}  
               />
             )}
           </div>

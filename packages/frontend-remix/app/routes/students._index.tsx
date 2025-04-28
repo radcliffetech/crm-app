@@ -9,6 +9,9 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import type { Student } from "~/types";
 import { StudentForm } from "~/components/forms/StudentForm";
 import { StudentsList } from "~/components/lists/StudentsList";
+import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -62,9 +65,16 @@ export default function StudentsPage() {
   }
 
   const handleUpdateStudent = async (id: string) => {
-    await updateStudent(id, formData);
-    reloadData();
-    resetForm();
+    try {
+      await updateStudent(id, formData);
+      reloadData();
+      resetForm();
+      toast.success("Student updated successfully!");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to update student " + err);
+      toast.error("Failed to update student.");
+    }
   };
 
   return (
@@ -90,8 +100,14 @@ export default function StudentsPage() {
             if (editingstudent_id) {
               await handleUpdateStudent(editingstudent_id);
             } else {
-              const newStudent = await createStudent(formData);
-              setStudents((prev) => [...prev, newStudent]);
+              try {
+                const newStudent = await createStudent(formData);
+                setStudents((prev) => [...prev, newStudent]);
+                toast.success("Student created successfully!");
+              } catch (err) {
+                console.error(err);
+                toast.error("Failed to create student.");
+              }
             }
             setShowForm(false);
           }}
@@ -118,8 +134,15 @@ export default function StudentsPage() {
         }}
         onDelete={async (student) => {
           if (window.confirm(`Are you sure you want to delete ${student.name_first} ${student.name_last}?`)) {
+            try {
             await deleteStudent(student.id);
             reloadData();
+            toast.success("Student deleted successfully!");
+            } catch (err) {
+              console.error(err);
+              setError("Failed to delete student " + err);
+              toast.error("Failed to delete student.");
+            }
           }
         }}
       />

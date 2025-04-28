@@ -11,6 +11,8 @@ import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegisterStudentForCourseForm } from "~/components/registrations/RegisterStudentForCourseForm";
 import { RegistrationsForStudentList } from "~/components/lists/RegistrationsForStudentList";
 import { StudentForm } from "~/components/forms/StudentForm";
+import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
 import { unregisterStudent } from "~/loaders/registrations";
 import { useParams } from "@remix-run/react";
 
@@ -58,9 +60,15 @@ export default function StudentDetailPage() {
           setFormData={setFormData}
           onSubmit={async (e) => {
             e.preventDefault();
-            await updateStudent(student.id, formData);
-            reloadData();
-            setEditing(false);
+            try {
+              await updateStudent(student.id, formData);
+              toast.success("Student updated successfully!");
+              reloadData();
+              setEditing(false);
+            } catch (err) {
+              console.error(err);
+              toast.error("Failed to update student.");
+            }
           }}
           editingstudent_id={student.id}
           onCancel={() => setEditing(false)}
@@ -127,10 +135,17 @@ export default function StudentDetailPage() {
         <RegistrationsForStudentList
           registrations={registrations}
           unregisterAction={async (reg: Registration) => {
-            await unregisterStudent(reg);
-            reloadData();
+            try {
+              await unregisterStudent(reg);
+              toast.success("Student unregistered successfully!");
+              reloadData();
+            } catch (err) {
+              console.error(err);
+              toast.error("Failed to unregister student.");
+              setError("Failed to unregister student from course: " + err);
+            }
           }}
-        /> 
+        />
       </div>
     </PageFrame>
   );

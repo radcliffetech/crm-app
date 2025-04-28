@@ -15,6 +15,9 @@ import { InstructorsList } from "~/components/lists/InstructorsList";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { canAccessAdmin } from "~/lib/permissions";
+import { toast } from "react-hot-toast";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -56,21 +59,26 @@ export default function InstructorsPage() {
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingInstructor) {
-      await updateInstructor(editingInstructor.id, {
-        ...formData,
-        created_at: editingInstructor.created_at,
-        updated_at: new Date().toISOString(),
-      });
-      setEditingInstructor(null);
-    } else {
-      const now = new Date().toISOString();
-      await createInstructor({ ...formData, created_at: now, updated_at: now });
+    try {
+      e.preventDefault();
+      if (editingInstructor) {
+        await updateInstructor(editingInstructor.id, {
+          ...formData,
+        });
+        setEditingInstructor(null);
+      } else {
+        const now = new Date().toISOString();
+        await createInstructor({ ...formData, created_at: now, updated_at: now });
+      }
+      reloadData();
+      setFormData({ name_first: "", name_last: "", email: "", bio: "" });
+      setShowForm(false);
+      toast.success("Instructor saved successfully!");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save instructor " + err);
+      toast.error("Failed to save instructor.");
     }
-    reloadData();
-    setFormData({ name_first: "", name_last: "", email: "", bio: "" });
-    setShowForm(false);
   };
 
   return (
@@ -113,8 +121,13 @@ export default function InstructorsPage() {
         onDelete={async (id) => {
           const instructor = instructors.find(i => i.id === id);
           if (instructor && window.confirm(`Are you sure you want to delete ${instructor.name_first} ${instructor.name_last}?`)) {
-            await deleteInstructor(id);
-            reloadData();
+            try {
+              await deleteInstructor(id);
+              reloadData();
+            } catch (err) {
+              console.error(err);
+              setError("Failed to delete instructor " + err);
+            }
           }
         }}
       />

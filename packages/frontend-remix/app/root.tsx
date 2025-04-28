@@ -13,6 +13,7 @@ import { createContext, useContext } from "react";
 import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";
+import { Toaster } from "react-hot-toast";
 import { useState } from "react";
 
 export const mockUser: User = {
@@ -58,6 +59,8 @@ function LandingPage({
   );
 }
 
+
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState(mockUser);
   const [isLoggedIn, setIsLoggedIn] = useState(true)
@@ -90,6 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {isLoggedIn ? (
             <>
               <Navbar handleLogin={handleLogin} handleLogout={handleLogout} user={user} switchRole={switchRole} />
+<Toaster position="top-right" reverseOrder={false} />
               <div className="flex-grow">
                 {children}
               </div>
