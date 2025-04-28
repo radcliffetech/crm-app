@@ -1,8 +1,8 @@
-![Build Status](https://img.shields.io/github/actions/workflow/status/radcliffetech/crm-app/ci.yml?branch=main)
+![Build Status](https://img.shields.io/github/actions/workflow/status/radcliffetech/crm-app/ci.yaml?branch=main)
 ![License](https://img.shields.io/github/license/radcliffetech/crm-app)
 ![Tech Stack](https://img.shields.io/badge/stack-Remix%20%7C%20Django%20%7C%20PostgreSQL-blue)
 
-<br/>
+----
 
 # CRM Project - Massachusetts Institute for Integrated Metaphysics
 
@@ -56,6 +56,40 @@ This is a sample Customer Relationship Management (CRM) application developed as
 ---
 
 ## 🚀 Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/radcliffetech/crm-app.git
+cd crm-app
+```
+
+### 2. Backend Setup (Django)
+
+```bash
+cd packages/backend-django
+python3 -m venv env
+source env/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver 8080
+```
+
+### 3. Frontend Setup (Remix)
+
+Open a second terminal:
+
+```bash
+cd packages/frontend-remix
+npm install
+npm run dev
+```
+
+You should now have:
+- Backend running at `http://localhost:8080/`
+- Frontend running at `http://localhost:5173/`
+
+---
 
 ## 📦 Project Structure
 
