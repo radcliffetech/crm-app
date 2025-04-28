@@ -8,6 +8,7 @@ import { BasicTable } from "~/components/ui/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
 import type { Registration } from "~/types";
+import { RegistrationDropdownActions } from "../ui/RegistrationDropdownActions";
 import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Registration>();
@@ -53,22 +54,7 @@ export function RegistrationsForStudentList({
       id: "actions",
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }) => (
-        <div className="text-right">
-          {row.original.registration_status === "registered" && (
-            <button
-              onClick={async () => {
-                if (window.confirm("Are you sure you want to unregister this student from the course?")) {
-                  let reg = row.original;
-                  await unregisterAction(reg);
-                }
-              }}
-              className="text-red-600 hover:text-red-800 text-sm"
-            >
-              Unregister
-            </button>
-          )}
-        </div>
-
+        <RegistrationDropdownActions registration={row.original} onUnregister={unregisterAction} />
       ),
     }),
   ], [unregisterAction]);
