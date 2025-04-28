@@ -32,6 +32,7 @@ export default function CourseDetailPage() {
 
   function reloadData() {
     if (id) {
+      console.log("Reloading course data for ID:", id);
       setLoading(true);
       setError(null);
       getCoursePageData(id)
@@ -43,13 +44,14 @@ export default function CourseDetailPage() {
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to load course data.");
+          setError("Failed to load course data" + err);
         })
         .finally(() => setLoading(false));
     }
   }
 
   useEffect(() => {
+    console.log("Fetching course data for ID:", id);
     reloadData();
 
   }, [id]);

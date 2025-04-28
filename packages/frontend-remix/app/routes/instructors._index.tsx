@@ -1,11 +1,10 @@
-import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   createInstructor,
   deleteInstructor,
   getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -15,6 +14,8 @@ import { InstructorsList } from "~/components/lists/InstructorsList";
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
+import { canAccessAdmin } from "~/lib/permissions";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -25,6 +26,7 @@ export const meta: MetaFunction = () => {
 
 
 export default function InstructorsPage() {
+  const user = useAuth();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
@@ -60,8 +62,6 @@ export default function InstructorsPage() {
     if (editingInstructor) {
       await updateInstructor(editingInstructor.id, {
         ...formData,
-        created_at: editingInstructor.created_at,
-        updated_at: new Date().toISOString(),
       });
       setEditingInstructor(null);
     } else {
@@ -76,7 +76,7 @@ export default function InstructorsPage() {
   return (
     <PageFrame>
       <PageHeader>Instructors</PageHeader>
-      {!showForm && (
+      {canAccessAdmin(user) && !showForm && (
         <AddButton
           onClick={() => {
             setShowForm(true);
@@ -88,7 +88,7 @@ export default function InstructorsPage() {
         </AddButton>
       )}
 
-      {showForm && (
+      {canAccessAdmin(user) && showForm && (
         <InstructorForm
           formData={formData}
           setFormData={setFormData}

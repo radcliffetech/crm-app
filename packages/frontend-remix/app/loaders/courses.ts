@@ -42,12 +42,14 @@ export async function getCoursePageData(id: string): Promise<{
   registrations: Registration[];
   unregisteredStudents: Student[];
 }> {
+  console.log("Fetching course data for ID:", id);
   const [course, registrations, unregisteredStudents] = await Promise.all([
     fetchPageData<Course>("courses", `/${id}/`),
     fetchListData<Registration>("registrations", "/", { course_id: id }),
     fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true})
   ]);
 
+    console.log("Course data fetched:", course);
     const instructor = course?.instructor_id
     ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
     : null;
@@ -60,7 +62,7 @@ export async function createCourse(data: Omit<Course, "id">): Promise<Course> {
   return await mutateData("courses", "/", "POST", data);
 }
 
-export async function updateCourse(id: string, data: Omit<Course, "id">): Promise<void> {
+export async function updateCourse(id: string, data: Omit<Course,  "id" | "created_at" | "updated_at">): Promise<void> {
   await mutateData("courses", `/${id}/`, "PUT", data);
 }
 

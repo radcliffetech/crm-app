@@ -29,8 +29,12 @@ export async function createInstructor(data: Omit<Instructor, "id">): Promise<In
   return await mutateData("instructors", "/", "POST", data);
 }
 
-export async function updateInstructor(id: string, data: Omit<Instructor, "id">): Promise<void> {
-  await mutateData("instructors", `/${id}/`, "PUT", data);
+export async function updateInstructor(id: string, data: Omit<Instructor,  "id" | "created_at" | "updated_at">): Promise<void> {
+
+  await mutateData("instructors", `/${id}/`, "PUT", {
+    ...data,
+    updated_at: new Date().toISOString(),
+  });
 }
 
 export async function deleteInstructor(id: string): Promise<void> {

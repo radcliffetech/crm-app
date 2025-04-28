@@ -9,6 +9,8 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import type { Student } from "~/types";
 import { StudentForm } from "~/components/forms/StudentForm";
 import { StudentsList } from "~/components/lists/StudentsList";
+import { canAccessAdmin } from "~/lib/permissions";
+import { useAuth } from "~/root";
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,6 +29,7 @@ const initialFormData = {
 }
 
 export default function StudentsPage() {
+  const user = useAuth();
   const [students, setStudents] = useState<Student[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -70,7 +73,7 @@ export default function StudentsPage() {
   return (
     <PageFrame>
       <PageHeader>Students</PageHeader>
-      {!showForm && (
+      {canAccessAdmin(user) && !showForm && (
         <AddButton
           onClick={() => {
             resetForm();
