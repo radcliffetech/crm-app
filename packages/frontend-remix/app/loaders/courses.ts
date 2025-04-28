@@ -1,6 +1,21 @@
 import type { Course, Instructor, Registration, Student } from "~/types";
 import { fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
 
+export type CoursePayload = {
+  title: string;
+  description: string;
+  description_full: string;
+  instructor_id: string;
+  start_date: string;
+  end_date: string;
+  syllabus_url?: string;
+  course_fee: number;
+  course_code: string;
+  prerequisites: string[];
+  created_at?: string;
+  updated_at?: string;
+};
+
 export async function getCoursesForInstructor(instructor_id: string): Promise<{
   courses: Course[];
   registrations: Registration[];
@@ -58,7 +73,7 @@ export async function getCoursePageData(id: string): Promise<{
   return output;
 }
 
-export async function createCourse(data: Omit<Course, "id">): Promise<Course> {
+export async function createCourse(data: CoursePayload): Promise<Course> {
   try {
     return await mutateData("courses", "/", "POST", data);
   } catch (error: any) {
@@ -66,7 +81,7 @@ export async function createCourse(data: Omit<Course, "id">): Promise<Course> {
   }
 }
 
-export async function updateCourse(id: string, data: Omit<Course, "id" | "created_at" | "updated_at">): Promise<void> {
+export async function updateCourse(id: string, data: CoursePayload): Promise<void> {
   try {
     await mutateData("courses", `/${id}/`, "PUT", data);
   } catch (error: any) {

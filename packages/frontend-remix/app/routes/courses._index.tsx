@@ -22,16 +22,37 @@ export const meta: MetaFunction = () => {
     ];
 };
 
-const emptyCourseForm = {
-    course_code: "",
-    title: "",
-    description: "",
-    description_full: "",
-    instructor_id: "",
-    start_date: "",
-    end_date: "",
-    syllabus_url: "",
-    course_fee: "",
+type CourseFormData = {
+  course_code: string;
+  title: string;
+  description: string;
+  description_full: string;
+  instructor_id: string;
+  start_date: string;
+  end_date: string;
+  syllabus_url: string;
+  course_fee: string;
+  prerequisites: string[];
+};
+
+type CoursePayload = Omit<CourseFormData, "prerequisites" | "course_fee"> & {
+  course_fee: number;
+  prerequisites: string[];
+  created_at?: string;
+  updated_at?: string;
+};
+
+const emptyCourseForm: CourseFormData = {
+  course_code: "",
+  title: "",
+  description: "",
+  description_full: "",
+  instructor_id: "",
+  start_date: "",
+  end_date: "",
+  syllabus_url: "",
+  course_fee: "",
+  prerequisites: [],
 };
 
 export default function CoursesPage() {
@@ -42,7 +63,7 @@ export default function CoursesPage() {
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-    const [formData, setFormData] = useState(emptyCourseForm);
+    const [formData, setFormData] = useState<CourseFormData>(emptyCourseForm);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -75,19 +96,23 @@ export default function CoursesPage() {
         setSaving(true);
         try {
             if (editingCourse) {
-                await updateCourse(editingCourse.id, {
+                const payload: CoursePayload = {
                     ...formData,
                     course_fee: Number(formData.course_fee),
-                });
+                    prerequisites: formData.prerequisites,
+                };
+                await updateCourse(editingCourse.id, payload);
                 reloadData();
                 setEditingCourse(null);
             } else {
-                const newCourse = await createCourse({
+                const payload: CoursePayload = {
                     ...formData,
                     course_fee: Number(formData.course_fee),
+                    prerequisites: formData.prerequisites,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
-                });
+                };
+                const newCourse = await createCourse(payload);
                 setCourses((prev) => [...prev, newCourse]);
             }
             toast.success("Course saved successfully!");
@@ -132,6 +157,7 @@ export default function CoursesPage() {
                         setEditingCourse(null);
                         setShowForm(false);
                     }}
+                    allCourses={courses}
                 />
             </Modal>
 
@@ -152,6 +178,7 @@ export default function CoursesPage() {
                         end_date: course.end_date.split("T")[0],
                         syllabus_url: course.syllabus_url || "",
                         course_fee: course.course_fee?.toString() || "",
+                        prerequisites: course.prerequisites?.map((p) => p.id) || [],
                     });
                     setShowForm(true);
                 }}

@@ -81,6 +81,18 @@ export default function CourseDetailPage() {
           {new Date(course.start_date).toLocaleDateString()} – {new Date(course.end_date).toLocaleDateString()}
         </p>
       )}
+      {course?.prerequisites && course.prerequisites?.length > 0 && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-gray-700">Prerequisites</h2>
+          <ul className="list-disc list-inside text-gray-600">
+            {course.prerequisites.map((prereq) => (
+              <li key={prereq.id}>
+                {prereq.course_code} – {prereq.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {instructor && (
         <p className="mb-2 text-sm text-gray-600">
           Instructor:{" "}
@@ -119,7 +131,7 @@ export default function CourseDetailPage() {
                     console.error(err);
                     setError("Failed to unregister student: " + err);
                   });
-                }}  
+                }}
               />
             )}
           </div>
