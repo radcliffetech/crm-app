@@ -14,7 +14,6 @@ export function RegisterCourseForStudentForm({
 }) {
   return (
     <div className="mt-6 p-6 bg-gray-50 shadow-md rounded-md">
-      <PageSubheader>Registration</PageSubheader>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
