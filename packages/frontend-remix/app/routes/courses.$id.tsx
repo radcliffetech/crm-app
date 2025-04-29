@@ -92,7 +92,7 @@ export default function CourseDetailPage() {
         start_date: course.start_date ?? "",
         end_date: course.end_date ?? "",
         course_fee: course.course_fee ?? "0",
-        prerequisites: course.prerequisites.map((prereq) => prereq.id),
+        prerequisites: course.prerequisites,
         instructor_id: course.instructor_id ?? "",
         syllabus_url: course.syllabus_url ?? "",
       });
@@ -103,11 +103,7 @@ export default function CourseDetailPage() {
   const handleFormSubmit = (event: FormEvent, payload: CourseFormData) => {
     event.preventDefault();
     if (!course) return;
-    updateCourse(course.id, {
-      ...payload,
-      course_fee: Number(payload.course_fee),
-      prerequisites: course.prerequisites.map((prereq) => prereq.id),
-    })
+    updateCourse(course.id, payload)
       .then(() => {
         toast.success("Course updated successfully!");
         setShowForm(false);
@@ -157,9 +153,6 @@ export default function CourseDetailPage() {
         </div>
       )}
 
-
-
-
       <DataLoaderState loading={loading} error={error} />
 
       {course && (
@@ -169,8 +162,8 @@ export default function CourseDetailPage() {
             <div className="mt-6 border border-gray-300 rounded p-4">
               <h2 className="text-lg font-semibold text-gray-700 mb-2">Prerequisites</h2>
               {course.prerequisites.map((prereq) => (
-                <p key={prereq.id} className="text-gray-600">
-                  {prereq.title} ({prereq.course_code})
+                <p key={prereq} className="text-gray-600">
+                  {prereq}
                 </p>
               ))}
             </div>
@@ -216,10 +209,7 @@ export default function CourseDetailPage() {
       {showForm && formData && (
         <Modal isOpen={true} onClose={() => setShowForm(false)}>
           <CourseForm
-            formData={{
-              ...formData,
-              prerequisites: formData.prerequisites,
-            }}
+            formData={formData}
             setFormData={setFormData}
             editingCourse={course}
             instructors={instructors}

@@ -4,11 +4,6 @@ type CourseAdditionalFields = {
   enrollment_count?: number; // new
 };
 
-export type CoursePrerequisite = {
-  id: string;
-  title: string;
-  course_code: string;
-};
 
 export type Course = {
   id: string;
@@ -23,8 +18,10 @@ export type Course = {
   syllabus_url?: string; // URL or path to the syllabus document
   created_at: string; //  ISO 
   updated_at: string; // ISO
-  prerequisites: CoursePrerequisite[]
+  prerequisites: string[]
 } & CourseAdditionalFields; // Merge with additional fields
+
+export type CoursePayload = Omit<Course, "id" | "created_at" | "updated_at"> 
 
 export type CourseFormData = {
   course_code: string;

@@ -67,43 +67,6 @@ class CourseViewSet(viewsets.ModelViewSet):
         if instructor_id:
             queryset = queryset.filter(instructor_id=instructor_id)
         return queryset
-    
-    def perform_create(self, serializer):
-        prerequisites_data = self.request.data.get("prerequisites", [])
-        print("[perform_create] Raw prerequisites_data:", prerequisites_data)
-        course = serializer.save()
-        if prerequisites_data:
-            prereq_ids = [
-                p["id"] if isinstance(p, dict) and "id" in p else p
-                for p in prerequisites_data
-            ]
-            print("[perform_create] Extracted prereq_ids:", prereq_ids)
-            try:
-                prereq_courses = Course.objects.filter(id__in=prereq_ids)
-                print("[perform_create] Fetched prerequisite Course objects:", list(prereq_courses))
-                course.prerequisites.set(prereq_courses)
-            except ValidationError as e:
-                print("[perform_create] ValidationError when setting prerequisites:", e)
-                raise
-
-    def perform_update(self, serializer):
-        prerequisites_data = self.request.data.get("prerequisites", [])
-        print("[perform_update] Raw prerequisites_data:", prerequisites_data)
-        print("[perform_update] Raw instructor_id:", self.request.data.get("instructor_id"))
-        course = serializer.save()
-        if prerequisites_data:
-            prereq_ids = [
-                p["id"] if isinstance(p, dict) and "id" in p else p
-                for p in prerequisites_data
-            ]
-            print("[perform_update] Extracted prereq_ids:", prereq_ids)
-            try:
-                prereq_courses = Course.objects.filter(id__in=prereq_ids)
-                print("[perform_update] Fetched prerequisite Course objects:", list(prereq_courses))
-                course.prerequisites.set(prereq_courses)
-            except ValidationError as e:
-                print("[perform_update] ValidationError when setting prerequisites:", e)
-                raise
             
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

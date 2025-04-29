@@ -10,7 +10,8 @@
     "end_date": "2025-07-18",
     "course_fee": 850,
     "created_at": "2024-10-02",
-    "updated_at": "2025-02-20"
+    "updated_at": "2025-02-20",
+    "prerequisites": []
   },
   {
     "id": "56f7ecb3-64d7-479f-901c-2c70df255272",
@@ -23,7 +24,22 @@
     "end_date": "2025-07-16",
     "course_fee": 750,
     "created_at": "1900-01-20",
-    "updated_at": "2024-06-17"
+    "updated_at": "2024-06-17",
+    "prerequisites": []
+  },
+  {
+    "id": "56f7ecb3-64d7-479f-901c-2c70df255272",
+    "course_code": "YODE-202",
+    "title": "Advance Yodeling",
+    "description": "Riiicola.",
+    "description_full": "**Course Overview**\n\nThis is a comprehensive guide to mastering meditative yodeling.\n\n**In this course, you will:**\n- Participate in immersive activities\n- Learn advanced techniques\n- Graduate with mythical-level skills\n\nBy the end, you'll be well-versed in the art of meditative yodeling.",
+    "instructor_id": "840629a0-ed4f-4a82-8f1f-5ca983d39234",
+    "start_date": "2025-06-02",
+    "end_date": "2025-07-16",
+    "course_fee": 750,
+    "created_at": "1900-01-20",
+    "updated_at": "2024-06-17",
+    "prerequisites": ["YODE-101"]
   },
   {
     "id": "f8026d00-fb9c-48a0-8ef9-d4b3d340c404",
@@ -36,7 +52,8 @@
     "end_date": "2025-07-12",
     "course_fee": 1200,
     "created_at": "2024-10-08",
-    "updated_at": "2024-10-13"
+    "updated_at": "2024-10-13",
+    "prerequisites": []
   },
   {
     "id": "51a1f42d-1399-4134-ace8-6941a0cb3a2f",
@@ -49,7 +66,8 @@
     "end_date": "2025-07-28",
     "course_fee": 750,
     "created_at": "2025-04-14",
-    "updated_at": "2025-06-23"
+    "updated_at": "2025-06-23",
+    "prerequisites": []
   },
   {
     "id": "96d89673-fcf2-4bd8-ae3d-968bf897d6e3",
@@ -62,7 +80,8 @@
     "end_date": "2025-08-18",
     "course_fee": 600,
     "created_at": "2024-06-24",
-    "updated_at": "2024-11-17"
+    "updated_at": "2024-11-17",
+    "prerequisites": ["BASKET-201", "YODE-101"]
   },
   {
     "id": "a05bb6b4-364e-4b4c-bf1f-4527d62720cc",
@@ -75,7 +94,8 @@
     "end_date": "2025-06-29",
     "course_fee": 900,
     "created_at": "2024-09-08",
-    "updated_at": "2024-08-17"
+    "updated_at": "2024-08-17",
+    "prerequisites": []
   },
   {
     "id": "87e32e9f-45e7-412f-bf88-00cfa2e6b6c3",
@@ -88,7 +108,8 @@
     "end_date": "2025-08-03",
     "course_fee": 900,
     "created_at": "2024-06-07",
-    "updated_at": "2024-07-15"
+    "updated_at": "2024-07-15",
+    "prerequisites": []
   },
   {
     "id": "bbaaf1cf-1c00-4e32-bb4e-70f292cc1b3d",
@@ -101,6 +122,7 @@
     "end_date": "2025-08-02",
     "course_fee": 600,
     "created_at": "2024-10-30",
-    "updated_at": "2024-05-25"
+    "updated_at": "2024-05-25",
+    "prerequisites": []
   }
 ]

@@ -61,13 +61,7 @@ class Course(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    prerequisites = models.ManyToManyField(
-        'self',
-        symmetrical=False,
-        blank=True,
-        related_name='required_for',
-        help_text='Courses that must be completed before enrolling in this course.'
-    )
+    prerequisites = models.JSONField(default=list, blank=True, help_text='List of course codes that must be completed before enrolling in this course.')
 
 
     def __str__(self):

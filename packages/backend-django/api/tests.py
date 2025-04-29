@@ -1,6 +1,6 @@
 from django.test import TestCase
 from api.serializers import CourseSerializer
-from api.models import Instructor
+from api.models import Instructor, Course
 
 class CRMTests(TestCase):
     def test_instructors_endpoint(self):
@@ -95,6 +95,7 @@ class CourseSerializerTests(TestCase):
             "end_date": "2025-05-15",
             "course_fee": "1000.00",
             "syllabus_url": "",
+            "prerequisites": []
         }
         serializer = CourseSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
@@ -113,7 +114,7 @@ class CourseSerializerTests(TestCase):
             instructor=self.instructor
         )
 
-        # Now create a new course with that prerequisite
+        # Now create a new course with that prerequisite (using course code)
         data = {
             "course_code": "TEST-201",
             "title": "Advanced Test Course",
@@ -124,18 +125,17 @@ class CourseSerializerTests(TestCase):
             "end_date": "2025-06-30",
             "course_fee": "1200.00",
             "syllabus_url": "",
-            "prerequisites": [str(prereq_course.id)]
+            "prerequisites": [prereq_course.course_code]
         }
         serializer = CourseSerializer(data=data)
+
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
         course = serializer.save()
-        course.prerequisites.set(data["prerequisites"])
 
         self.assertEqual(course.course_code, "TEST-201")
         self.assertEqual(course.instructor, self.instructor)
-        self.assertEqual(course.prerequisites.count(), 1)
-        self.assertEqual(str(course.prerequisites.first().id), str(prereq_course.id))
+        self.assertIn(prereq_course.course_code, course.prerequisites)
 
     def test_update_course_set_prerequisites(self):
         """Test updating a course to assign multiple prerequisites."""
@@ -170,8 +170,8 @@ class CourseSerializerTests(TestCase):
             "syllabus_url": target_course.syllabus_url,
             "course_fee": str(target_course.course_fee),
             "prerequisites": [
-                str(prereq1.id),
-                str(prereq2.id),
+                str(prereq1.course_code),
+                str(prereq2.course_code),
             ]
         }
         
@@ -182,18 +182,16 @@ class CourseSerializerTests(TestCase):
         # Save and manually set prerequisites after save
         course = serializer.save()
         prereq_ids = update_data["prerequisites"]
-        course.prerequisites.set(prereq_ids)
+        course.prerequisites = prereq_ids
 
         # Assertions
-        self.assertEqual(course.prerequisites.count(), 2)
-        self.assertIn(prereq1, course.prerequisites.all())
-        self.assertIn(prereq2, course.prerequisites.all())
+        self.assertEqual(len(course.prerequisites), 2)
+        self.assertIn(prereq1.course_code, course.prerequisites)
+        self.assertIn(prereq2.course_code, course.prerequisites)
 
 
     def test_update_course_assign_instructor(self):
         """Test updating a course to assign an instructor."""
-        # Create a course with a temporary instructor instead of None
-        from api.models import Course
 
         dummy_instructor = Instructor.objects.create(
             name_first="Temp",
@@ -246,3 +244,54 @@ class CourseSerializerTests(TestCase):
 
         # Assertions
         self.assertEqual(updated_course.instructor.id, new_instructor.id)        
+
+    def test_update_course_change_prereqs(self):
+        """Test updating a course to change its prerequisites."""
+        # Create prerequisite courses
+        prereq1 = self.create_basic_course(
+            course_code="PRE-201",
+            title="Basic Unicorn Grooming",
+            instructor=self.instructor
+        )
+        prereq2 = self.create_basic_course(
+            course_code="PRE-202",
+            title="Advanced Unicorn Grooming",
+            instructor=self.instructor
+        )
+
+        # Create the course we will update
+        target_course = self.create_basic_course(
+            course_code="MYST-201",
+            title="Advanced Unicorn Grooming",
+            instructor=self.instructor
+        )
+
+        # Simulate incoming update data
+        update_data = {
+            "course_code": target_course.course_code,
+            "title": target_course.title,
+            "description": target_course.description,
+            "description_full": target_course.description_full,
+            "instructor_id": str(self.instructor.id),
+            "start_date": str(target_course.start_date),
+            "end_date": str(target_course.end_date),
+            "syllabus_url": target_course.syllabus_url,
+            "course_fee": str(target_course.course_fee),
+            "prerequisites": [
+                str(prereq1.course_code),
+                str(prereq2.course_code),
+            ]
+        }
+
+        # Deserialize and validate
+        serializer = CourseSerializer(target_course, data=update_data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        # Save and manually set prerequisites after save
+        course = serializer.save()
+        chk = Course.objects.get(id=course.id)
+
+        # Assertions
+        self.assertEqual(len(chk.prerequisites), 2)
+        self.assertIn(prereq1.course_code, chk.prerequisites)
+        self.assertIn(prereq2.course_code, chk.prerequisites)
