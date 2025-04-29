@@ -1,5 +1,9 @@
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+
 import { CoursesPageContainer } from "~/components/Course/CoursesPageContainer";
-import type { MetaFunction } from "@remix-run/node";
+import { getCoursesPageData } from "~/loaders/courses";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,6 +15,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader(args: LoaderFunctionArgs) {
+  const { courses, instructors } = await getCoursesPageData();
+  return json({ courses, instructors });
+}
+
 export default function CoursesPage() {
-  return <CoursesPageContainer />;
+  const loaderData = useLoaderData<typeof loader>();
+  return <CoursesPageContainer loaderData={loaderData} />;
 }

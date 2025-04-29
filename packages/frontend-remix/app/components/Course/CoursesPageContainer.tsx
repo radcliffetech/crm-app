@@ -1,17 +1,9 @@
 import type { Course, CourseFormData, Instructor } from "~/types";
-import {
-  createCourse,
-  deleteCourse,
-  getCoursesPageData,
-  updateCourse,
-} from "~/loaders/courses";
-// components/Common/CoursesPageContainer.tsx
-import { useEffect, useState } from "react";
+import { createCourse, deleteCourse, updateCourse } from "~/loaders/courses";
 
 import { AddButton } from "~/components/Common/AddButton";
 import { CourseForm } from "~/components/Course/CourseForm";
 import { CoursesList } from "~/components/Course/CoursesList";
-import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
@@ -19,6 +11,7 @@ import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useConfirmDialog } from "~/components/Common/ConfirmDialogProvider";
+import { useState } from "react";
 
 export const emptyCourseForm: CourseFormData = {
   course_code: "",
@@ -33,44 +26,36 @@ export const emptyCourseForm: CourseFormData = {
   prerequisites: [] as string[],
 };
 
-export function CoursesPageContainer() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
+type CoursesPageContainerProps = {
+  loaderData: {
+    courses: Course[];
+    instructors: Instructor[];
+  };
+};
+
+export function CoursesPageContainer({
+  loaderData,
+}: CoursesPageContainerProps) {
+  const [courses, setCourses] = useState<Course[]>(loaderData.courses);
+  const [instructors] = useState<Instructor[]>(loaderData.instructors);
   const [showForm, setShowForm] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [formData, setFormData] = useState<CourseFormData>(emptyCourseForm);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const confirm = useConfirmDialog();
   const user = useAuth();
-
-  function reloadData() {
-    setLoading(true);
-    setError(null);
-    getCoursesPageData()
-      .then(({ courses, instructors }) => {
-        setCourses(courses);
-        setInstructors(instructors);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load courses.");
-      })
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingCourse) {
         await updateCourse(editingCourse.id, formData);
-        reloadData();
+        setCourses((prev) =>
+          prev.map((c) =>
+            c.id === editingCourse.id ? { ...c, ...formData } : c
+          )
+        );
         setEditingCourse(null);
       } else {
         const newCourse = await createCourse(formData);
@@ -113,7 +98,7 @@ export function CoursesPageContainer() {
           setFormData={setFormData}
           editingCourse={editingCourse}
           instructors={instructors}
-          onSubmit={(e) => handleSubmit(e)}
+          onSubmit={handleSubmit}
           onCancel={() => {
             setFormData(emptyCourseForm);
             setEditingCourse(null);
@@ -122,8 +107,6 @@ export function CoursesPageContainer() {
           allCourses={courses}
         />
       </Modal>
-
-      <DataLoaderState loading={loading} error={error} />
 
       <CoursesList
         courses={courses}
@@ -160,10 +143,11 @@ export function CoursesPageContainer() {
             }
             try {
               await deleteCourse(id);
-              reloadData();
+              setCourses((prev) => prev.filter((c) => c.id !== id));
+              toast.success("Course deleted successfully!");
             } catch (error: any) {
               console.error(error);
-              setError(
+              toast.error(
                 error.message ||
                   "Cannot delete course: it has active student registrations."
               );

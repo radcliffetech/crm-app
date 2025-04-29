@@ -1,12 +1,10 @@
-// components/Search/SearchContainer.tsx
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
-import { SearchResultsList } from "~/components/Student/SearchResultsList";
-import { searchLoader } from "~/loaders/search";
+import { SearchResultsList } from "~/components/Search/SearchResultsList";
 
 function SearchResults({
   loading,
@@ -24,7 +22,6 @@ function SearchResults({
           Looking for matches...
         </p>
       )}
-
       {!loading && results && (
         <div>
           {flatResults.length === 0 ? (
@@ -39,7 +36,6 @@ function SearchResults({
           )}
         </div>
       )}
-
       {!loading && !results && (
         <p className="text-gray-500 italic">
           Try searching for a student's name, an instructor, or a course title.
@@ -52,13 +48,13 @@ function SearchResults({
 function SearchForm({
   query,
   setQuery,
-  onSubmit,
   loading,
+  onSubmit,
 }: {
   query: string;
   setQuery: (value: string) => void;
-  onSubmit: () => void;
   loading: boolean;
+  onSubmit: () => void;
 }) {
   return (
     <div className="my-4 flex">
@@ -72,7 +68,7 @@ function SearchForm({
       />
       <button
         onClick={onSubmit}
-        disabled={loading}
+        disabled={loading || query.trim() === ""}
         className="px-4 py-2 btn-primary rounded-r-lg border border-blue-600 disabled:opacity-50"
       >
         {loading ? "Searching..." : "Search"}
@@ -81,45 +77,41 @@ function SearchForm({
   );
 }
 
+type LoaderData = {
+  q: string;
+  results: { type: string; label: string; link: string }[] | null;
+};
+
 export function SearchContainer() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<
-    { type: string; label: string; link: string }[] | null
-  >(null);
-  const [loading, setLoading] = useState(false);
+  const initialData = useLoaderData<LoaderData>();
+  const fetcher = useFetcher();
+  const [query, setQuery] = useState(initialData.q);
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
 
-  async function fetchResults() {
-    if (query.trim() === "") {
-      setResults(null);
-      return;
-    }
-    setLoading(true);
-    const data = await searchLoader(query);
-    setResults(data);
-    setLoading(false);
-  }
+  const data = fetcher.data as LoaderData | undefined;
+  const loading = fetcher.state !== "idle";
+  const results = data?.results ?? initialData.results;
 
+  // Debounce query typing
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const q = params.get("q");
-    if (q) {
-      setQuery(q);
-      fetchResults();
-    }
-  }, []);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      fetchResults();
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`, {
-        replace: true,
-      });
-    }, 500);
-
-    return () => clearTimeout(handler);
+    const timeout = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+    }, 400);
+    return () => clearTimeout(timeout);
   }, [query]);
+
+  // Fetch on debounced input change
+  useEffect(() => {
+    if (debouncedQuery !== "") {
+      fetcher.load(`/search?q=${encodeURIComponent(debouncedQuery)}`);
+    }
+  }, [debouncedQuery]);
+
+  function handleManualSubmit() {
+    if (query.trim() !== "") {
+      fetcher.load(`/search?q=${encodeURIComponent(query.trim())}`);
+    }
+  }
 
   return (
     <PageFrame>
@@ -127,12 +119,14 @@ export function SearchContainer() {
       <PageSubheader>
         Find students, instructors, courses, and registrations.
       </PageSubheader>
+
       <SearchForm
         query={query}
         setQuery={setQuery}
-        onSubmit={fetchResults}
         loading={loading}
+        onSubmit={handleManualSubmit}
       />
+
       <SearchResults loading={loading} results={results} />
     </PageFrame>
   );
