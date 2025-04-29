@@ -27,10 +27,6 @@ class InstructorViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset().filter(is_active=True)
         return queryset
 
-    def update(self, request, *args, **kwargs):
-        print("Incoming data:", request.data)   
-        return super( ).update(request, *args, **kwargs)
-
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         # Check for active or upcoming courses before marking inactive
@@ -80,14 +76,6 @@ class CourseViewSet(viewsets.ModelViewSet):
         instance.is_active = False
         instance.save()
         return Response(status=204)
-
-    def create(self, request, *args, **kwargs):
-        print("Incoming data:", request.data)
-        return super().create(request, *args, **kwargs)
-    
-    def update(self, request, *args, **kwargs):
-        print("Incoming data:", request.data)
-        return super().update(request, *args, **kwargs)
     
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by("-created_at")
@@ -125,7 +113,6 @@ class StudentViewSet(viewsets.ModelViewSet):
         return queryset
 
     def destroy(self, request, *args, **kwargs):
-        print("Destroying student:", self.request.data)
         instance = self.get_object()
         # Check for active or upcoming registrations before marking inactive
         active_registrations = Registration.objects.filter(
@@ -165,7 +152,6 @@ class RegistrationViewSet(viewsets.ModelViewSet):
     def unregister_student_from_course(self, request):
         student_id = request.data.get("student_id")
         course_id = request.data.get("course_id")
-        print("Post data:", request.data)
 
         if not student_id or not course_id:
             return Response({"error": "student_id and course_id are required"}, status=400)
@@ -194,7 +180,6 @@ class RegistrationViewSet(viewsets.ModelViewSet):
     def register_student_for_course(self, request):
         student_id = request.data.get("student_id")
         course_id = request.data.get("course_id")
-        print("Post data:", request.data)
 
         if not student_id or not course_id:
             return Response({"error": "student_id and course_id are required"}, status=400)
@@ -211,17 +196,40 @@ class RegistrationViewSet(viewsets.ModelViewSet):
             return Response({"error": "Student is already registered for this course."}, status=400)
 
         try:
+            course = Course.objects.get(id=course_id)
+            student = Student.objects.get(id=student_id)
+
+            # Check for missing prerequisites
+            missing_prereqs = []
+            for prereq_code in course.prerequisites:
+                completed_course = Course.objects.filter(course_code=prereq_code).first()
+                if not completed_course:
+                    missing_prereqs.append(prereq_code)
+                    continue
+                completed_registration = Registration.objects.filter(
+                    student=student,
+                    course=completed_course,
+                    registration_status="registered",
+                    is_active=True
+                ).exists()
+                if not completed_registration:
+                    missing_prereqs.append(prereq_code)
+
+            if missing_prereqs:
+                return Response(
+                    {"error": f"Student is missing required prerequisites: {missing_prereqs}"},
+                    status=400
+                )
+
             _ = Registration.objects.create(
-                student_id=student_id,
-                course_id=course_id,
+                student=student,
+                course=course,
                 registration_status="registered",
                 payment_status="pending"
             )
 
-            self.email_service.send_registration_email(
-                student=Student.objects.get(id=student_id),
-                course=Course.objects.get(id=course_id)
-            )
+            self.email_service.send_registration_email(student=student, course=course)
+
             return Response({"message": "Student registered successfully."})
         except Exception as e:
             return Response({"error": str(e)}, status=500)

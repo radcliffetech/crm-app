@@ -2,9 +2,9 @@ name: CRM App CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test-backend:
@@ -31,7 +31,8 @@ jobs:
       - name: Run Django tests
         working-directory: packages/backend-django
         run: |
-          python manage.py test
+          coverage run manage.py test
+          coverage report --fail-under=80
 
   build-frontend:
     runs-on: ubuntu-latest

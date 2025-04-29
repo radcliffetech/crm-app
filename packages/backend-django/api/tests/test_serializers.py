@@ -84,6 +84,23 @@ class CourseSerializerTests(TestCase):
         self.assertEqual(course.instructor, self.instructor)
         self.assertIn(prereq_course.course_code, course.prerequisites)
 
+    def test_create_course_without_instructor_raises_validation_error(self):
+        """Test that creating a course without an instructor raises a ValidationError."""
+        data = {
+            "course_code": "TEST-999",
+            "title": "Course Without Instructor",
+            "description": "No instructor provided",
+            "description_full": "Details",
+            "start_date": "2025-09-01",
+            "end_date": "2025-09-30",
+            "course_fee": "500.00",
+            "syllabus_url": "",
+            "prerequisites": []
+        }
+        serializer = CourseSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("instructor_id", serializer.errors)
+        
     def test_update_course_set_prerequisites(self):
         """Test updating a course to assign multiple prerequisites."""
         # Create prerequisite courses
@@ -285,6 +302,37 @@ class CourseListSerializerTests(TestCase):
         self.assertEqual(data["prerequisites"], ["PREREQ-1"])
 
 
+    def test_course_list_enrollment_count_increments(self):
+        instructor = Instructor.objects.create(
+            name_first="Test",
+            name_last="Teacher",
+            email="teacher@example.com"
+        )
+        course = Course.objects.create(
+            course_code="COUNT-101",
+            title="Counting Course",
+            description="Counts enrollments",
+            description_full="Description",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-01-31",
+            course_fee=500.00,
+        )
+        student = Student.objects.create(
+            name_first="Bob",
+            name_last="Builder",
+            email="bob@example.com"
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        serializer = CourseListSerializer(course)
+        self.assertEqual(serializer.data["enrollment_count"], 1)
+
+
 class StudentSerializerTests(TestCase):
     def test_student_serializer(self):
         student = Student.objects.create(
@@ -335,3 +383,20 @@ class RegistrationSerializerTests(TestCase):
         self.assertEqual(data["course_name"], "Gem Handling")
         self.assertEqual(data["registration_status"], "confirmed")
         self.assertEqual(data["payment_status"], "paid")
+
+    def test_create_course_missing_instructor_raises_validation_error(self):
+        """Test that creating a course without an instructor raises a ValidationError."""
+        data = {
+            "course_code": "TEST-999",
+            "title": "Course Without Instructor",
+            "description": "No instructor provided",
+            "description_full": "Details",
+            "start_date": "2025-09-01",
+            "end_date": "2025-09-30",
+            "course_fee": "500.00",
+            "syllabus_url": "",
+            "prerequisites": []
+        }
+        serializer = CourseSerializer(data=data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("instructor_id", serializer.errors)

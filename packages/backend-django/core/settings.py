@@ -7,8 +7,8 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
-if SECRET_KEY == "":
-    raise ValueError("SECRET_KEY environment variable not set.")
+if SECRET_KEY == "":  # pragma: no cover
+    raise ValueError("SECRET_KEY environment variable not set.")  # pragma: no cover
 
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 

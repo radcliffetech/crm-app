@@ -2,7 +2,7 @@ import json
 import os
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from api.models import Student, Course, Instructor
+from api.models import Student, Course, Instructor, Registration
 from uuid import UUID
 from datetime import datetime
 
@@ -19,6 +19,7 @@ class Command(BaseCommand):
         Student.objects.all().delete()
         Course.objects.all().delete()
         Instructor.objects.all().delete()
+        Registration.objects.all().delete()
 
         self.stdout.write("Loading instructors...")
         self.load_data("instructors.json", self.load_instructor)
