@@ -4,37 +4,33 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
 import type { Registration } from "~/types";
-import { RegistrationDropdownActions } from "../ui/RegistrationDropdownActions";
+import { RegistrationDropdownActions } from "./RegistrationDropdownActions";
 import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Registration>();
 
-export function RegistrationsForStudentList({
+export function RegistrationsForCourseList({
   registrations,
   unregisterAction,
 }: {
   registrations: Registration[];
-  unregisterAction: (reg: Registration) => Promise<void>;
+  unregisterAction: (reg: Registration) => void;
 }) {
-  if (registrations.length === 0) {
-    return <p className="text-gray-500 italic">No courses registered.</p>;
-  }
-
   const columns = useMemo<ColumnDef<Registration, unknown>[]>(
     () => [
       columnHelper.display({
-        id: "course_name",
-        header: "Course Name",
+        id: "name",
+        header: "Name",
         cell: ({ row }) => (
           <Link
-            to={`/courses/${row.original.course_id}`}
+            to={`/students/${row.original.student_id}`}
             className="text-blue-600 hover:underline"
           >
-            {row.original?.course_name}
+            {row.original.student_name}
           </Link>
         ),
       }),
@@ -68,7 +64,7 @@ export function RegistrationsForStudentList({
         ),
       }),
     ],
-    [unregisterAction],
+    [unregisterAction]
   );
 
   const table = useReactTable({
@@ -77,9 +73,5 @@ export function RegistrationsForStudentList({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  return (
-    <>
-      <BasicTable table={table} />
-    </>
-  );
+  return <BasicTable table={table} />;
 }

@@ -4,10 +4,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Course } from "~/types";
-import { DropdownActions } from "~/components/ui/DropdownActions";
+import { DropdownActions } from "~/components/Common/DropdownActions";
 import { Link } from "@remix-run/react";
 import { useMemo } from "react";
 
@@ -87,7 +87,7 @@ export function CoursesList({
           ),
       }),
     ],
-    [onEdit, onDelete, canEdit, canDelete, deletingId],
+    [onEdit, onDelete, canEdit, canDelete, deletingId]
   );
 
   const table = useReactTable({

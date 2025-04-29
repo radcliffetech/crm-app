@@ -4,7 +4,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import { Link } from "@remix-run/react";
 
 type ResultRow = {

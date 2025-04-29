@@ -1,7 +1,7 @@
 import type { MetaFunction } from "@remix-run/node";
-import { PageFrame } from "~/components/ui/PageFrame";
-import { PageHeader } from "~/components/ui/PageHeader";
-import PageSubheader from "~/components/ui/PageSubheader";
+import { PageFrame } from "~/components/Common/PageFrame";
+import { PageHeader } from "~/components/Common/PageHeader";
+import { PageSubheader } from "~/components/Common/PageSubheader";
 
 export const meta: MetaFunction = () => {
   return [

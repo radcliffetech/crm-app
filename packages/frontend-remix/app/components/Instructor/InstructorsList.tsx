@@ -1,57 +1,56 @@
-import { Link } from "@remix-run/react";
 import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
-  type ColumnDef,
 } from "@tanstack/react-table";
+
+import { BasicTable } from "~/components/Common/BasicTable";
+import type { ColumnDef } from "@tanstack/react-table";
+import { DropdownActions } from "~/components/Common/DropdownActions";
+import type { Instructor } from "~/types";
+import { Link } from "@remix-run/react";
 import { useMemo } from "react";
-import { BasicTable } from "~/components/ui/BasicTable";
-import type { Student } from "~/types";
 
-const columnHelper = createColumnHelper<Student>();
+const columnHelper = createColumnHelper<Instructor>();
 
-import { DropdownActions } from "~/components/ui/DropdownActions";
-
-export function StudentsList({
-  students,
+export function InstructorsList({
+  instructors,
   onEdit,
   onDelete,
   canEdit,
   canDelete,
   deletingId,
 }: {
-  students: Student[];
-  onEdit: (student: Student) => void;
-  onDelete: (student: Student) => void;
+  instructors: Instructor[];
+  onEdit: (instructor: Instructor) => void;
+  onDelete: (id: string) => void;
   canEdit: boolean;
   canDelete: boolean;
   deletingId: string | null;
 }) {
-  const columns = useMemo<ColumnDef<Student, any>[]>(
+  const columns = useMemo<ColumnDef<Instructor, unknown>[]>(
     () => [
       columnHelper.display({
         id: "name",
         header: "Name",
         cell: ({ row }) => (
           <Link
-            to={`/students/${row.original.id}`}
+            to={`/instructors/${row.original.id}`}
             className="text-blue-600 hover:underline"
           >
             {row.original.name_first} {row.original.name_last}
           </Link>
         ),
       }),
-      columnHelper.accessor("email", {
+      columnHelper.display({
+        id: "email",
         header: "Email",
+        cell: ({ row }) => row.original.email,
       }),
-      columnHelper.accessor("company", {
-        header: "Company",
-        cell: (info) => info.getValue() || "-",
-      }),
-      columnHelper.accessor("phone", {
-        header: "Phone",
-        cell: (info) => info.getValue() || "-",
+      columnHelper.display({
+        id: "bio",
+        header: "Bio",
+        cell: ({ row }) => row.original.bio || "-",
       }),
       columnHelper.display({
         id: "actions",
@@ -63,19 +62,19 @@ export function StudentsList({
             </div>
           ) : (
             <DropdownActions
+              onEdit={() => onEdit(row.original)}
+              onDelete={() => onDelete(row.original.id)}
               canEdit={canEdit}
               canDelete={canDelete}
-              onEdit={() => onEdit(row.original)}
-              onDelete={() => onDelete(row.original)}
             />
           ),
       }),
     ],
-    [onEdit, onDelete, canEdit, canDelete, deletingId],
+    [onEdit, onDelete, canEdit, canDelete]
   );
 
   const table = useReactTable({
-    data: students,
+    data: instructors,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });

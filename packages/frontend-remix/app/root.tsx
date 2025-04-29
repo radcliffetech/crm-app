@@ -10,12 +10,12 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import type { User, UserRole } from "./types";
-import { createContext, useContext , useState } from "react";
+import { createContext, useContext, useState } from "react";
 
-import { ConfirmDialogProvider } from "./components/ConfirmDialogProvider";
-import { Footer } from "./components/ui/Footer";
+import { ConfirmDialogProvider } from "./components/Common/ConfirmDialogProvider";
+import { Footer } from "./components/Common/Footer";
 import type { LinksFunction } from "@remix-run/node";
-import { Navbar } from "./components/ui/Navbar";
+import { Navbar } from "./components/Common/Navbar";
 import { Toaster } from "react-hot-toast";
 
 export const mockUser: User = {
