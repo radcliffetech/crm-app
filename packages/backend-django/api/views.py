@@ -180,7 +180,6 @@ class RegistrationViewSet(viewsets.ModelViewSet):
     def register_student_for_course(self, request):
         student_id = request.data.get("student_id")
         course_id = request.data.get("course_id")
-        print("Post data:", request.data)
 
         if not student_id or not course_id:
             return Response({"error": "student_id and course_id are required"}, status=400)

@@ -398,9 +398,17 @@ class CourseTests(TestCase):
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_course_filter_active_courses_no_matches(self):
-        self.course.start_date = "2024-01-01"
-        self.course.end_date = "2024-06-01"
-        self.course.save()
+        Course.objects.all().delete()  # Clean out any other test courses
+        self.course = Course.objects.create(
+            course_code="PAST-101",
+            title="Old Course",
+            description="Previously active course",
+            description_full="Old full description",
+            instructor=self.instructor,
+            start_date="2022-01-01",
+            end_date="2022-06-01",
+            course_fee=500.00
+        )
         url = "/api/courses/?active_courses=true"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
