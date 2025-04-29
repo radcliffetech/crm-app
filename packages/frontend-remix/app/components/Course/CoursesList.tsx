@@ -8,6 +8,7 @@ import { BasicTable } from "~/components/Common/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Course } from "~/types";
 import { DropdownActions } from "~/components/Common/DropdownActions";
+import { EditButton } from "~/components/Common/EditButton";
 import { Link } from "@remix-run/react";
 import { useMemo } from "react";
 
@@ -33,6 +34,7 @@ export function CoursesList({
       columnHelper.display({
         id: "title",
         header: "Title",
+        enableSorting: true,
         cell: (info) => (
           <Link
             to={`/courses/${info.row.original.id}`}
@@ -45,38 +47,42 @@ export function CoursesList({
       columnHelper.display({
         id: "course_code",
         header: "Course Code",
+        enableSorting: true,
         cell: (info) => info.row.original.course_code,
       }),
       columnHelper.display({
         id: "instructor_name",
         header: "Instructor",
+        enableSorting: true,
         cell: ({ row }) => row.original.instructor_name,
       }),
       columnHelper.display({
         id: "enrollment_count",
         header: "Enrolled",
+        enableSorting: true,
         cell: ({ row }) => row.original.enrollment_count,
       }),
       columnHelper.display({
         id: "start_date",
         header: "Start Date",
+        enableSorting: true,
         cell: (info) =>
           new Date(info.row.original.start_date).toLocaleDateString(),
       }),
       columnHelper.display({
         id: "end_date",
         header: "End Date",
+        enableSorting: true,
         cell: (info) =>
           new Date(info.row.original.end_date).toLocaleDateString(),
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Actions</div>,
+        enableSorting: false,
         cell: (info) =>
           deletingId === info.row.original.id ? (
-            <div className="flex justify-center p-2">
-              <div className="h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+            <EditButton loading={true} />
           ) : (
             <DropdownActions
               canEdit={canEdit}
@@ -94,6 +100,7 @@ export function CoursesList({
     data: courses,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    enableSorting: true,
   });
 
   return <BasicTable table={table} />;

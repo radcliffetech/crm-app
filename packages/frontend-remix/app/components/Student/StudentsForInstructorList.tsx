@@ -36,6 +36,7 @@ export function StudentsForInstructorList({
       columnHelper.display({
         id: "name",
         header: "Name",
+        enableSorting: true,
         cell: ({ row }) => (
           <Link
             to={`/students/${row.original.id}`}
@@ -48,11 +49,13 @@ export function StudentsForInstructorList({
       columnHelper.display({
         id: "email",
         header: "Email",
+        enableSorting: true,
         cell: ({ row }) => row.original.email,
       }),
       columnHelper.display({
         id: "courses",
         header: "Enrolled In",
+        enableSorting: false,
         cell: ({ row }) => {
           const enrolledCourses = allCourses
             .filter((course) => course.instructor_id === instructor_id)
@@ -88,6 +91,7 @@ export function StudentsForInstructorList({
     data: students,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    enableSorting: true,
   });
 
   if (students.length === 0) {

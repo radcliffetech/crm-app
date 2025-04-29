@@ -1,11 +1,11 @@
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
 
 type EditButtonProps = {
-  loading: boolean;
+  loading?: boolean;
   onClick?: () => void;
 };
 
-export function EditButton({ loading, onClick }: EditButtonProps) {
+export function EditButton({ loading = false, onClick }: EditButtonProps) {
   if (loading) {
     return (
       <div className="flex justify-center p-2">

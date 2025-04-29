@@ -34,6 +34,7 @@ export function InstructorsList({
       columnHelper.display({
         id: "name",
         header: "Name",
+        enableSorting: true,
         cell: ({ row }) => (
           <Link
             to={`/instructors/${row.original.id}`}
@@ -46,19 +47,22 @@ export function InstructorsList({
       columnHelper.display({
         id: "email",
         header: "Email",
+        enableSorting: true,
         cell: ({ row }) => row.original.email,
       }),
       columnHelper.display({
         id: "bio",
         header: "Bio",
+        enableSorting: true,
         cell: ({ row }) => row.original.bio || "-",
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Actions</div>,
+        enableSorting: false,
         cell: ({ row }) =>
           deletingId === row.original.id ? (
-            <EditButton loading={true} />
+            <EditButton loading />
           ) : (
             <DropdownActions
               onEdit={() => onEdit(row.original)}
@@ -76,6 +80,7 @@ export function InstructorsList({
     data: instructors,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    enableSorting: true,
   });
 
   return <BasicTable table={table} />;
