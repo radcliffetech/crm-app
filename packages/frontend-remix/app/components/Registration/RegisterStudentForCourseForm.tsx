@@ -1,7 +1,6 @@
 import type { Course, Registration } from "~/types";
 
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
-import { registerStudentToCourse } from "~/loaders/registrations";
 
 export function RegisterStudentForCourseForm({
   student_id,
@@ -12,18 +11,17 @@ export function RegisterStudentForCourseForm({
   student_id: string;
   courses: Course[];
   registrations: Registration[];
-  onRegister: () => void;
+  onRegister: (courseId: string) => Promise<void>;
 }) {
   return (
-    <div className="mt-6 p-6 bg-gray-50 shadow-md rounded-md">
+    <div className="">
       <form
         onSubmit={async (e) => {
           e.preventDefault();
           const form = e.target as HTMLFormElement;
           const course_id = form.course_id.value;
           if (course_id) {
-            await registerStudentToCourse(student_id, course_id);
-            onRegister();
+            await onRegister(course_id);
           }
         }}
         className="flex items-center gap-4"
@@ -32,7 +30,7 @@ export function RegisterStudentForCourseForm({
           <option value="">Select a course</option>
           {courses
             .filter(
-              (course) => !registrations.some((r) => r.course_id === course.id),
+              (course) => !registrations.some((r) => r.course_id === course.id)
             )
             .map((course) => (
               <option key={course.id} value={course.id}>

@@ -80,7 +80,7 @@ export function InstructorDetailContainer({
               )}
             </>
           )}
-          <div className="py-4">
+          <div className="my-4 border border-gray-300 rounded p-4">
             <PageSubheader>Courses</PageSubheader>
             {courses.length > 0 ? (
               <CoursesForInstructorList courses={courses} />
@@ -89,8 +89,10 @@ export function InstructorDetailContainer({
             )}
           </div>
 
-          <PageSubheader>Students</PageSubheader>
-          <StudentsForInstructorList instructor_id={instructor.id} />
+          <div className="my-4 border border-gray-300 rounded p-4">
+            <PageSubheader>Students</PageSubheader>
+            <StudentsForInstructorList instructor_id={instructor.id} />
+          </div>
         </>
       )}
     </PageFrame>

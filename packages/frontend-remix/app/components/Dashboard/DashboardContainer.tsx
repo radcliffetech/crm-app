@@ -19,8 +19,6 @@ export function DashboardContainer({ loaderData }: DashboardContainerProps) {
 
   return (
     <PageFrame>
-      <PageHeader>Dashboard</PageHeader>
-
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <DashboardCard
           title="Students"
@@ -50,8 +48,10 @@ export function DashboardContainer({ loaderData }: DashboardContainerProps) {
         </div>
       </div>
 
-      <PageSubheader>Active Courses</PageSubheader>
-      <CoursesActiveList courses={courses} />
+      <div className="my-4 border border-gray-300 rounded p-4">
+        <PageSubheader>Active Courses</PageSubheader>
+        <CoursesActiveList courses={courses} />
+      </div>
     </PageFrame>
   );
 }

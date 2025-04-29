@@ -6,27 +6,22 @@ import type {
   Student,
 } from "~/types";
 import { FormEvent, useState } from "react";
-import {
-  registerStudentToCourse,
-  unregisterStudent,
-} from "~/loaders/registrations";
+import { Link, useRevalidator } from "@remix-run/react";
 
 import { CourseForm } from "~/components/Course/CourseForm";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
-import { Link } from "@remix-run/react";
 import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
 import { PencilSquareIcon } from "@heroicons/react/24/solid";
-import { RegisterCourseForStudentForm } from "~/components/Registration/RegisterCourseForStudentForm";
 import { RegistrationsForCourseList } from "~/components/Registration/RegistrationsForCourseList";
 import RenderMarkdown from "~/components/Common/RenderMarkdown";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
+import { unregisterStudent } from "~/loaders/registrations";
 import { updateCourse } from "~/loaders/courses";
 import { useAuth } from "~/root";
-import { useRevalidator } from "@remix-run/react";
 
 const emptyCourseForm: CourseFormData = {
   course_code: "",
@@ -98,19 +93,6 @@ export function CourseDetailContainer({
       .catch((err) => {
         console.error(err);
         toast.error("Failed to update course.");
-      });
-  };
-
-  const handleRegisterStudent = (student_id: string) => {
-    if (!course) return;
-    registerStudentToCourse(student_id, course.id)
-      .then(() => {
-        toast.success("Student registered successfully!");
-        revalidate();
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to register student.");
       });
   };
 
@@ -187,25 +169,22 @@ export function CourseDetailContainer({
             </div>
           )}
 
-          <div className="prose my-4 text-gray-700">
+          <div className="prose my-4 text-gray-700  border border-gray-300 rounded p-4">
             <RenderMarkdown>{course.description_full}</RenderMarkdown>
           </div>
 
-          <p className="text-xl font-light text-gray-800 mt-6">
-            Course Fee: $
+          <p className="text-xl font-light text-gray-800 mt-4  border border-gray-300 rounded p-4">
+            <h2 className="text-lg font-light text-gray-700 mb-2">
+              Course Fee
+            </h2>
+            $
             {Number(course.course_fee).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </p>
 
-          <RegisterCourseForStudentForm
-            course={course}
-            unregisteredStudents={unregisteredStudents}
-            onRegister={handleRegisterStudent}
-          />
-
-          <div className="py-4">
+          <div className="my-4 border border-gray-300 rounded p-4">
             <PageSubheader>Registered Students</PageSubheader>
             {registrations.length === 0 ? (
               <p className="text-gray-500 italic">No students registered.</p>

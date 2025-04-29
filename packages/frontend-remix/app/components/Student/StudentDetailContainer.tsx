@@ -10,6 +10,7 @@ import { RegisterStudentForCourseForm } from "~/components/Registration/Register
 import { RegistrationsForStudentList } from "~/components/Registration/RegistrationsForStudentList";
 import { StudentForm } from "~/components/Student/StudentForm";
 import { canAccessAdmin } from "~/lib/permissions";
+import { registerStudentToCourse } from "~/loaders/registrations";
 import { toast } from "react-hot-toast";
 import { unregisterStudent } from "~/loaders/registrations";
 import { updateStudent } from "~/loaders/students";
@@ -49,7 +50,7 @@ export function StudentDetailContainer({
       </PageHeader>
 
       {canAccessAdmin(user) && (
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-start mb-4">
           <button
             onClick={() => setEditing(true)}
             className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
@@ -60,12 +61,15 @@ export function StudentDetailContainer({
         </div>
       )}
 
-      <p className="mb-2">
-        <strong>Email:</strong> {student.email}
-      </p>
-      <p className="mb-2">
-        <strong>Notes:</strong> {student.notes || "—"}
-      </p>
+      <div className="my-4 border border-gray-300 rounded p-4">
+        <PageSubheader>Info</PageSubheader>
+        <p className="mb-2">
+          <strong>Email:</strong> {student.email}
+        </p>
+        <p className="mb-2">
+          <strong>Notes:</strong> {student.notes || "—"}
+        </p>
+      </div>
 
       {editing && (
         <Modal isOpen={editing} onClose={() => setEditing(false)}>
@@ -90,23 +94,34 @@ export function StudentDetailContainer({
         </Modal>
       )}
 
-      <PageSubheader>Registration</PageSubheader>
-      <RegisterStudentForCourseForm
-        student_id={student.id}
-        courses={courses}
-        registrations={registrations}
-        onRegister={async () => {
-          try {
-            toast.success("Student registered successfully!");
-            revalidate();
-          } catch (err) {
-            console.error(err);
-            toast.error("Failed to register student.");
-          }
-        }}
-      />
+      <div className="my-4 border border-gray-300 rounded p-4">
+        <PageSubheader>Registration</PageSubheader>
+        <RegisterStudentForCourseForm
+          student_id={student.id}
+          courses={courses}
+          registrations={registrations}
+          onRegister={async (courseId: string) => {
+            try {
+              await registerStudentToCourse(student.id, courseId);
+              toast.success("Student registered successfully!");
+              await revalidate();
+            } catch (err: any) {
+              console.error(err);
 
-      <div className="py-4">
+              try {
+                const errorData = await err.response?.json();
+                toast.error(errorData?.error || "Failed to register student.");
+              } catch {
+                toast.error("Failed to register student.");
+              }
+
+              throw err;
+            }
+          }}
+        />
+      </div>
+
+      <div className="my-4 border border-gray-300 rounded p-4">
         <PageSubheader>Registered Courses</PageSubheader>
         <RegistrationsForStudentList
           registrations={registrations}
