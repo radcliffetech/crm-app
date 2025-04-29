@@ -165,8 +165,9 @@ crm-app/
 
 Planned future enhancements for the CRM:
 
+- [ ] Mock Payments
+- [ ] Registrations & Payments - Tracking and Manaegment
+- [ ] Course Calendar
+- [ ] Course Catalog (with AI)
 - [ ] Support multiple user roles: Admin, Faculty, and Students
-- [ ] Implement a simple payment processing system
 - [ ] Add a messaging system for CRM users
-- [ ] Build a dynamic course catalog with materials
-- [ ] Enhance README with additional live screenshots
