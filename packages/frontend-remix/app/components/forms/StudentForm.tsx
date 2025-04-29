@@ -27,7 +27,6 @@ export function StudentForm({
   setFormData,
   onSubmit,
   editingstudent_id,
-  onCancel,
 }: StudentFormProps) {
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">

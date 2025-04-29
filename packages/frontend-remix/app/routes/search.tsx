@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "@remix-run/react";
 
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
@@ -6,8 +7,6 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import PageSubheader from "~/components/ui/PageSubheader";
 import { SearchResultsList } from "~/components/lists/SearchResultsList";
 import { searchLoader } from "~/loaders/search";
-import { useLocation } from "@remix-run/react";
-import { useNavigate } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [

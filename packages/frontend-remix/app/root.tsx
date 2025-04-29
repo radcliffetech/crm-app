@@ -10,15 +10,13 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import type { User, UserRole } from "./types";
-import { createContext, useContext } from "react";
+import { createContext, useContext , useState } from "react";
 
 import { ConfirmDialogProvider } from "./components/ConfirmDialogProvider";
 import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";
 import { Toaster } from "react-hot-toast";
-import { loadVitePluginContext } from "@remix-run/dev/dist/vite/plugin";
-import { useState } from "react";
 
 export const mockUser: User = {
   id: "123",

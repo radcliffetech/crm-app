@@ -18,6 +18,8 @@
     "@remix-run/react": "^2.16.5",
     "@remix-run/serve": "^2.16.5",
     "@tanstack/react-table": "^8.21.3",
+    "eslint-plugin-tailwindcss": "^3.18.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "firebase": "^11.6.0",
     "firebase-admin": "^13.3.0",
     "isbot": "^4.1.0",

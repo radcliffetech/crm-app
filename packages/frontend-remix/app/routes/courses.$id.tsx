@@ -49,7 +49,7 @@ export default function CourseDetailPage() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [unregisteredStudents, setUnregisteredStudents] = useState<Student[]>(
-    [],
+    []
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export default function CourseDetailPage() {
             setInstructors(instructors);
             setRegistrations(registrations);
             setUnregisteredStudents(unregisteredStudents);
-          },
+          }
         )
         .catch((err) => {
           console.error(err);
@@ -219,7 +219,6 @@ export default function CourseDetailPage() {
               <p className="text-gray-500 italic">No students registered.</p>
             ) : (
               <RegistrationsForCourseList
-                course={course}
                 registrations={registrations}
                 unregisterAction={(reg: Registration) => {
                   unregisterStudent(reg)

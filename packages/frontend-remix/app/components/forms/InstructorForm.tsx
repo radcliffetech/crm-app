@@ -4,7 +4,6 @@ export function InstructorForm({
   formData,
   setFormData,
   onSubmit,
-  onCancel,
   editingInstructor,
 }: {
   formData: {

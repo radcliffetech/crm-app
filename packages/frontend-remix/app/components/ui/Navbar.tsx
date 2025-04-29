@@ -17,11 +17,12 @@ export function Navbar({
   handleLogout: () => void;
   switchRole: (newRole: UserRole) => void;
 }) {
+  const locationData = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const matches = useMatches();
-  const location = matches.length ? useLocation() : null;
+  const location = matches.length ? locationData : null;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

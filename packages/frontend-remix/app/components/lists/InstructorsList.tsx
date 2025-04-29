@@ -1,14 +1,11 @@
-import {
-  EllipsisVerticalIcon,
-  PencilSquareIcon,
-  TrashIcon,
-} from "@heroicons/react/24/solid";
+
+
 import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 
 import { BasicTable } from "~/components/ui/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";

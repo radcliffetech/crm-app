@@ -17,7 +17,7 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({}) => {
+export const meta: MetaFunction = () => {
   return [
     { title: `Instructor Detail – MiiM CRM` },
     {

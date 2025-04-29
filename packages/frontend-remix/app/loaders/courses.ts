@@ -21,7 +21,7 @@ export async function getCoursesForInstructor(instructor_id: string): Promise<{
   const student_ids = new Set(
     registrations
       .filter((r) => courses.some((c) => c.id === r.course_id))
-      .map((r) => r.student_id),
+      .map((r) => r.student_id)
   );
 
   const students = allStudents.filter((s) => student_ids.has(s.id));
@@ -73,7 +73,7 @@ export async function getCoursePageData(id: string): Promise<{
   const instructor = course.instructor_id
     ? await fetchPageData<Instructor>(
         "instructors",
-        `/${course.instructor_id}/`,
+        `/${course.instructor_id}/`
       )
     : null;
 
@@ -98,7 +98,7 @@ export async function createCourse(data: CoursePayload): Promise<Course> {
 
 export async function updateCourse(
   id: string,
-  data: CoursePayload,
+  data: CoursePayload
 ): Promise<void> {
   console.log("updateCourse", id, data);
   try {

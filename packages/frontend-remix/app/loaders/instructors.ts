@@ -1,12 +1,10 @@
+import type { Course, Instructor } from "~/types";
 import {
   ENDPOINTS,
   fetchListData,
   fetchPageData,
   mutateData,
 } from "~/lib/api/fetch";
-
-import type { Course } from "~/types";
-import type { Instructor } from "~/types";
 
 export async function getAllInstructors(): Promise<Instructor[]> {
   const res = await fetch(`${ENDPOINTS.instructors}/`);
@@ -31,7 +29,7 @@ export async function getInstructorPageData(id: string): Promise<{
 }
 
 export async function createInstructor(
-  data: Omit<Instructor, "id">,
+  data: Omit<Instructor, "id">
 ): Promise<Instructor> {
   try {
     return await mutateData("instructors", "/", "POST", data);
@@ -42,7 +40,7 @@ export async function createInstructor(
 
 export async function updateInstructor(
   id: string,
-  data: Omit<Instructor, "id" | "created_at" | "updated_at">,
+  data: Omit<Instructor, "id" | "created_at" | "updated_at">
 ): Promise<void> {
   try {
     await mutateData("instructors", `/${id}/`, "PUT", {

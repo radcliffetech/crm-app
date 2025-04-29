@@ -18,7 +18,7 @@ import { unregisterStudent } from "~/loaders/registrations";
 import { useAuth } from "~/root";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({}) => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Student Detail – MiiM CRM",

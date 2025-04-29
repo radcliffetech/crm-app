@@ -45,6 +45,9 @@ module.exports = {
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
       ],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+      },
       settings: {
         react: {
           version: "detect",

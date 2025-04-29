@@ -1,26 +1,23 @@
-import type { Course, Registration } from "~/types";
-import { EllipsisVerticalIcon, TrashIcon } from "@heroicons/react/24/solid";
+import type { Registration } from "~/types";
 import {
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useRef, useState } from "react";
 
 import { BasicTable } from "~/components/ui/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "@remix-run/react";
 import { RegistrationDropdownActions } from "../ui/RegistrationDropdownActions";
+import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Registration>();
 
 export function RegistrationsForCourseList({
   registrations,
-  course,
   unregisterAction,
 }: {
   registrations: Registration[];
-  course: Course;
   unregisterAction: (reg: Registration) => void;
 }) {
   const columns = useMemo<ColumnDef<Registration, unknown>[]>(
@@ -67,7 +64,7 @@ export function RegistrationsForCourseList({
         ),
       }),
     ],
-    [course.id, unregisterAction],
+    [unregisterAction]
   );
 
   const table = useReactTable({
