@@ -292,92 +292,158 @@ class RegistrationTests(TestCase):
 # ----------------- Course Tests -----------------
 class CourseTests(TestCase):
     def setUp(self):
-        # Clean up all relevant objects to avoid test leakage
+        # Only clean up all objects and create client
         Course.objects.all().delete()
         Student.objects.all().delete()
         Instructor.objects.all().delete()
         Registration.objects.all().delete()
         self.client = APIClient()
-        self.instructor = Instructor.objects.create(
+
+    def test_block_instructor_destroy_with_active_courses(self):
+        instructor = Instructor.objects.create(
             name_first="Koga",
             name_last="Fuchsia",
             email="koga@ninjalab.com"
         )
-        self.student = Student.objects.create(
-            name_first="Janine",
-            name_last="Fuchsia",
-            email="janine@ninjalab.com"
-        )
-        self.course = Course.objects.create(
+        course = Course.objects.create(
             course_code="NINJA-101",
             title="Ninja Training",
             description="Stealth and speed",
             description_full="How to disappear and reappear",
-            instructor=self.instructor,
+            instructor=instructor,
             start_date="2025-01-01",
             end_date="2025-12-31",
             course_fee=600.00
         )
-        self.registration = Registration.objects.create(
-            student=self.student,
-            course=self.course,
-            registration_status="registered",
-            payment_status="completed"
-        )
-        # For course search
-        self.instructor2 = Instructor.objects.create(
-            name_first="Alan",
-            name_last="Turing",
-            email="alan@math.org"
-        )
-        self.student2 = Student.objects.create(
-            name_first="Ada",
-            name_last="Lovelace",
-            email="ada@math.org"
-        )
-        self.course2 = Course.objects.create(
-            course_code="CS123",
-            title="Comp Sci",
-            description="Basics",
-            description_full="Details",
-            instructor=self.instructor2,
-            start_date="2025-01-01",
-            end_date="2025-06-01",
-            course_fee=999.00
-        )
-        Registration.objects.create(
-            student=self.student2,
-            course=self.course2,
-            registration_status="registered",
-            payment_status="completed"
-        )
-
-    def test_block_instructor_destroy_with_active_courses(self):
-        url = f"/api/instructors/{self.instructor.id}/"
+        url = f"/api/instructors/{instructor.id}/"
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 400)
         self.assertIn("Cannot delete instructor with active or upcoming courses.", response.data["error"])
 
     def test_block_student_destroy_with_active_registrations(self):
-        url = f"/api/students/{self.student.id}/"
+        instructor = Instructor.objects.create(
+            name_first="Koga",
+            name_last="Fuchsia",
+            email="koga@ninjalab.com"
+        )
+        student = Student.objects.create(
+            name_first="Janine",
+            name_last="Fuchsia",
+            email="janine@ninjalab.com"
+        )
+        course = Course.objects.create(
+            course_code="NINJA-101",
+            title="Ninja Training",
+            description="Stealth and speed",
+            description_full="How to disappear and reappear",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-12-31",
+            course_fee=600.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        url = f"/api/students/{student.id}/"
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 400)
         self.assertIn("Cannot delete student with active or upcoming course registrations.", response.data["error"])
 
     def test_registration_soft_delete(self):
-        url = f"/api/registrations/{self.registration.id}/"
+        instructor = Instructor.objects.create(
+            name_first="Koga",
+            name_last="Fuchsia",
+            email="koga@ninjalab.com"
+        )
+        student = Student.objects.create(
+            name_first="Janine",
+            name_last="Fuchsia",
+            email="janine@ninjalab.com"
+        )
+        course = Course.objects.create(
+            course_code="NINJA-101",
+            title="Ninja Training",
+            description="Stealth and speed",
+            description_full="How to disappear and reappear",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-12-31",
+            course_fee=600.00
+        )
+        registration = Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        url = f"/api/registrations/{registration.id}/"
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
-        self.registration.refresh_from_db()
-        self.assertFalse(self.registration.is_active)
+        registration.refresh_from_db()
+        self.assertFalse(registration.is_active)
 
     def test_course_destroy_blocked_by_registrations(self):
-        url = f"/api/courses/{self.course.id}/"
+        instructor = Instructor.objects.create(
+            name_first="Koga",
+            name_last="Fuchsia",
+            email="koga@ninjalab.com"
+        )
+        student = Student.objects.create(
+            name_first="Janine",
+            name_last="Fuchsia",
+            email="janine@ninjalab.com"
+        )
+        course = Course.objects.create(
+            course_code="NINJA-101",
+            title="Ninja Training",
+            description="Stealth and speed",
+            description_full="How to disappear and reappear",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-12-31",
+            course_fee=600.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        url = f"/api/courses/{course.id}/"
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 400)
         self.assertIn("Cannot delete course with existing student registrations.", response.data["error"])
 
     def test_search_returns_courses(self):
+        instructor = Instructor.objects.create(
+            name_first="Alan",
+            name_last="Turing",
+            email="alan@math.org"
+        )
+        student = Student.objects.create(
+            name_first="Ada",
+            name_last="Lovelace",
+            email="ada@math.org"
+        )
+        course = Course.objects.create(
+            course_code="CS123",
+            title="Comp Sci",
+            description="Basics",
+            description_full="Details",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-06-01",
+            course_fee=999.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
         url = reverse("search-all")
         response = self.client.get(url, {"q": "Ada"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -385,113 +451,258 @@ class CourseTests(TestCase):
         self.assertEqual(response.data["students"][0]["email"], "ada@math.org")
 
     def test_course_list_uses_course_list_serializer(self):
+        instructor = Instructor.objects.create(
+            name_first="Alan",
+            name_last="Turing",
+            email="alan@math.org"
+        )
+        course = Course.objects.create(
+            course_code="CS123",
+            title="Comp Sci",
+            description="Basics",
+            description_full="Details",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-06-01",
+            course_fee=999.00
+        )
         url = "/api/courses/"
         response = self.client.get(url)
-        print("Courses in DB:", Course.objects.all())
-        print("Students in DB:", Student.objects.all())
-        print("Instructors in DB:", Instructor.objects.all())
-        print("Registrations in DB:", Registration.objects.all())
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(all("course_code" in course for course in response.data))
+
+        self.assertTrue(all("course_code" in course for course in response.data["results"]))
 
     def test_course_filter_active_courses(self):
+        instructor = Instructor.objects.create(
+            name_first="Alan",
+            name_last="Turing",
+            email="alan@math.org"
+        )
+        Course.objects.create(
+            course_code="CS123",
+            title="Comp Sci",
+            description="Basics",
+            description_full="Details",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-06-01",
+            course_fee=999.00
+        )
         url = "/api/courses/?active_courses=true"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_course_filter_by_instructor_id(self):
-        url = f"/api/courses/?instructor_id={self.instructor2.id}"
+        instructor = Instructor.objects.create(
+            name_first="Alan",
+            name_last="Turing",
+            email="alan@math.org"
+        )
+        Course.objects.create(
+            course_code="CS123",
+            title="Comp Sci",
+            description="Basics",
+            description_full="Details",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-06-01",
+            course_fee=999.00
+        )
+        url = f"/api/courses/?instructor_id={instructor.id}"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_course_filter_active_courses_no_matches(self):
-        self.course = Course.objects.create(
+
+        instructor = Instructor.objects.create(
+            name_first="Koga",
+            name_last="Fuchsia",
+            email="koga@ninjalab.com"
+        )
+        Course.objects.create(
             course_code="PAST-101",
             title="Old Course",
             description="Previously active course",
             description_full="Old full description",
-            instructor=self.instructor,
+            instructor=instructor,
             start_date="2022-01-01",
             end_date="2022-06-01",
-            course_fee=500.00
+            course_fee=500.00,
         )
+
         url = "/api/courses/?active_courses=true"
         response = self.client.get(url)
-        print("Courses in DB:", Course.objects.all())
-        print("Students in DB:", Student.objects.all())
-        print("Instructors in DB:", Instructor.objects.all())
-        print("Registrations in DB:", Registration.objects.all())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data["results"]), 0)
 
 
 # ----------------- Student Tests -----------------
 class StudentTests(TestCase):
     def setUp(self):
-        # Clean up all relevant objects to avoid test leakage
+        # Only clean up all objects and create client
         Course.objects.all().delete()
         Student.objects.all().delete()
         Instructor.objects.all().delete()
         Registration.objects.all().delete()
         self.client = APIClient()
-        self.instructor = Instructor.objects.create(
+
+    def test_student_filter_by_course_id(self):
+        instructor = Instructor.objects.create(
             name_first="Lt.",
             name_last="Surge",
             email="surge@vermillion.com"
         )
-        self.student = Student.objects.create(
+        student = Student.objects.create(
             name_first="Eevee",
             name_last="Trainer",
             email="eevee@kanto.com"
         )
-        self.course = Course.objects.create(
+        course = Course.objects.create(
             course_code="ELEC-101",
             title="Electric Mastery",
             description="Harness electric powers",
             description_full="Electric techniques",
-            instructor=self.instructor,
+            instructor=instructor,
             start_date="2025-04-01",
             end_date="2025-10-01",
             course_fee=500.00
         )
         Registration.objects.create(
-            student=self.student,
-            course=self.course,
+            student=student,
+            course=course,
             registration_status="registered",
             payment_status="completed"
         )
-
-    def test_student_filter_by_course_id(self):
-        url = f"/api/students/?course_id={self.course.id}"
+        url = f"/api/students/?course_id={course.id}"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_student_filter_by_course_id_eligible(self):
-        url = f"/api/students/?course_id={self.course.id}&eligible=true"
+        instructor = Instructor.objects.create(
+            name_first="Lt.",
+            name_last="Surge",
+            email="surge@vermillion.com"
+        )
+        student = Student.objects.create(
+            name_first="Eevee",
+            name_last="Trainer",
+            email="eevee@kanto.com"
+        )
+        course = Course.objects.create(
+            course_code="ELEC-101",
+            title="Electric Mastery",
+            description="Harness electric powers",
+            description_full="Electric techniques",
+            instructor=instructor,
+            start_date="2025-04-01",
+            end_date="2025-10-01",
+            course_fee=500.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        url = f"/api/students/?course_id={course.id}&eligible=true"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_student_filter_by_instructor_id(self):
-        url = f"/api/students/?instructor_id={self.instructor.id}"
+        instructor = Instructor.objects.create(
+            name_first="Lt.",
+            name_last="Surge",
+            email="surge@vermillion.com"
+        )
+        student = Student.objects.create(
+            name_first="Eevee",
+            name_last="Trainer",
+            email="eevee@kanto.com"
+        )
+        course = Course.objects.create(
+            course_code="ELEC-101",
+            title="Electric Mastery",
+            description="Harness electric powers",
+            description_full="Electric techniques",
+            instructor=instructor,
+            start_date="2025-04-01",
+            end_date="2025-10-01",
+            course_fee=500.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        url = f"/api/students/?instructor_id={instructor.id}"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_student_filter_by_instructor_id_eligible(self):
-        url = f"/api/students/?instructor_id={self.instructor.id}&eligible=true"
+        instructor = Instructor.objects.create(
+            name_first="Lt.",
+            name_last="Surge",
+            email="surge@vermillion.com"
+        )
+        student = Student.objects.create(
+            name_first="Eevee",
+            name_last="Trainer",
+            email="eevee@kanto.com"
+        )
+        course = Course.objects.create(
+            course_code="ELEC-101",
+            title="Electric Mastery",
+            description="Harness electric powers",
+            description_full="Electric techniques",
+            instructor=instructor,
+            start_date="2025-04-01",
+            end_date="2025-10-01",
+            course_fee=500.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
+        url = f"/api/students/?instructor_id={instructor.id}&eligible=true"
         response = self.client.get(url)
-        print("Courses in DB:", Course.objects.all())
-        print("Students in DB:", Student.objects.all())
-        print("Instructors in DB:", Instructor.objects.all())
-        print("Registrations in DB:", Registration.objects.all())
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_student_list_no_filters(self):
+        instructor = Instructor.objects.create(
+            name_first="Lt.",
+            name_last="Surge",
+            email="surge@vermillion.com"
+        )
+        student = Student.objects.create(
+            name_first="Eevee",
+            name_last="Trainer",
+            email="eevee@kanto.com"
+        )
+        course = Course.objects.create(
+            course_code="ELEC-101",
+            title="Electric Mastery",
+            description="Harness electric powers",
+            description_full="Electric techniques",
+            instructor=instructor,
+            start_date="2025-04-01",
+            end_date="2025-10-01",
+            course_fee=500.00
+        )
+        Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="registered",
+            payment_status="completed"
+        )
         url = "/api/students/"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
