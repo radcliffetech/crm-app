@@ -67,8 +67,6 @@ export function InstructorDetailContainer({
           )}
           {!isEditing && (
             <>
-              <p className="mb-4 text-gray-600">{instructor.email}</p>
-              <p className="mb-8 italic">{instructor.bio}</p>
               {canAccessAdmin(user) && (
                 <button
                   onClick={() => setIsEditing(true)}
@@ -80,6 +78,12 @@ export function InstructorDetailContainer({
               )}
             </>
           )}
+
+          <div className="my-4 border border-gray-300 rounded p-4">
+            <PageSubheader>Info</PageSubheader>
+            <p className="mb-4 text-gray-600">{instructor.email}</p>
+            <p className="mb-8 italic">{instructor.bio}</p>
+          </div>
           <div className="my-4 border border-gray-300 rounded p-4">
             <PageSubheader>Courses</PageSubheader>
             {courses.length > 0 ? (

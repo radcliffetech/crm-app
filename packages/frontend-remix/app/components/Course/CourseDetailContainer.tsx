@@ -50,14 +50,8 @@ type CourseDetailContainerProps = {
 export function CourseDetailContainer({
   loaderData,
 }: CourseDetailContainerProps) {
-  const {
-    course,
-    instructor,
-    registrations,
-    unregisteredStudents,
-    instructors,
-    courses,
-  } = loaderData;
+  const { course, instructor, registrations, instructors, courses } =
+    loaderData;
   const auth = useAuth();
   const { revalidate } = useRevalidator();
 
@@ -118,26 +112,8 @@ export function CourseDetailContainer({
               {course.course_code}
             </span>
           )}
-          {course && (
-            <p className="mb-4 text-sm text-gray-500">
-              {new Date(course.start_date).toLocaleDateString()} –{" "}
-              {new Date(course.end_date).toLocaleDateString()}
-            </p>
-          )}
-          {instructor && (
-            <p className="mb-2 text-sm text-gray-600">
-              Instructor:{" "}
-              <Link
-                to={`/instructors/${instructor.id}`}
-                className="text-blue-600 hover:underline"
-              >
-                {instructor.name_first} {instructor.name_last}
-              </Link>
-            </p>
-          )}
         </PageHeader>
       </div>
-
       {canAccessAdmin(auth) && (
         <div className="mb-4">
           <button
@@ -150,34 +126,55 @@ export function CourseDetailContainer({
         </div>
       )}
 
+      <div className="my-4 border border-gray-300 rounded p-4">
+        <PageSubheader>Course Info</PageSubheader>
+        {course && (
+          <>
+            <p className="mb-1 text-xl text-gray-600">{course.description}</p>
+
+            <p className="mb-4 text-sm text-gray-500">
+              {new Date(course.start_date).toLocaleDateString()} –{" "}
+              {new Date(course.end_date).toLocaleDateString()}
+            </p>
+          </>
+        )}
+        {instructor && (
+          <p className="mb-2 text-sm text-gray-600">
+            Instructor:{" "}
+            <Link
+              to={`/instructors/${instructor.id}`}
+              className="text-blue-600 hover:underline"
+            >
+              {instructor.name_first} {instructor.name_last}
+            </Link>
+          </p>
+        )}
+      </div>
+
       <DataLoaderState loading={false} error={null} />
 
       {course && (
         <>
-          <p className="mb-1 text-xl text-gray-600">{course.description}</p>
-
-          {course.prerequisites.length > 0 && (
-            <div className="mt-6 border border-gray-300 rounded p-4">
-              <h2 className="text-lg font-light text-gray-700 mb-2">
-                Prerequisites
-              </h2>
-              {course.prerequisites.map((prereq) => (
+          <div className="mt-6 border border-gray-300 rounded p-4">
+            <PageSubheader>Prerequisites</PageSubheader>
+            {course.prerequisites.length > 0 ? (
+              course.prerequisites.map((prereq) => (
                 <p key={prereq} className="text-gray-600">
                   {prereq}
                 </p>
-              ))}
-            </div>
-          )}
+              ))
+            ) : (
+              <p className="text-gray-500 italic">No prerequisites.</p>
+            )}
+          </div>
 
           <div className="prose my-4 text-gray-700  border border-gray-300 rounded p-4">
+            <PageSubheader>Course Description</PageSubheader>
             <RenderMarkdown>{course.description_full}</RenderMarkdown>
           </div>
 
           <p className="text-xl font-light text-gray-800 mt-4  border border-gray-300 rounded p-4">
-            <h2 className="text-lg font-light text-gray-700 mb-2">
-              Course Fee
-            </h2>
-            $
+            <PageSubheader>Course Fee</PageSubheader>$
             {Number(course.course_fee).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
