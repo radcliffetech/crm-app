@@ -1,4 +1,5 @@
 import { FormField } from "~/components/Common/FormField";
+import { SaveButton } from "~/components/Common/SaveButton";
 
 type StudentFormProps = {
   formData: {
@@ -95,9 +96,7 @@ export function StudentForm({
         />
       </FormField>
 
-      <button type="submit" className="btn-primary py-2 px-4 rounded">
-        {editingstudent_id ? "Update" : "Save"}
-      </button>
+      <SaveButton isEditing={editingstudent_id !== null} fullWidth />
     </form>
   );
 }

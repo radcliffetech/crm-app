@@ -3,12 +3,12 @@ import { FormEvent, useState } from "react";
 
 import { CoursesForInstructorList } from "~/components/Course/CoursesForInstructorList";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
+import { EditButton } from "~/components/Common/EditButton";
 import { InstructorForm } from "~/components/Instructor/InstructorForm";
 import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { StudentsForInstructorList } from "~/components/Student/StudentsForInstructorList";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
@@ -68,13 +68,10 @@ export function InstructorDetailContainer({
           {!isEditing && (
             <>
               {canAccessAdmin(user) && (
-                <button
+                <EditButton
+                  loading={false}
                   onClick={() => setIsEditing(true)}
-                  className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
-                >
-                  <PencilSquareIcon className="h-5 w-5" />
-                  Edit
-                </button>
+                />
               )}
             </>
           )}

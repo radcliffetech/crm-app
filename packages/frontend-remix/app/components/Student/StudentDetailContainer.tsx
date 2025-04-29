@@ -1,11 +1,11 @@
 import type { Course, Registration, Student } from "~/types";
 
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
+import { EditButton } from "~/components/Common/EditButton";
 import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegisterStudentForCourseForm } from "~/components/Registration/RegisterStudentForCourseForm";
 import { RegistrationsForStudentList } from "~/components/Registration/RegistrationsForStudentList";
 import { StudentForm } from "~/components/Student/StudentForm";
@@ -51,13 +51,7 @@ export function StudentDetailContainer({
 
       {canAccessAdmin(user) && (
         <div className="flex justify-start mb-4">
-          <button
-            onClick={() => setEditing(true)}
-            className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
-          >
-            <PencilSquareIcon className="h-5 w-5" />
-            Edit
-          </button>
+          <EditButton loading={false} onClick={() => setEditing(true)} />
         </div>
       )}
 

@@ -1,5 +1,6 @@
 import { FormField } from "~/components/Common/FormField";
 import type { Instructor } from "~/types";
+import { SaveButton } from "~/components/Common/SaveButton";
 
 export function InstructorForm({
   formData,
@@ -69,9 +70,7 @@ export function InstructorForm({
         />
       </FormField>
 
-      <button type="submit" className="btn-primary py-2 px-4 rounded">
-        {editingInstructor ? "Update" : "Save"}
-      </button>
+      <SaveButton isEditing={editingInstructor !== null} fullWidth />
     </form>
   );
 }

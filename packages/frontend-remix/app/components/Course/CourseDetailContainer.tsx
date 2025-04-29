@@ -10,11 +10,11 @@ import { Link, useRevalidator } from "@remix-run/react";
 
 import { CourseForm } from "~/components/Course/CourseForm";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
+import { EditButton } from "~/components/Common/EditButton";
 import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegistrationsForCourseList } from "~/components/Registration/RegistrationsForCourseList";
 import RenderMarkdown from "~/components/Common/RenderMarkdown";
 import { canAccessAdmin } from "~/lib/permissions";
@@ -116,13 +116,7 @@ export function CourseDetailContainer({
       </div>
       {canAccessAdmin(auth) && (
         <div className="mb-4">
-          <button
-            onClick={openEditForm}
-            className="btn-primary rounded px-4 py-2"
-          >
-            <PencilSquareIcon className="h-4 w-4 inline-block mr-1" />
-            Edit
-          </button>
+          <EditButton loading={false} onClick={openEditForm} />
         </div>
       )}
 
