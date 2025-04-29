@@ -1,14 +1,12 @@
 from django.urls import reverse
-from django.test import TestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 from rest_framework import status
 from api.models import Instructor, Course, Student, Registration
 
 
-# ----------------- Registration Tests -----------------
-class RegistrationTests(TestCase):
+ # ----------------- Registration Tests -----------------
+class RegistrationTests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
         # Instructor and courses for prereq/registration tests
         self.instructor = Instructor.objects.create(
             name_first="Prof",
@@ -289,15 +287,14 @@ class RegistrationTests(TestCase):
         self.assertIn("error", response.data)
 
 
-# ----------------- Course Tests -----------------
-class CourseTests(TestCase):
+ # ----------------- Course Tests -----------------
+class CourseTests(APITestCase):
     def setUp(self):
         # Only clean up all objects and create client
         Course.objects.all().delete()
         Student.objects.all().delete()
         Instructor.objects.all().delete()
         Registration.objects.all().delete()
-        self.client = APIClient()
 
     def test_block_instructor_destroy_with_active_courses(self):
         instructor = Instructor.objects.create(
@@ -305,7 +302,7 @@ class CourseTests(TestCase):
             name_last="Fuchsia",
             email="koga@ninjalab.com"
         )
-        course = Course.objects.create(
+        Course.objects.create(
             course_code="NINJA-101",
             title="Ninja Training",
             description="Stealth and speed",
@@ -538,15 +535,13 @@ class CourseTests(TestCase):
         self.assertEqual(len(response.data["results"]), 0)
 
 
-# ----------------- Student Tests -----------------
-class StudentTests(TestCase):
+ # ----------------- Student Tests -----------------
+class StudentTests(APITestCase):
     def setUp(self):
-        # Only clean up all objects and create client
         Course.objects.all().delete()
         Student.objects.all().delete()
         Instructor.objects.all().delete()
         Registration.objects.all().delete()
-        self.client = APIClient()
 
     def test_student_filter_by_course_id(self):
         instructor = Instructor.objects.create(
@@ -642,7 +637,7 @@ class StudentTests(TestCase):
         url = f"/api/students/?instructor_id={instructor.id}"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data), 1)
+        self.assertGreaterEqual(len(response.data["results"]), 1)
 
     def test_student_filter_by_instructor_id_eligible(self):
         instructor = Instructor.objects.create(
@@ -709,10 +704,9 @@ class StudentTests(TestCase):
         self.assertGreaterEqual(len(response.data), 1)
 
 
-# ----------------- Dashboard Tests -----------------
-class DashboardTests(TestCase):
+ # ----------------- Dashboard Tests -----------------
+class DashboardTests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Sabrina",
             name_last="Psychic",
@@ -793,10 +787,9 @@ class DashboardTests(TestCase):
         self.assertEqual(response.data["registrationCount"], 1)
 
 
-# ----------------- Search Tests -----------------
-class SearchTests(TestCase):
+ # ----------------- Search Tests -----------------
+class SearchTests(APITestCase):
     def setUp(self):
-        self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Erika",
             name_last="Celadon",
