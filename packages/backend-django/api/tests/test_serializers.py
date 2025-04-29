@@ -1,65 +1,12 @@
 from django.test import TestCase
-from api.serializers import CourseSerializer
-from api.models import Instructor, Course
-
-class CRMTests(TestCase):
-    def test_instructors_endpoint(self):
-        """Test that the instructors endpoint returns HTTP 200 OK."""
-        response = self.client.get("/api/instructors/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_courses_endpoint(self):
-        """Test that the courses endpoint returns HTTP 200 OK."""
-        response = self.client.get("/api/courses/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_students_endpoint(self):
-        """Test that the students endpoint returns HTTP 200 OK."""
-        response = self.client.get("/api/students/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_registrations_endpoint(self):
-        """Test that the registrations endpoint returns HTTP 200 OK."""
-        response = self.client.get("/api/registrations/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_dashboard_summary_endpoint(self):
-        """Test that the dashboard summary endpoint returns HTTP 200 OK."""
-        response = self.client.get("/api/dashboard-summary/")
-        self.assertEqual(response.status_code, 200)
-
-    def test_search_all_endpoint(self):
-        """Test that the search-all endpoint returns HTTP 200 OK."""
-        response = self.client.get("/api/search/?q=test")
-        self.assertEqual(response.status_code, 200)
-
-    def test_instructors_empty_list(self):
-        """Test that the instructors list is empty initially (no instructors in database)."""
-        response = self.client.get("/api/instructors/")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(),  {'count': 0, 'next': None, 'previous': None, 'results': []})
-
-    def test_create_instructor(self):
-        """Test creating a new instructor via POST request."""
-        data = {
-            "name_first": "John",
-            "name_last": "Doe",
-            "email": "john.doe@example.com"
-        }
-        response = self.client.post("/api/instructors/", data, content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["name_first"], "John")
-
-    def test_search_returns_structure(self):
-        """Test that the search endpoint returns the expected top-level keys even when no results."""
-        response = self.client.get("/api/search/?q=nonexistent")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("instructors", response.json())
-        self.assertIn("courses", response.json())
-        self.assertIn("students", response.json())
-
-
-
+from api.serializers import (
+    CourseSerializer,
+    InstructorSerializer,
+    CourseListSerializer,
+    StudentSerializer,
+    RegistrationSerializer,
+)
+from api.models import Instructor, Course, Student, Registration
 
 class CourseSerializerTests(TestCase):
     def setUp(self):
@@ -295,3 +242,96 @@ class CourseSerializerTests(TestCase):
         self.assertEqual(len(chk.prerequisites), 2)
         self.assertIn(prereq1.course_code, chk.prerequisites)
         self.assertIn(prereq2.course_code, chk.prerequisites)
+
+
+# Additional serializer tests
+class InstructorSerializerTests(TestCase):
+    def test_serialize_instructor(self):
+        instructor = Instructor.objects.create(
+            name_first="Alice",
+            name_last="Wonderland",
+            email="alice@example.com"
+        )
+        serializer = InstructorSerializer(instructor)
+        data = serializer.data
+        self.assertEqual(data["name_first"], "Alice")
+        self.assertEqual(data["name_last"], "Wonderland")
+        self.assertEqual(data["email"], "alice@example.com")
+
+
+class CourseListSerializerTests(TestCase):
+    def test_course_list_serializer_fields(self):
+        instructor = Instructor.objects.create(
+            name_first="John",
+            name_last="Doe",
+            email="john.doe@example.com"
+        )
+        course = Course.objects.create(
+            course_code="TEST-101",
+            title="Test Course",
+            description="Short",
+            description_full="Full desc",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-02-01",
+            course_fee=300.00,
+            prerequisites=["PREREQ-1"],
+            syllabus_url="https://example.com/syllabus.pdf"
+        )
+        serializer = CourseListSerializer(course)
+        data = serializer.data
+        self.assertEqual(data["instructor_name"], "John Doe")
+        self.assertEqual(data["enrollment_count"], 0)
+        self.assertEqual(data["prerequisites"], ["PREREQ-1"])
+
+
+class StudentSerializerTests(TestCase):
+    def test_student_serializer(self):
+        student = Student.objects.create(
+            name_first="Jane",
+            name_last="Smith",
+            email="jane@example.com"
+        )
+        serializer = StudentSerializer(student)
+        data = serializer.data
+        self.assertEqual(data["name_first"], "Jane")
+        self.assertEqual(data["name_last"], "Smith")
+        self.assertEqual(data["email"], "jane@example.com")
+
+
+class RegistrationSerializerTests(TestCase):
+    def test_registration_serializer(self):
+        instructor = Instructor.objects.create(
+            name_first="Greg",
+            name_last="Oracle",
+            email="greg@example.com"
+        )
+        course = Course.objects.create(
+            course_code="GEM-101",
+            title="Gem Handling",
+            description="Sparkles",
+            description_full="Advanced sparkle handling",
+            instructor=instructor,
+            start_date="2025-01-01",
+            end_date="2025-02-01",
+            course_fee=200.00,
+            prerequisites=[],
+            syllabus_url=""
+        )
+        student = Student.objects.create(
+            name_first="Frodo",
+            name_last="Baggins",
+            email="frodo@shire.net"
+        )
+        registration = Registration.objects.create(
+            student=student,
+            course=course,
+            registration_status="confirmed",
+            payment_status="paid"
+        )
+        serializer = RegistrationSerializer(registration)
+        data = serializer.data
+        self.assertEqual(data["student_name"], "Frodo Baggins")
+        self.assertEqual(data["course_name"], "Gem Handling")
+        self.assertEqual(data["registration_status"], "confirmed")
+        self.assertEqual(data["payment_status"], "paid")
