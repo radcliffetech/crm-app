@@ -1,4 +1,4 @@
-import type { Course, Instructor } from "~/types"
+import type { Course, CourseFormData, Instructor } from "~/types";
 import { createCourse, deleteCourse, getCoursesPageData, updateCourse } from "~/loaders/courses";
 import { useEffect, useState } from "react";
 
@@ -10,7 +10,6 @@ import type { MetaFunction } from "@remix-run/node";
 import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
-import { Spinner } from "~/components/ui/Spinner";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
@@ -24,23 +23,35 @@ export const meta: MetaFunction = () => {
 };
 
 
+type CoursePayload = Omit<CourseFormData, "prerequisites" | "course_fee"> & {
+  course_fee: number;
+  prerequisites: string[];
+  created_at?: string;
+  updated_at?: string;
+};
+
+export const emptyCourseForm: CourseFormData = {
+  course_code: "",
+  title: "",
+  description: "",
+  description_full: "",
+  instructor_id: "",
+  start_date: "",
+  end_date: "",
+  syllabus_url: "",
+  course_fee: "",
+  prerequisites: [] as string[],
+};
+
 export default function CoursesPage() {
+
     const [courses, setCourses] = useState<Course[]>([]);
 
     // we need instructors for the form
     const [instructors, setInstructors] = useState<Instructor[]>([]);
     const [showForm, setShowForm] = useState(false);
     const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        description_full: "",
-        instructor_id: "",
-        start_date: "",
-        end_date: "",
-        syllabus_url: "",
-        course_fee: "",
-    });
+    const [formData, setFormData] = useState<CourseFormData>(emptyCourseForm);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -73,36 +84,30 @@ export default function CoursesPage() {
         setSaving(true);
         try {
             if (editingCourse) {
-                await updateCourse(editingCourse.id, {
+                const payload: CoursePayload = {
                     ...formData,
                     course_fee: Number(formData.course_fee),
-                });
+                    prerequisites: formData.prerequisites,
+                };
+                await updateCourse(editingCourse.id, payload);
                 reloadData();
                 setEditingCourse(null);
             } else {
-                const newCourse = await createCourse({
+                const payload: CoursePayload = {
                     ...formData,
-                    syllabus_url: formData.syllabus_url,
                     course_fee: Number(formData.course_fee),
+                    prerequisites: formData.prerequisites,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
-                });
+                };
+                const newCourse = await createCourse(payload);
                 setCourses((prev) => [...prev, newCourse]);
             }
             toast.success("Course saved successfully!");
         } catch {
             toast.error("Failed to save course.");
         }
-        setFormData({
-            title: "",
-            description: "",
-            description_full: "",
-            instructor_id: "",
-            start_date: "",
-            end_date: "",
-            syllabus_url: "",
-            course_fee: "",
-        });
+        setFormData(emptyCourseForm);
         setShowForm(false);
         setSaving(false);
     };
@@ -113,16 +118,7 @@ export default function CoursesPage() {
             <PageHeader>Courses</PageHeader>
             {!showForm && (
                 <AddButton onClick={() => {
-                    setFormData({
-                        title: "",
-                        description: "",
-                        description_full: "",
-                        instructor_id: "",
-                        start_date: "",
-                        end_date: "",
-                        syllabus_url: "",
-                        course_fee: "",
-                    });
+                    setFormData(emptyCourseForm);
                     setEditingCourse(null);
                     setShowForm(true);
                 }}>
@@ -133,16 +129,7 @@ export default function CoursesPage() {
             <Modal
                 isOpen={showForm}
                 onClose={() => {
-                    setFormData({
-                        title: "",
-                        description: "",
-                        description_full: "",
-                        instructor_id: "",
-                        start_date: "",
-                        end_date: "",
-                        syllabus_url: "",
-                        course_fee: "",
-                    });
+                    setFormData(emptyCourseForm);
                     setEditingCourse(null);
                     setShowForm(false);
                 }}
@@ -152,21 +139,13 @@ export default function CoursesPage() {
                     setFormData={setFormData}
                     editingCourse={editingCourse}
                     instructors={instructors}
-                    onSubmit={handleSubmit}
+                    onSubmit={(e) => handleSubmit(e)}
                     onCancel={() => {
-                        setFormData({
-                            title: "",
-                            description: "",
-                            description_full: "",
-                            instructor_id: "",
-                            start_date: "",
-                            end_date: "",
-                            syllabus_url: "",
-                            course_fee: "",
-                        });
+                        setFormData(emptyCourseForm);
                         setEditingCourse(null);
                         setShowForm(false);
                     }}
+                    allCourses={courses}
                 />
             </Modal>
 
@@ -178,6 +157,7 @@ export default function CoursesPage() {
                 onEdit={(course) => {
                     setEditingCourse(course);
                     setFormData({
+                        course_code: course.course_code,
                         title: course.title,
                         description: course.description,
                         description_full: course.description_full,
@@ -186,6 +166,7 @@ export default function CoursesPage() {
                         end_date: course.end_date.split("T")[0],
                         syllabus_url: course.syllabus_url || "",
                         course_fee: course.course_fee?.toString() || "",
+                        prerequisites: course.prerequisites?.map((p) => p.id) || [],
                     });
                     setShowForm(true);
                 }}

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from django.utils.timezone import now
 from django.db import transaction
 from .services.email_service import EmailService
+from django.core.exceptions import ValidationError
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25
@@ -66,7 +67,44 @@ class CourseViewSet(viewsets.ModelViewSet):
         if instructor_id:
             queryset = queryset.filter(instructor_id=instructor_id)
         return queryset
+    
+    def perform_create(self, serializer):
+        prerequisites_data = self.request.data.get("prerequisites", [])
+        print("[perform_create] Raw prerequisites_data:", prerequisites_data)
+        course = serializer.save()
+        if prerequisites_data:
+            prereq_ids = [
+                p["id"] if isinstance(p, dict) and "id" in p else p
+                for p in prerequisites_data
+            ]
+            print("[perform_create] Extracted prereq_ids:", prereq_ids)
+            try:
+                prereq_courses = Course.objects.filter(id__in=prereq_ids)
+                print("[perform_create] Fetched prerequisite Course objects:", list(prereq_courses))
+                course.prerequisites.set(prereq_courses)
+            except ValidationError as e:
+                print("[perform_create] ValidationError when setting prerequisites:", e)
+                raise
 
+    def perform_update(self, serializer):
+        prerequisites_data = self.request.data.get("prerequisites", [])
+        print("[perform_update] Raw prerequisites_data:", prerequisites_data)
+        print("[perform_update] Raw instructor_id:", self.request.data.get("instructor_id"))
+        course = serializer.save()
+        if prerequisites_data:
+            prereq_ids = [
+                p["id"] if isinstance(p, dict) and "id" in p else p
+                for p in prerequisites_data
+            ]
+            print("[perform_update] Extracted prereq_ids:", prereq_ids)
+            try:
+                prereq_courses = Course.objects.filter(id__in=prereq_ids)
+                print("[perform_update] Fetched prerequisite Course objects:", list(prereq_courses))
+                course.prerequisites.set(prereq_courses)
+            except ValidationError as e:
+                print("[perform_update] ValidationError when setting prerequisites:", e)
+                raise
+            
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         # Check for existing registrations (active or otherwise)
@@ -80,28 +118,14 @@ class CourseViewSet(viewsets.ModelViewSet):
         instance.save()
         return Response(status=204)
 
-def create(self, validated_data):
-    instructor_id = validated_data.pop("instructor_id")
-    instructor = Instructor.objects.get(id=instructor_id)
-    return Course.objects.create(instructor=instructor, **validated_data)
-
-def update(self, instance, validated_data):
-    print("Incoming course data:", self.request.data)
-    instructor_id = validated_data.pop("instructor_id", None)
-    if instructor_id:
-        instance.instructor = Instructor.objects.get(id=instructor_id)
-
-    # Check to see if the instrcutor has changed...
-    if instance.instructor != instructor_id:
-        print("Instructor has changed")
-        # Perform any additional logic here if needed
-    # Check to see if the course fee has changed...
-    if instance.course_fee != validated_data.get("course_fee", instance.course_fee):
-        print("Course fee has changed")
-        # Perform any additional logic here if needed
-
-    return super().update(instance, validated_data)    
-
+    def create(self, request, *args, **kwargs):
+        print("Incoming data:", request.data)
+        return super().create(request, *args, **kwargs)
+    
+    def update(self, request, *args, **kwargs):
+        print("Incoming data:", request.data)
+        return super().update(request, *args, **kwargs)
+    
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by("-created_at")
     serializer_class = StudentSerializer
@@ -282,58 +306,6 @@ def search_all(request):
         description__icontains=query
     )
 
-    return Response({
-        "students": StudentSerializer(students.distinct(), many=True).data,
-        "instructors": InstructorSerializer(instructors.distinct(), many=True).data,
-        "courses": CourseSerializer(courses.distinct(), many=True).data,
-    })
-
-@api_view(["GET"])
-def dashboard_summary(request):
-    return Response({
-        "studentCount": Student.objects.filter(is_active=True).count(),
-        "instructorCount": Instructor.objects.filter(is_active=True).count(),
-        "courseCount": Course.objects.filter(is_active=True).count(),
-        "registrationCount": Registration.objects.filter(is_active=True).count(),
-    })
-
-@api_view(["GET"])
-def search_all(request):
-    query = request.query_params.get("q", "").strip()
-
-    if not query:
-        return Response({"error": "Missing search query parameter 'q'"}, status=400)
-
-    students = Student.objects.filter(
-        is_active=True,
-        name_first__icontains=query
-    ) | Student.objects.filter(
-        is_active=True,
-        name_last__icontains=query
-    ) | Student.objects.filter(
-        is_active=True,
-        email__icontains=query
-    )
-
-    instructors = Instructor.objects.filter(
-        is_active=True,
-        name_first__icontains=query
-    ) | Instructor.objects.filter(
-        is_active=True,
-        name_last__icontains=query
-    ) | Instructor.objects.filter(
-        is_active=True,
-        email__icontains=query
-    )
-
-    courses = Course.objects.filter(
-        is_active=True,
-        title__icontains=query
-    ) | Course.objects.filter(
-        is_active=True,
-        description__icontains=query
-    )
-
     registrations = Registration.objects.filter(
         is_active=True,
         registration_status__icontains=query
@@ -346,3 +318,11 @@ def search_all(request):
         "registrations": RegistrationSerializer(registrations.distinct(), many=True).data,
     })
 
+@api_view(["GET"])
+def dashboard_summary(request):
+    return Response({
+        "studentCount": Student.objects.filter(is_active=True).count(),
+        "instructorCount": Instructor.objects.filter(is_active=True).count(),
+        "courseCount": Course.objects.filter(is_active=True).count(),
+        "registrationCount": Registration.objects.filter(is_active=True).count(),
+    })

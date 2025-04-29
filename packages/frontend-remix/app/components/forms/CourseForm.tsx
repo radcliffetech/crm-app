@@ -6,7 +6,7 @@ export function CourseForm({
   editingCourse,
   instructors,
   onSubmit,
-  onCancel,
+  allCourses,
 }: {
   formData: {
     title: string;
@@ -17,18 +17,38 @@ export function CourseForm({
     end_date: string;
     syllabus_url: string;
     course_fee: string;
+    course_code: string;
+    prerequisites: string[];
   };
   setFormData: React.Dispatch<React.SetStateAction<typeof formData>>;
   editingCourse: Course | null;
   instructors: Instructor[];
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
+  allCourses: Course[];
 }) {
   if (!instructors || instructors.length === 0) {
     return <div className="text-red-500">No instructors available</div>;
   }
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label className="flex flex-col">
+          <span className="flex items-center gap-1">
+            Course Code <span className="text-red-500">*</span>
+          </span>
+          <input
+            type="text"
+            value={formData.course_code}
+            onChange={(e) => {
+              const raw = e.target.value.toUpperCase();
+              const cleaned = raw.replace(/[^A-Z0-9-]/g, "");
+              setFormData({ ...formData, course_code: cleaned });
+            }}
+            className="border p-2"
+            required
+            disabled={!!editingCourse}
+          />
+        </label>
         <label className="flex flex-col">
           <span className="flex items-center gap-1">
             Title <span className="text-red-500">*</span>
@@ -57,6 +77,28 @@ export function CourseForm({
                 {instructor.name_first} {instructor.name_last} ({instructor.email})
               </option>
             ))}
+          </select>
+        </label>
+        <label className="flex flex-col md:col-span-2">
+          <span className="flex items-center gap-1">
+            Prerequisites <span className="text-sm text-gray-500">(optional)</span>
+          </span>
+          <select
+            multiple
+            value={formData.prerequisites}
+            onChange={(e) => {
+              const selected = Array.from(e.target.selectedOptions, option => option.value);
+              setFormData({ ...formData, prerequisites: selected });
+            }}
+            className="border p-2 h-24"
+          >
+            {allCourses
+              .filter((c) => c.id !== editingCourse?.id)
+              .map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.course_code} – {course.title}
+                </option>
+              ))}
           </select>
         </label>
         <label className="flex flex-col">
@@ -125,11 +167,14 @@ export function CourseForm({
           <textarea
             value={formData.description_full}
             onChange={(e) => setFormData({ ...formData, description_full: e.target.value })}
-            className="border p-2 h-40"
+            className="border p-2 h-20"
             required
           />
         </label>
-        <button type="submit" className="btn-primary py-2 px-4 rounded">
+        <button
+          type="submit"
+          className="btn-primary py-2 px-4 rounded w-full mt-4"
+        >
           {editingCourse ? "Update" : "Save"}
         </button>
     </form>

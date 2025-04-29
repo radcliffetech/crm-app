@@ -1,5 +1,5 @@
 import { ArrowRightEndOnRectangleIcon, Cog6ToothIcon, HomeIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
-import { Link, useLocation } from "@remix-run/react";
+import { Link, useLocation, useMatches } from "@remix-run/react";
 import { User, UserRole } from "~/types";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,7 +15,8 @@ export function Navbar({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const location = useLocation();
+  const matches = useMatches();
+  const location = matches.length ? useLocation() : null;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -104,7 +105,7 @@ export function Navbar({
   <>  </>  
         )}
       </nav>
-      {user && location.pathname !== "/search" && (
+      {user && location && location.pathname !== "/search" && (
         <div className="flex justify-end px-4 py-2 bg-white">
           <form
             onSubmit={(e) => {

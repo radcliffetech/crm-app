@@ -1,6 +1,21 @@
 import type { Course, Instructor, Registration, Student } from "~/types";
 import { fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
 
+export type CoursePayload = {
+  title: string;
+  description: string;
+  description_full: string;
+  instructor_id: string;
+  start_date: string;
+  end_date: string;
+  syllabus_url?: string;
+  course_fee: number;
+  course_code: string;
+  prerequisites: string[];
+  created_at?: string;
+  updated_at?: string;
+};
+
 export async function getCoursesForInstructor(instructor_id: string): Promise<{
   courses: Course[];
   registrations: Registration[];
@@ -36,29 +51,39 @@ export async function getCoursesPageData(): Promise<{
   return { courses, instructors, registrations };
 }
 
+export async function getCourses(): Promise<Course[]> {
+  const courses = await fetchListData<Course>("courses", "/");
+  return courses;
+}
+
 export async function getCoursePageData(id: string): Promise<{
-  course: Course | null;
+  course: Course;
   instructor: Instructor | null;
   registrations: Registration[];
   unregisteredStudents: Student[];
+  instructors: Instructor[];
+  courses: Course[];
 }> {
-  console.log("Fetching course data for ID:", id);
-  const [course, registrations, unregisteredStudents] = await Promise.all([
+  const [course, registrations, unregisteredStudents, instructors, courses] = await Promise.all([
     fetchPageData<Course>("courses", `/${id}/`),
     fetchListData<Registration>("registrations", "/", { course_id: id }),
-    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true })
+    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true }),
+    fetchListData<Instructor>("instructors", "/"),
+    fetchListData<Course>("courses", "/")
   ]);
 
-  console.log("Course data fetched:", course);
-  const instructor = course?.instructor_id
+  if (!course) {
+    throw new Error("Course not found or invalid ID. " + id);
+  }
+  const instructor = course.instructor_id
     ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
     : null;
 
-  const output = { course, instructor, registrations, unregisteredStudents };
+  const output = { course, instructor, registrations, unregisteredStudents, instructors, courses };
   return output;
 }
 
-export async function createCourse(data: Omit<Course, "id">): Promise<Course> {
+export async function createCourse(data: CoursePayload): Promise<Course> {
   try {
     return await mutateData("courses", "/", "POST", data);
   } catch (error: any) {
@@ -66,7 +91,7 @@ export async function createCourse(data: Omit<Course, "id">): Promise<Course> {
   }
 }
 
-export async function updateCourse(id: string, data: Omit<Course, "id" | "created_at" | "updated_at">): Promise<void> {
+export async function updateCourse(id: string, data: CoursePayload): Promise<void> {
   try {
     await mutateData("courses", `/${id}/`, "PUT", data);
   } catch (error: any) {

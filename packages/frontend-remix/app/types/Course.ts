@@ -4,17 +4,37 @@ type CourseAdditionalFields = {
   enrollment_count?: number; // new
 };
 
+export type CoursePrerequisite = {
+  id: string;
+  title: string;
+  course_code: string;
+};
+
 export type Course = {
-    id: string;
-    title: string;
-    description: string;
-    description_full: string;
-    instructor_id: string;
-    start_date: string; // ISO
-    end_date: string; // ISO
-    course_fee: number; // Optional: Add course fee if applicable
-    prerequisites?: string[]; // Array of course IDs or names
-    syllabus_url?: string; // URL or path to the syllabus document
-    created_at: string; //  ISO 
-    updated_at: string; // ISO
-  } & CourseAdditionalFields; // Merge with additional fields
+  id: string;
+  course_code: string;
+  title: string;  
+  description: string;
+  description_full: string;
+  instructor_id: string;
+  start_date: string; // ISO
+  end_date: string; // ISO
+  course_fee: string; // Optional: Add course fee if applicable
+  syllabus_url?: string; // URL or path to the syllabus document
+  created_at: string; //  ISO 
+  updated_at: string; // ISO
+  prerequisites: CoursePrerequisite[]
+} & CourseAdditionalFields; // Merge with additional fields
+
+export type CourseFormData = {
+  course_code: string;
+  title: string;
+  description: string;
+  description_full: string;
+  instructor_id: string;
+  start_date: string;
+  end_date: string;
+  syllabus_url: string;
+  course_fee: string;
+  prerequisites: string[];
+};

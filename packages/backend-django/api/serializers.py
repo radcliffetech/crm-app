@@ -6,23 +6,69 @@ class InstructorSerializer(serializers.ModelSerializer):
         model = Instructor
         fields = '__all__'
 
-class CourseSerializer(serializers.ModelSerializer):
-    instructor_id = serializers.UUIDField(source="instructor.id", read_only=True)
 
+    
+class CoursePrerequisiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ["id", "title", "course_code"]
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    instructor_id = serializers.UUIDField(source="instructor.id")
+    prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Course
         fields = [
-            "id", "title", "description", "description_full",
-            "instructor_id",
-            "start_date", "end_date", "syllabus_url", "course_fee",
-            "created_at", "updated_at"
+            "id", "course_code", "title", "description", "description_full",
+            "instructor_id", 
+            "start_date", "end_date", "course_fee",
+            "syllabus_url", "prerequisites", "created_at", 
+            "updated_at", "is_active"
         ]
+        read_only_fields = ["id", "instructor", "created_at", "updated_at", "is_active"]
+
+    def create(self, validated_data):
+        instructor_data = validated_data.pop("instructor", None)
+        prerequisites_data = validated_data.pop("prerequisites", [])
+
+        if instructor_data:
+            instructor = Instructor.objects.get(id=instructor_data["id"])
+        else:
+            raise serializers.ValidationError({"instructor_id": "Instructor must be provided."})
+
+        course = Course.objects.create(instructor=instructor, **validated_data)
+
+        if prerequisites_data:
+            course.prerequisites.set(prerequisites_data)
+
+        return course
+    
+    def update(self, instance, validated_data):
+        instructor_data = validated_data.pop("instructor", None)
+        prerequisites_data = validated_data.pop("prerequisites", None)
+
+        if instructor_data:
+            instructor = Instructor.objects.get(id=instructor_data["id"])
+            instance.instructor = instructor
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if prerequisites_data is not None:
+            instance.prerequisites.set(prerequisites_data)
+
+        return instance
 
 class CourseListSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField(read_only=True)
     enrollment_count = serializers.SerializerMethodField(read_only=True)
     instructor_id = serializers.UUIDField(source="instructor.id", read_only=True)
-
+    prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Course
         fields = [
@@ -30,7 +76,7 @@ class CourseListSerializer(serializers.ModelSerializer):
             "instructor_id",
             "start_date", "end_date", "syllabus_url", "course_fee",
             "created_at", "updated_at",
-            "instructor_name", "enrollment_count"
+            "instructor_name", "enrollment_count", "course_code", "prerequisites"
         ]
 
     def get_instructor_name(self, obj):
@@ -38,6 +84,8 @@ class CourseListSerializer(serializers.ModelSerializer):
 
     def get_enrollment_count(self, obj):
         return Registration.objects.filter(course=obj).count()
+    
+
     
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
