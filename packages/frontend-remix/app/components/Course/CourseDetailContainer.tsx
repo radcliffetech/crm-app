@@ -5,9 +5,7 @@ import type {
   Registration,
   Student,
 } from "~/types";
-import { FormEvent, useEffect, useState } from "react";
-import { Link, useParams } from "@remix-run/react";
-import { getCoursePageData, updateCourse } from "~/loaders/courses";
+import { FormEvent, useState } from "react";
 import {
   registerStudentToCourse,
   unregisterStudent,
@@ -15,6 +13,7 @@ import {
 
 import { CourseForm } from "~/components/Course/CourseForm";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
+import { Link } from "@remix-run/react";
 import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
@@ -25,7 +24,9 @@ import { RegistrationsForCourseList } from "~/components/Registration/Registrati
 import RenderMarkdown from "~/components/Common/RenderMarkdown";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
+import { updateCourse } from "~/loaders/courses";
 import { useAuth } from "~/root";
+import { useRevalidator } from "@remix-run/react";
 
 const emptyCourseForm: CourseFormData = {
   course_code: "",
@@ -40,57 +41,33 @@ const emptyCourseForm: CourseFormData = {
   prerequisites: [] as string[],
 };
 
-export function CourseDetailContainer() {
-  const { id } = useParams();
-  const auth = useAuth();
+type CourseDetailContainerProps = {
+  loaderData: {
+    course: Course;
+    instructor: Instructor | null;
+    registrations: Registration[];
+    unregisteredStudents: Student[];
+    instructors: Instructor[];
+    courses: Course[];
+  };
+};
 
-  const [course, setCourse] = useState<Course | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [instructor, setInstructor] = useState<Instructor | null>(null);
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [unregisteredStudents, setUnregisteredStudents] = useState<Student[]>(
-    []
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function CourseDetailContainer({
+  loaderData,
+}: CourseDetailContainerProps) {
+  const {
+    course,
+    instructor,
+    registrations,
+    unregisteredStudents,
+    instructors,
+    courses,
+  } = loaderData;
+  const auth = useAuth();
+  const { revalidate } = useRevalidator();
 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<CourseFormData>(emptyCourseForm);
-
-  function reloadData() {
-    if (!id) return;
-    setLoading(true);
-    setError(null);
-    getCoursePageData(id)
-      .then(
-        ({
-          course,
-          instructor,
-          registrations,
-          unregisteredStudents,
-          instructors,
-          courses,
-        }) => {
-          setCourse(course);
-          setCourses(courses);
-          setInstructor(instructor);
-          setInstructors(instructors);
-          setRegistrations(registrations);
-          setUnregisteredStudents(unregisteredStudents);
-        }
-      )
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load course data " + err);
-        toast.error("Failed to load course data.");
-      })
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, [id]);
 
   const openEditForm = () => {
     if (!course) return;
@@ -116,11 +93,10 @@ export function CourseDetailContainer() {
       .then(() => {
         toast.success("Course updated successfully!");
         setShowForm(false);
-        reloadData();
+        revalidate();
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to update course: " + err);
         toast.error("Failed to update course.");
       });
   };
@@ -130,11 +106,10 @@ export function CourseDetailContainer() {
     registerStudentToCourse(student_id, course.id)
       .then(() => {
         toast.success("Student registered successfully!");
-        reloadData();
+        revalidate();
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to register student: " + err);
         toast.error("Failed to register student.");
       });
   };
@@ -143,11 +118,10 @@ export function CourseDetailContainer() {
     unregisterStudent(reg)
       .then(() => {
         toast.success("Student unregistered successfully!");
-        reloadData();
+        revalidate();
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to unregister student: " + err);
         toast.error("Failed to unregister student.");
       });
   };
@@ -182,7 +156,7 @@ export function CourseDetailContainer() {
         </PageHeader>
       </div>
 
-      {canAccessAdmin(auth) && course && (
+      {canAccessAdmin(auth) && (
         <div className="mb-4">
           <button
             onClick={openEditForm}
@@ -194,7 +168,7 @@ export function CourseDetailContainer() {
         </div>
       )}
 
-      <DataLoaderState loading={loading} error={error} />
+      <DataLoaderState loading={false} error={null} />
 
       {course && (
         <>
