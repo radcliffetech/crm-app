@@ -6,7 +6,7 @@ import {
 
 import { AddButton } from "~/components/Common/AddButton";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
-import { Modal } from "~/components/Common/Modal";
+import { EditModal } from "~/components/Common/EditModal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import type { Student } from "~/types";
@@ -16,6 +16,7 @@ import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useConfirmDialog } from "~/components/Common/ConfirmDialogProvider";
+import { useEditState } from "~/components/Common/useEditState";
 import { useState } from "react";
 
 const initialFormData = {
@@ -37,7 +38,7 @@ export function StudentsPageContainer({
   loaderData,
 }: StudentsPageContainerProps) {
   const [students, setStudents] = useState<Student[]>(loaderData.students);
-  const [showForm, setShowForm] = useState(false);
+  const { editing, open, close } = useEditState();
   const [formData, setFormData] = useState(initialFormData);
   const [editingstudent_id, setEditingstudent_id] = useState<string | null>(
     null
@@ -70,22 +71,22 @@ export function StudentsPageContainer({
     <PageFrame>
       <PageHeader>Students</PageHeader>
 
-      {!showForm && (
+      {!editing && (
         <AddButton
           onClick={() => {
             resetForm();
-            setShowForm(true);
+            open();
           }}
         >
           Add
         </AddButton>
       )}
 
-      <Modal
-        isOpen={showForm}
+      <EditModal
+        open={editing}
         onClose={() => {
           resetForm();
-          setShowForm(false);
+          close();
         }}
       >
         <StudentForm
@@ -105,16 +106,17 @@ export function StudentsPageContainer({
               console.error(err);
               toast.error("Failed to create student.");
             } finally {
-              setShowForm(false);
+              resetForm();
+              close();
             }
           }}
           editingstudent_id={editingstudent_id}
           onCancel={() => {
             resetForm();
-            setShowForm(false);
+            close();
           }}
         />
-      </Modal>
+      </EditModal>
 
       <StudentsList
         students={students}
@@ -129,7 +131,7 @@ export function StudentsPageContainer({
             company: student.company || "",
             notes: student.notes || "",
           });
-          setShowForm(true);
+          open();
         }}
         onDelete={async (student) => {
           setDeletingId(student.id);
