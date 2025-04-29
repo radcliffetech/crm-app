@@ -90,7 +90,7 @@ export function CourseForm({
               const selected = Array.from(e.target.selectedOptions, option => option.value);
               setFormData({ ...formData, prerequisites: selected });
             }}
-            className="border p-2 h-40"
+            className="border p-2 h-24"
           >
             {allCourses
               .filter((c) => c.id !== editingCourse?.id)
@@ -167,11 +167,14 @@ export function CourseForm({
           <textarea
             value={formData.description_full}
             onChange={(e) => setFormData({ ...formData, description_full: e.target.value })}
-            className="border p-2 h-40"
+            className="border p-2 h-20"
             required
           />
         </label>
-        <button type="submit" className="btn-primary py-2 px-4 rounded w-full">
+        <button
+          type="submit"
+          className="btn-primary py-2 px-4 rounded w-full mt-4"
+        >
           {editingCourse ? "Update" : "Save"}
         </button>
     </form>

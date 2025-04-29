@@ -1,4 +1,4 @@
-
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 export function Modal({
   isOpen,
@@ -19,7 +19,7 @@ export function Modal({
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
           aria-label="Close"
         >
-          &times;
+         <XMarkIcon className="h-6 w-6" />
         </button>
         {children}
       </div>

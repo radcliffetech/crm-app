@@ -15,7 +15,7 @@ class CoursePrerequisiteSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    instructor_id = serializers.UUIDField(source="instructor.id", read_only=True)
+    instructor_id = serializers.UUIDField(source="instructor.id")
     prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
     
     class Meta:
@@ -30,17 +30,38 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "instructor", "created_at", "updated_at", "is_active"]
 
     def create(self, validated_data):
+        instructor_data = validated_data.pop("instructor", None)
         prerequisites_data = validated_data.pop("prerequisites", [])
-        instructor_id = validated_data.pop("instructor_id")
-        instructor = Instructor.objects.get(id=instructor_id)
+
+        if instructor_data:
+            instructor = Instructor.objects.get(id=instructor_data["id"])
+        else:
+            raise serializers.ValidationError({"instructor_id": "Instructor must be provided."})
+
         course = Course.objects.create(instructor=instructor, **validated_data)
+
         if prerequisites_data:
             course.prerequisites.set(prerequisites_data)
-        return course
 
+        return course
+    
     def update(self, instance, validated_data):
-        validated_data.pop("instructor_id", None)  # Don't allow instructor_id to change during update
-        return super().update(instance, validated_data)
+        instructor_data = validated_data.pop("instructor", None)
+        prerequisites_data = validated_data.pop("prerequisites", None)
+
+        if instructor_data:
+            instructor = Instructor.objects.get(id=instructor_data["id"])
+            instance.instructor = instructor
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+
+        if prerequisites_data is not None:
+            instance.prerequisites.set(prerequisites_data)
+
+        return instance
 
 class CourseListSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField(read_only=True)

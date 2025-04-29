@@ -1,6 +1,7 @@
 import type { Course, CourseFormData, Instructor, Registration, Student } from "~/types";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useParams } from "@remix-run/react";
+import { getCoursePageData, updateCourse } from "~/loaders/courses";
 import { registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
 
 import { CourseForm } from "~/components/forms/CourseForm";
@@ -10,14 +11,13 @@ import { Modal } from "~/components/ui/Modal";
 import { PageFrame } from "~/components/ui/PageFrame";
 import { PageHeader } from "~/components/ui/PageHeader";
 import PageSubheader from "~/components/ui/PageSubheader";
+import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { RegisterCourseForStudentForm } from "~/components/registrations/RegisterCourseForStudentForm";
 import { RegistrationsForCourseList } from "~/components/lists/RegistrationsForCourseList";
 import RenderMarkdown from "~/components/ui/RenderMarkdown";
 import { canAccessAdmin } from "~/lib/permissions";
 import { emptyCourseForm } from "./courses._index";
-import { getCoursePageData } from "~/loaders/courses";
 import { toast } from "react-hot-toast";
-import { updateCourse } from "~/loaders/courses";
 import { useAuth } from "~/root";
 
 export const meta: MetaFunction = ({ params }) => {
@@ -48,7 +48,7 @@ export default function CourseDetailPage() {
       setLoading(true);
       setError(null);
       getCoursePageData(id)
-        .then(({ course, instructor, registrations, unregisteredStudents, 
+        .then(({ course, instructor, registrations, unregisteredStudents,
           instructors, courses }) => {
           setCourse(course);
           setCourses(courses);
@@ -122,30 +122,20 @@ export default function CourseDetailPage() {
 
   return (
     <PageFrame>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-2">
         <PageHeader>
           {course?.title}
           {course?.course_code && (
-            <span className="block text-base text-gray-500 mt-1">
+            <span className="block text-base text-gray-500 my-2">
               {course.course_code}
             </span>
           )}
-        </PageHeader>
-        {canAccessAdmin(auth) && course && (
-          <button
-            onClick={openEditForm}
-            className="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700"
-          >
-            Edit Course
-          </button>
-        )}
-      </div>
-      {course && (
-        <p className="mb-4 text-sm text-gray-500">
-          {new Date(course.start_date).toLocaleDateString()} – {new Date(course.end_date).toLocaleDateString()}
-        </p>
-      )}
-      {instructor && (
+          {course && (
+            <p className="mb-4 text-sm text-gray-500">
+              {new Date(course.start_date).toLocaleDateString()} – {new Date(course.end_date).toLocaleDateString()}
+            </p>
+          )}
+                {instructor && (
         <p className="mb-2 text-sm text-gray-600">
           Instructor:{" "}
           <Link to={`/instructors/${instructor.id}`} className="text-blue-600 hover:underline">
@@ -153,6 +143,22 @@ export default function CourseDetailPage() {
           </Link>
         </p>
       )}
+        </PageHeader>
+      </div>
+      {canAccessAdmin(auth) && course && (
+        <div className="mb-4">
+          <button
+            onClick={openEditForm}
+            className="btn-primary rounded px-4 py-2"
+          >
+            <PencilSquareIcon className="h-4 w-4 inline-block mr-1" />
+            Edit
+          </button>
+        </div>
+      )}
+
+
+
 
       <DataLoaderState loading={loading} error={error} />
 
@@ -179,6 +185,11 @@ export default function CourseDetailPage() {
             Course Fee: ${Number(course.course_fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
 
+          <RegisterCourseForStudentForm
+            course={course}
+            unregisteredStudents={unregisteredStudents}
+            onRegister={registerForCourse}
+          />
           <div className="py-4">
             <PageSubheader>Registered Students</PageSubheader>
             {registrations.length === 0 ? (
@@ -199,27 +210,23 @@ export default function CourseDetailPage() {
               />
             )}
           </div>
-          <RegisterCourseForStudentForm
-            course={course}
-            unregisteredStudents={unregisteredStudents}
-            onRegister={registerForCourse}
-          />
+         
         </>)}
 
       {showForm && formData && (
         <Modal isOpen={true} onClose={() => setShowForm(false)}>
           <CourseForm
-              formData={{
-                ...formData,
-                prerequisites: formData.prerequisites,
-              }}
-              setFormData={setFormData}
-              editingCourse={course}
-              instructors={instructors}
-              onSubmit={(e: React.FormEvent) => handleFormSubmit(e, formData)}
-              onCancel={() => setShowForm(false)}
-              allCourses={courses}
-            />
+            formData={{
+              ...formData,
+              prerequisites: formData.prerequisites,
+            }}
+            setFormData={setFormData}
+            editingCourse={course}
+            instructors={instructors}
+            onSubmit={(e: React.FormEvent) => handleFormSubmit(e, formData)}
+            onCancel={() => setShowForm(false)}
+            allCourses={courses}
+          />
         </Modal>
       )}
 

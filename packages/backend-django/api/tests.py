@@ -128,6 +128,7 @@ class CourseSerializerTests(TestCase):
         }
         serializer = CourseSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
+
         course = serializer.save()
         course.prerequisites.set(data["prerequisites"])
 
