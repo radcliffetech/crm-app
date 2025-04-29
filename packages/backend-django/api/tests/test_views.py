@@ -1,12 +1,14 @@
 from django.urls import reverse
-from rest_framework.test import APITestCase
+from django.test import TestCase
+from rest_framework.test import APIClient
 from rest_framework import status
 from api.models import Instructor, Course, Student, Registration
 
 
 # ----------------- Registration Tests -----------------
-class RegistrationTests(APITestCase):
+class RegistrationTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
         # Instructor and courses for prereq/registration tests
         self.instructor = Instructor.objects.create(
             name_first="Prof",
@@ -288,8 +290,9 @@ class RegistrationTests(APITestCase):
 
 
 # ----------------- Course Tests -----------------
-class CourseTests(APITestCase):
+class CourseTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Koga",
             name_last="Fuchsia",
@@ -405,8 +408,9 @@ class CourseTests(APITestCase):
 
 
 # ----------------- Student Tests -----------------
-class StudentTests(APITestCase):
+class StudentTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Lt.",
             name_last="Surge",
@@ -466,8 +470,9 @@ class StudentTests(APITestCase):
 
 
 # ----------------- Dashboard Tests -----------------
-class DashboardTests(APITestCase):
+class DashboardTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Sabrina",
             name_last="Psychic",
@@ -549,8 +554,9 @@ class DashboardTests(APITestCase):
 
 
 # ----------------- Search Tests -----------------
-class SearchTests(APITestCase):
+class SearchTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Erika",
             name_last="Celadon",

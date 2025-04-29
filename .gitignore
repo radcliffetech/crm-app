@@ -17,3 +17,5 @@ dist/
 
 # VSCode
 .vscode/
+
+.coverage
