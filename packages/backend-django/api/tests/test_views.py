@@ -292,6 +292,11 @@ class RegistrationTests(TestCase):
 # ----------------- Course Tests -----------------
 class CourseTests(TestCase):
     def setUp(self):
+        # Clean up all relevant objects to avoid test leakage
+        Course.objects.all().delete()
+        Student.objects.all().delete()
+        Instructor.objects.all().delete()
+        Registration.objects.all().delete()
         self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Koga",
@@ -418,6 +423,11 @@ class CourseTests(TestCase):
 # ----------------- Student Tests -----------------
 class StudentTests(TestCase):
     def setUp(self):
+        # Clean up all relevant objects to avoid test leakage
+        Course.objects.all().delete()
+        Student.objects.all().delete()
+        Instructor.objects.all().delete()
+        Registration.objects.all().delete()
         self.client = APIClient()
         self.instructor = Instructor.objects.create(
             name_first="Lt.",
