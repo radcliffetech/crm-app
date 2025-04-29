@@ -187,7 +187,7 @@ export default function CourseDetailPage() {
           <p className="mb-1 text-xl  text-gray-600">{course.description}</p>
           {course.prerequisites.length > 0 && (
             <div className="mt-6 border border-gray-300 rounded p-4">
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
+              <h2 className="text-lg font-light text-gray-700 mb-2">
                 Prerequisites
               </h2>
               {course.prerequisites.map((prereq) => (
@@ -200,7 +200,7 @@ export default function CourseDetailPage() {
           <div className="prose my-4 text-gray-700">
             <RenderMarkdown>{course.description_full}</RenderMarkdown>
           </div>
-          <p className="text-xl font-bold text-gray-800 mt-6">
+          <p className="text-xl font-light text-gray-800 mt-6">
             Course Fee: $
             {Number(course.course_fee).toLocaleString(undefined, {
               minimumFractionDigits: 2,

@@ -3,5 +3,5 @@ export default function PageSubheader({
 }: {
   children?: React.ReactNode;
 }) {
-  return <h2 className="text-xl font-semibold mb-4">{children}</h2>;
+  return <h2 className="text-xl font-light mb-4">{children}</h2>;
 }
