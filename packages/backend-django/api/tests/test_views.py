@@ -477,6 +477,10 @@ class StudentTests(TestCase):
     def test_student_filter_by_instructor_id_eligible(self):
         url = f"/api/students/?instructor_id={self.instructor.id}&eligible=true"
         response = self.client.get(url)
+        print("Courses in DB:", Course.objects.all())
+        print("Students in DB:", Student.objects.all())
+        print("Instructors in DB:", Instructor.objects.all())
+        print("Registrations in DB:", Registration.objects.all())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
