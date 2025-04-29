@@ -387,6 +387,10 @@ class CourseTests(TestCase):
     def test_course_list_uses_course_list_serializer(self):
         url = "/api/courses/"
         response = self.client.get(url)
+        print("Courses in DB:", Course.objects.all())
+        print("Students in DB:", Student.objects.all())
+        print("Instructors in DB:", Instructor.objects.all())
+        print("Registrations in DB:", Registration.objects.all())
         self.assertEqual(response.status_code, 200)
         self.assertTrue(all("course_code" in course for course in response.data))
 
@@ -403,7 +407,6 @@ class CourseTests(TestCase):
         self.assertGreaterEqual(len(response.data), 1)
 
     def test_course_filter_active_courses_no_matches(self):
-        Course.objects.all().delete()  # Clean out any other test courses
         self.course = Course.objects.create(
             course_code="PAST-101",
             title="Old Course",
@@ -416,6 +419,10 @@ class CourseTests(TestCase):
         )
         url = "/api/courses/?active_courses=true"
         response = self.client.get(url)
+        print("Courses in DB:", Course.objects.all())
+        print("Students in DB:", Student.objects.all())
+        print("Instructors in DB:", Instructor.objects.all())
+        print("Registrations in DB:", Registration.objects.all())
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
 
