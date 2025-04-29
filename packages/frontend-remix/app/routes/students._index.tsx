@@ -1,6 +1,9 @@
-import type { MetaFunction } from "@remix-run/node";
-// routes/students._index.tsx
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+
 import { StudentsPageContainer } from "~/components/Student/StudentsPageContainer";
+import { getAllStudents } from "~/loaders/students";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,6 +15,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader(args: LoaderFunctionArgs) {
+  const students = await getAllStudents();
+  return json({ students });
+}
+
 export default function StudentsIndexPage() {
-  return <StudentsPageContainer />;
+  const loaderData = useLoaderData<typeof loader>();
+  return <StudentsPageContainer loaderData={loaderData} />;
 }

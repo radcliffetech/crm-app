@@ -1,7 +1,5 @@
 import type { Course, Instructor } from "~/types";
-// components/Instructor/InstructorDetailContainer.tsx
-import { FormEvent, useEffect, useState } from "react";
-import { getInstructorPageData, updateInstructor } from "~/loaders/instructors";
+import { FormEvent, useState } from "react";
 
 import { CoursesForInstructorList } from "~/components/Course/CoursesForInstructorList";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
@@ -14,48 +12,38 @@ import { PencilSquareIcon } from "@heroicons/react/24/solid";
 import { StudentsForInstructorList } from "~/components/Student/StudentsForInstructorList";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
+import { updateInstructor } from "~/loaders/instructors";
 import { useAuth } from "~/root";
-import { useParams } from "@remix-run/react";
+import { useRevalidator } from "@remix-run/react";
 
-export function InstructorDetailContainer() {
-  const { id } = useParams();
-  const [instructor, setInstructor] = useState<Instructor | null>(null);
-  const [courses, setCourses] = useState<Course[]>([]);
+type InstructorDetailContainerProps = {
+  loaderData: {
+    instructor: Instructor;
+    courses: Course[];
+  };
+};
+
+export function InstructorDetailContainer({
+  loaderData,
+}: InstructorDetailContainerProps) {
+  const { instructor, courses } = loaderData;
+  const user = useAuth();
+  const { revalidate } = useRevalidator();
+
   const [isEditing, setIsEditing] = useState(false);
   const [formState, setFormState] = useState({
-    name_first: "",
-    name_last: "",
-    email: "",
-    bio: "",
+    name_first: instructor.name_first,
+    name_last: instructor.name_last,
+    email: instructor.email,
+    bio: instructor.bio || "",
   });
-  const user = useAuth();
-
-  function reloadData() {
-    if (id) {
-      getInstructorPageData(id).then(({ instructor, courses }) => {
-        setInstructor(instructor);
-        setCourses(courses);
-        setFormState({
-          name_first: instructor.name_first,
-          name_last: instructor.name_last,
-          email: instructor.email,
-          bio: instructor.bio || "",
-        });
-      });
-    }
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, [id]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!instructor) return;
     await updateInstructor(instructor.id, formState);
-    reloadData();
-    setIsEditing(false);
     toast.success("Instructor updated successfully!");
+    revalidate();
+    setIsEditing(false);
   };
 
   return (

@@ -1,11 +1,8 @@
 import {
   createInstructor,
   deleteInstructor,
-  getAllInstructors,
   updateInstructor,
 } from "~/loaders/instructors";
-// components/Instructor/InstructorsPageContainer.tsx
-import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/Common/AddButton";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
@@ -19,6 +16,7 @@ import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useConfirmDialog } from "~/components/Common/ConfirmDialogProvider";
+import { useState } from "react";
 
 const initialFormData = {
   name_first: "",
@@ -27,35 +25,27 @@ const initialFormData = {
   bio: "",
 };
 
-export function InstructorsPageContainer() {
+type InstructorsPageContainerProps = {
+  loaderData: {
+    instructors: Instructor[];
+  };
+};
+
+export function InstructorsPageContainer({
+  loaderData,
+}: InstructorsPageContainerProps) {
   const user = useAuth();
   const confirm = useConfirmDialog();
 
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [instructors, setInstructors] = useState<Instructor[]>(
+    loaderData.instructors
+  );
   const [showForm, setShowForm] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(
     null
   );
   const [formData, setFormData] = useState(initialFormData);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  function reloadData() {
-    setLoading(true);
-    setError(null);
-    getAllInstructors()
-      .then(setInstructors)
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load instructors.");
-      })
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, []);
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -67,22 +57,26 @@ export function InstructorsPageContainer() {
     try {
       if (editingInstructor) {
         await updateInstructor(editingInstructor.id, formData);
+        setInstructors((prev) =>
+          prev.map((i) =>
+            i.id === editingInstructor.id ? { ...i, ...formData } : i
+          )
+        );
         setEditingInstructor(null);
       } else {
         const now = new Date().toISOString();
-        await createInstructor({
+        const newInstructor = await createInstructor({
           ...formData,
           created_at: now,
           updated_at: now,
         });
+        setInstructors((prev) => [...prev, newInstructor]);
       }
-      reloadData();
       resetForm();
       setShowForm(false);
       toast.success("Instructor saved successfully!");
     } catch (err) {
       console.error(err);
-      setError("Failed to save instructor " + err);
       toast.error("Failed to save instructor.");
     }
   };
@@ -121,8 +115,6 @@ export function InstructorsPageContainer() {
         />
       </Modal>
 
-      <DataLoaderState loading={loading} error={error} />
-
       <InstructorsList
         instructors={instructors}
         deletingId={deletingId}
@@ -152,11 +144,12 @@ export function InstructorsPageContainer() {
             }
             try {
               await deleteInstructor(id);
-              reloadData();
+              setInstructors((prev) =>
+                prev.filter((i) => i.id !== instructor.id)
+              );
               toast.success("Instructor deleted successfully!");
             } catch (err) {
               console.error(err);
-              setError("Failed to delete instructor " + err);
               toast.error("Failed to delete instructor.");
             } finally {
               setDeletingId(null);

@@ -1,5 +1,9 @@
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+
 import { DashboardContainer } from "~/components/Dashboard/DashboardContainer";
-import type { MetaFunction } from "@remix-run/node";
+import { getDashboardData } from "~/loaders/dashboard";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,6 +12,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader(args: LoaderFunctionArgs) {
+  const data = await getDashboardData();
+  return json(data);
+}
+
 export default function IndexPage() {
-  return <DashboardContainer />;
+  const loaderData = useLoaderData<typeof loader>();
+  return <DashboardContainer loaderData={loaderData} />;
 }

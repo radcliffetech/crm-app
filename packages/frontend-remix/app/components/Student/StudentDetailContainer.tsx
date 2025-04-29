@@ -1,7 +1,4 @@
 import type { Course, Registration, Student } from "~/types";
-import { getStudentPageData, updateStudent } from "~/loaders/students";
-// components/Student/StudentDetailContainer.tsx
-import { useEffect, useState } from "react";
 
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { Modal } from "~/components/Common/Modal";
@@ -15,73 +12,42 @@ import { StudentForm } from "~/components/Student/StudentForm";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { unregisterStudent } from "~/loaders/registrations";
+import { updateStudent } from "~/loaders/students";
 import { useAuth } from "~/root";
-import { useParams } from "@remix-run/react";
+import { useRevalidator } from "@remix-run/react";
+import { useState } from "react";
 
-export function StudentDetailContainer() {
+type StudentDetailContainerProps = {
+  loaderData: {
+    student: Student;
+    registrations: Registration[];
+    courses: Course[];
+  };
+};
+
+export function StudentDetailContainer({
+  loaderData,
+}: StudentDetailContainerProps) {
+  const { student, registrations, courses } = loaderData;
   const user = useAuth();
-  const { id } = useParams();
-  const [student, setStudent] = useState<Student | null>(null);
+  const { revalidate } = useRevalidator();
+
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name_first: "",
-    name_last: "",
-    email: "",
-    phone: "",
-    company: "",
-    notes: "",
+    name_first: student.name_first,
+    name_last: student.name_last,
+    email: student.email,
+    phone: student.phone || "",
+    company: student.company || "",
+    notes: student.notes || "",
   });
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  function reloadData() {
-    if (id) {
-      setLoading(true);
-      setError(null);
-      getStudentPageData(id)
-        .then(({ student, registrations, courses }) => {
-          setStudent(student);
-          if (student) {
-            setFormData({
-              name_first: student.name_first,
-              name_last: student.name_last,
-              email: student.email,
-              phone: student.phone || "",
-              company: student.company || "",
-              notes: student.notes || "",
-            });
-          }
-          setRegistrations(registrations);
-          setCourses(courses);
-        })
-        .catch((err) => {
-          console.error(err);
-          setError("Failed to load student data.");
-          toast.error("Failed to load student data.");
-        })
-        .finally(() => setLoading(false));
-    }
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, [id]);
-
-  if (!student) {
-    return (
-      <div className="p-8">
-        <DataLoaderState loading={loading} error={error} />
-      </div>
-    );
-  }
 
   return (
     <PageFrame>
       <PageHeader>
         {student.name_first} {student.name_last}
       </PageHeader>
+
       {canAccessAdmin(user) && (
         <div className="flex justify-end mb-4">
           <button
@@ -93,6 +59,7 @@ export function StudentDetailContainer() {
           </button>
         </div>
       )}
+
       <p className="mb-2">
         <strong>Email:</strong> {student.email}
       </p>
@@ -110,7 +77,7 @@ export function StudentDetailContainer() {
               try {
                 await updateStudent(student.id, formData);
                 toast.success("Student updated successfully!");
-                reloadData();
+                revalidate();
                 setEditing(false);
               } catch (err) {
                 console.error(err);
@@ -130,8 +97,8 @@ export function StudentDetailContainer() {
         registrations={registrations}
         onRegister={async () => {
           try {
-            reloadData();
             toast.success("Student registered successfully!");
+            revalidate();
           } catch (err) {
             console.error(err);
             toast.error("Failed to register student.");
@@ -147,11 +114,10 @@ export function StudentDetailContainer() {
             try {
               await unregisterStudent(reg);
               toast.success("Student unregistered successfully!");
-              reloadData();
+              revalidate();
             } catch (err) {
               console.error(err);
               toast.error("Failed to unregister student.");
-              setError("Failed to unregister student from course: " + err);
             }
           }}
         />

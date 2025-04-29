@@ -1,10 +1,8 @@
 import {
   createStudent,
   deleteStudent,
-  getAllStudents,
   updateStudent,
 } from "~/loaders/students";
-import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/Common/AddButton";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
@@ -18,6 +16,7 @@ import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useConfirmDialog } from "~/components/Common/ConfirmDialogProvider";
+import { useState } from "react";
 
 const initialFormData = {
   name_first: "",
@@ -28,34 +27,25 @@ const initialFormData = {
   notes: "",
 };
 
-export function StudentsPageContainer() {
-  const [students, setStudents] = useState<Student[]>([]);
+type StudentsPageContainerProps = {
+  loaderData: {
+    students: Student[];
+  };
+};
+
+export function StudentsPageContainer({
+  loaderData,
+}: StudentsPageContainerProps) {
+  const [students, setStudents] = useState<Student[]>(loaderData.students);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [editingstudent_id, setEditingstudent_id] = useState<string | null>(
     null
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const confirm = useConfirmDialog();
-
-  function reloadData() {
-    setLoading(true);
-    setError(null);
-    getAllStudents()
-      .then(setStudents)
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load students.");
-      })
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, []);
+  const user = useAuth();
 
   const resetForm = () => {
     setFormData(initialFormData);
@@ -65,12 +55,13 @@ export function StudentsPageContainer() {
   const handleUpdateStudent = async (id: string) => {
     try {
       await updateStudent(id, formData);
-      reloadData();
+      setStudents((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, ...formData } : s))
+      );
       resetForm();
       toast.success("Student updated successfully!");
     } catch (err) {
       console.error(err);
-      setError("Failed to update student " + err);
       toast.error("Failed to update student.");
     }
   };
@@ -78,6 +69,7 @@ export function StudentsPageContainer() {
   return (
     <PageFrame>
       <PageHeader>Students</PageHeader>
+
       {!showForm && (
         <AddButton
           onClick={() => {
@@ -92,8 +84,7 @@ export function StudentsPageContainer() {
       <Modal
         isOpen={showForm}
         onClose={() => {
-          setFormData(initialFormData);
-          setEditingstudent_id(null);
+          resetForm();
           setShowForm(false);
         }}
       >
@@ -119,14 +110,11 @@ export function StudentsPageContainer() {
           }}
           editingstudent_id={editingstudent_id}
           onCancel={() => {
-            setFormData(initialFormData);
-            setEditingstudent_id(null);
+            resetForm();
             setShowForm(false);
           }}
         />
       </Modal>
-
-      <DataLoaderState loading={loading} error={error} />
 
       <StudentsList
         students={students}
@@ -157,18 +145,17 @@ export function StudentsPageContainer() {
           }
           try {
             await deleteStudent(student.id);
-            reloadData();
+            setStudents((prev) => prev.filter((s) => s.id !== student.id));
             toast.success("Student deleted successfully!");
           } catch (err) {
             console.error(err);
-            setError("Failed to delete student " + err);
             toast.error("Failed to delete student.");
           } finally {
             setDeletingId(null);
           }
         }}
-        canDelete={canAccessAdmin(useAuth())}
-        canEdit={canAccessAdmin(useAuth())}
+        canDelete={canAccessAdmin(user)}
+        canEdit={canAccessAdmin(user)}
       />
     </PageFrame>
   );

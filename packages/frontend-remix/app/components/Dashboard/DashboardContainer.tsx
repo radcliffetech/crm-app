@@ -1,49 +1,26 @@
-// components/Dashboard/DashboardContainer.tsx
-import { useEffect, useState } from "react";
-
 import type { Course } from "~/types";
 import { CoursesActiveList } from "~/components/Course/CoursesActiveList";
 import { DashboardCard } from "~/components/Dashboard/DashboardCard";
-import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
-import { getDashboardData } from "~/loaders/dashboard";
 
-export function DashboardContainer() {
-  const [studentCount, setStudentCount] = useState(0);
-  const [instructorCount, setInstructorCount] = useState(0);
-  const [courseCount, setCourseCount] = useState(0);
-  const [courses, setCourses] = useState<Course[]>([]);
+type DashboardContainerProps = {
+  loaderData: {
+    studentCount: number;
+    instructorCount: number;
+    courseCount: number;
+    courses: Course[];
+  };
+};
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  function reloadData() {
-    setLoading(true);
-    setError(null);
-    getDashboardData()
-      .then(({ studentCount, courseCount, instructorCount, courses }) => {
-        setStudentCount(studentCount);
-        setCourseCount(courseCount);
-        setInstructorCount(instructorCount);
-        setCourses(courses);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load dashboard data " + err);
-      })
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    reloadData();
-  }, []);
+export function DashboardContainer({ loaderData }: DashboardContainerProps) {
+  const { studentCount, instructorCount, courseCount, courses } = loaderData;
 
   return (
     <PageFrame>
       <PageHeader>Dashboard</PageHeader>
-      <DataLoaderState loading={loading} error={error} />
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <DashboardCard
           title="Students"
@@ -72,6 +49,7 @@ export function DashboardContainer() {
           />
         </div>
       </div>
+
       <PageSubheader>Active Courses</PageSubheader>
       <CoursesActiveList courses={courses} />
     </PageFrame>
