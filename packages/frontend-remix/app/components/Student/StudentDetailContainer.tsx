@@ -1,20 +1,22 @@
 import type { Course, Registration, Student } from "~/types";
+import {
+  registerStudentToCourse,
+  unregisterStudent,
+} from "~/loaders/registrations";
 
-import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { EditButton } from "~/components/Common/EditButton";
-import { Modal } from "~/components/Common/Modal";
+import { EditModal } from "~/components/Common/EditModal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
-import { PageSubheader } from "~/components/Common/PageSubheader";
+import { PageSection } from "~/components/Common/PageSection";
 import { RegisterStudentForCourseForm } from "~/components/Registration/RegisterStudentForCourseForm";
 import { RegistrationsForStudentList } from "~/components/Registration/RegistrationsForStudentList";
 import { StudentForm } from "~/components/Student/StudentForm";
 import { canAccessAdmin } from "~/lib/permissions";
-import { registerStudentToCourse } from "~/loaders/registrations";
 import { toast } from "react-hot-toast";
-import { unregisterStudent } from "~/loaders/registrations";
 import { updateStudent } from "~/loaders/students";
 import { useAuth } from "~/root";
+import { useEditState } from "~/components/Common/useEditState";
 import { useRevalidator } from "@remix-run/react";
 import { useState } from "react";
 
@@ -33,7 +35,7 @@ export function StudentDetailContainer({
   const user = useAuth();
   const { revalidate } = useRevalidator();
 
-  const [editing, setEditing] = useState(false);
+  const { editing, open, close } = useEditState();
   const [formData, setFormData] = useState({
     name_first: student.name_first,
     name_last: student.name_last,
@@ -51,22 +53,21 @@ export function StudentDetailContainer({
 
       {canAccessAdmin(user) && (
         <div className="flex justify-start mb-4">
-          <EditButton loading={false} onClick={() => setEditing(true)} />
+          <EditButton loading={false} onClick={open} />
         </div>
       )}
 
-      <div className="my-4 border border-gray-300 rounded p-4">
-        <PageSubheader>Info</PageSubheader>
+      <PageSection title="Info">
         <p className="mb-2">
           <strong>Email:</strong> {student.email}
         </p>
         <p className="mb-2">
           <strong>Notes:</strong> {student.notes || "—"}
         </p>
-      </div>
+      </PageSection>
 
       {editing && (
-        <Modal isOpen={editing} onClose={() => setEditing(false)}>
+        <EditModal open={editing} onClose={close}>
           <StudentForm
             formData={formData}
             setFormData={setFormData}
@@ -76,20 +77,19 @@ export function StudentDetailContainer({
                 await updateStudent(student.id, formData);
                 toast.success("Student updated successfully!");
                 revalidate();
-                setEditing(false);
+                close();
               } catch (err) {
                 console.error(err);
                 toast.error("Failed to update student.");
               }
             }}
             editingstudent_id={student.id}
-            onCancel={() => setEditing(false)}
+            onCancel={close}
           />
-        </Modal>
+        </EditModal>
       )}
 
-      <div className="my-4 border border-gray-300 rounded p-4">
-        <PageSubheader>Registration</PageSubheader>
+      <PageSection title="Registration">
         <RegisterStudentForCourseForm
           student_id={student.id}
           courses={courses}
@@ -113,10 +113,9 @@ export function StudentDetailContainer({
             }
           }}
         />
-      </div>
+      </PageSection>
 
-      <div className="my-4 border border-gray-300 rounded p-4">
-        <PageSubheader>Registered Courses</PageSubheader>
+      <PageSection title="Registered Courses">
         <RegistrationsForStudentList
           registrations={registrations}
           unregisterAction={async (reg: Registration) => {
@@ -130,7 +129,7 @@ export function StudentDetailContainer({
             }
           }}
         />
-      </div>
+      </PageSection>
     </PageFrame>
   );
 }

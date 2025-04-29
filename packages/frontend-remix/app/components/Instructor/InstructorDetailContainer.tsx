@@ -4,16 +4,17 @@ import { FormEvent, useState } from "react";
 import { CoursesForInstructorList } from "~/components/Course/CoursesForInstructorList";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { EditButton } from "~/components/Common/EditButton";
+import { EditModal } from "~/components/Common/EditModal";
 import { InstructorForm } from "~/components/Instructor/InstructorForm";
-import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
-import { PageSubheader } from "~/components/Common/PageSubheader";
+import { PageSection } from "~/components/Common/PageSection";
 import { StudentsForInstructorList } from "~/components/Student/StudentsForInstructorList";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { updateInstructor } from "~/loaders/instructors";
 import { useAuth } from "~/root";
+import { useEditState } from "~/components/Common/useEditState";
 import { useRevalidator } from "@remix-run/react";
 
 type InstructorDetailContainerProps = {
@@ -30,7 +31,7 @@ export function InstructorDetailContainer({
   const user = useAuth();
   const { revalidate } = useRevalidator();
 
-  const [isEditing, setIsEditing] = useState(false);
+  const { editing, open, close } = useEditState();
   const [formState, setFormState] = useState({
     name_first: instructor.name_first,
     name_last: instructor.name_last,
@@ -43,7 +44,7 @@ export function InstructorDetailContainer({
     await updateInstructor(instructor.id, formState);
     toast.success("Instructor updated successfully!");
     revalidate();
-    setIsEditing(false);
+    close();
   };
 
   return (
@@ -54,46 +55,39 @@ export function InstructorDetailContainer({
           <PageHeader>
             {instructor.name_first} {instructor.name_last}
           </PageHeader>
-          {isEditing && (
-            <Modal isOpen={isEditing} onClose={() => setIsEditing(false)}>
+          {editing && (
+            <EditModal open={editing} onClose={close}>
               <InstructorForm
                 formData={formState}
                 setFormData={setFormState}
                 onSubmit={handleSubmit}
-                onCancel={() => setIsEditing(false)}
+                onCancel={close}
                 editingInstructor={instructor}
               />
-            </Modal>
+            </EditModal>
           )}
-          {!isEditing && (
+          {!editing && (
             <>
               {canAccessAdmin(user) && (
-                <EditButton
-                  loading={false}
-                  onClick={() => setIsEditing(true)}
-                />
+                <EditButton loading={false} onClick={open} />
               )}
             </>
           )}
 
-          <div className="my-4 border border-gray-300 rounded p-4">
-            <PageSubheader>Info</PageSubheader>
+          <PageSection title="Info">
             <p className="mb-4 text-gray-600">{instructor.email}</p>
             <p className="mb-8 italic">{instructor.bio}</p>
-          </div>
-          <div className="my-4 border border-gray-300 rounded p-4">
-            <PageSubheader>Courses</PageSubheader>
+          </PageSection>
+          <PageSection title="Courses">
             {courses.length > 0 ? (
               <CoursesForInstructorList courses={courses} />
             ) : (
               <p className="text-gray-500 italic">No courses assigned.</p>
             )}
-          </div>
-
-          <div className="my-4 border border-gray-300 rounded p-4">
-            <PageSubheader>Students</PageSubheader>
+          </PageSection>
+          <PageSection title="Students">
             <StudentsForInstructorList instructor_id={instructor.id} />
-          </div>
+          </PageSection>
         </>
       )}
     </PageFrame>
