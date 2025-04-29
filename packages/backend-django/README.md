@@ -32,9 +32,7 @@ coverage html
 open htmlcov/index.html
 ```
 
-✅ Test coverage: **100%**
-
-Continuous Integration is configured via GitHub Actions to enforce 100% coverage on all pull requests.
+Continuous Integration is configured via GitHub Actions to enforce minimium coverage on all pull requests.
 
 ## Features
 
