@@ -30,6 +30,7 @@ export function CourseForm({
   if (!instructors || instructors.length === 0) {
     return <div className="text-red-500">No instructors available</div>;
   }
+  console.log("CourseForm", formData.prerequisites);
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col">
@@ -93,9 +94,9 @@ export function CourseForm({
             className="border p-2 h-24"
           >
             {allCourses
-              .filter((c) => c.id !== editingCourse?.id)
+              .filter((c) => c.course_code !== editingCourse?.course_code) 
               .map((course) => (
-                <option key={course.id} value={course.id}>
+                <option key={course.course_code} value={course.course_code}>
                   {course.course_code} – {course.title}
                 </option>
               ))}

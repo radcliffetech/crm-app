@@ -29,6 +29,8 @@ class Command(BaseCommand):
         self.stdout.write("Loading students...")
         self.load_data("students.json", self.load_student)
 
+        # set up some course prerequisites
+        self.stdout.write("Setting up course prerequisites...")
 
         self.stdout.write(self.style.SUCCESS("Sample data reset and loaded successfully."))
 
@@ -54,7 +56,7 @@ class Command(BaseCommand):
     def load_course(self, data):
         instructor = Instructor.objects.get(id=UUID(data["instructor_id"]))
 
-        course, created = Course.objects.update_or_create(
+        Course.objects.update_or_create(
             id=UUID(data["id"]),
             defaults={
                 "title": data["title"],
@@ -66,21 +68,11 @@ class Command(BaseCommand):
                 "end_date": datetime.fromisoformat(data["end_date"]).date(),
                 "course_fee": data["course_fee"],
                 "syllabus_url": data.get("syllabus_url"),
+                "prerequisites": data.get("prerequisites", []),
                 "created_at": datetime.fromisoformat(data["created_at"]),
                 "updated_at": datetime.fromisoformat(data["updated_at"]),
             }
         )
-
-        prerequisite_codes = data.get("prerequisites", [])
-        if prerequisite_codes:
-            prereq_courses = Course.objects.filter(course_code__in=prerequisite_codes)
-            course.prerequisites.set(prereq_courses)
-        else:
-            # Randomly assign 0–1 fake prerequisites for demo purposes if no prerequisites listed
-            other_courses = Course.objects.exclude(id=course.id)
-            if other_courses.exists():
-                sample = other_courses.order_by('?').first()
-                course.prerequisites.add(sample)
 
     def load_student(self, data):
         print(f"Loading student: {data['name_first']} {data['name_last']}")

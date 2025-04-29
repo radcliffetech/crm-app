@@ -13,7 +13,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
-import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
+import { useConfirmDialog } from "~/components/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
     return [
@@ -23,12 +23,7 @@ export const meta: MetaFunction = () => {
 };
 
 
-type CoursePayload = Omit<CourseFormData, "prerequisites" | "course_fee"> & {
-  course_fee: number;
-  prerequisites: string[];
-  created_at?: string;
-  updated_at?: string;
-};
+
 
 export const emptyCourseForm: CourseFormData = {
   course_code: "",
@@ -84,23 +79,11 @@ export default function CoursesPage() {
         setSaving(true);
         try {
             if (editingCourse) {
-                const payload: CoursePayload = {
-                    ...formData,
-                    course_fee: Number(formData.course_fee),
-                    prerequisites: formData.prerequisites,
-                };
-                await updateCourse(editingCourse.id, payload);
+                await updateCourse(editingCourse.id, formData);
                 reloadData();
                 setEditingCourse(null);
             } else {
-                const payload: CoursePayload = {
-                    ...formData,
-                    course_fee: Number(formData.course_fee),
-                    prerequisites: formData.prerequisites,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                };
-                const newCourse = await createCourse(payload);
+                const newCourse = await createCourse(formData);
                 setCourses((prev) => [...prev, newCourse]);
             }
             toast.success("Course saved successfully!");
@@ -166,7 +149,7 @@ export default function CoursesPage() {
                         end_date: course.end_date.split("T")[0],
                         syllabus_url: course.syllabus_url || "",
                         course_fee: course.course_fee?.toString() || "",
-                        prerequisites: course.prerequisites?.map((p) => p.id) || [],
+                        prerequisites: course.prerequisites,
                     });
                     setShowForm(true);
                 }}

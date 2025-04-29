@@ -15,9 +15,10 @@ import { StudentForm } from "~/components/forms/StudentForm";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { unregisterStudent } from "~/loaders/registrations";
+import { useAuth } from "~/root";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({  }) => {
+export const meta: MetaFunction = ({ }) => {
   return [
     {
       title: "Student Detail – MiiM CRM",
@@ -30,6 +31,7 @@ export const meta: MetaFunction = ({  }) => {
 };
 
 export default function StudentDetailPage() {
+  const user = useAuth();
   const { id } = useParams();
   const [student, setStudent] = useState<Student | null>(null);
   const [editing, setEditing] = useState(false);
@@ -86,13 +88,17 @@ export default function StudentDetailPage() {
   return (
     <PageFrame>
       <PageHeader>{student.name_first} {student.name_last}</PageHeader>
-      <button
-        onClick={() => setEditing(true)}
-        className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
-      >
-        <PencilSquareIcon className="h-5 w-5" />
-        Edit
-      </button>
+      {canAccessAdmin(user) && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setEditing(true)}
+            className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
+          >s
+            <PencilSquareIcon className="h-5 w-5" />
+            Edit
+          </button>
+        </div>
+      )}
       <p className="mb-2"><strong>Email:</strong> {student.email}</p>
       <p className="mb-2"><strong>Notes:</strong> {student.notes || "—"}</p>
 

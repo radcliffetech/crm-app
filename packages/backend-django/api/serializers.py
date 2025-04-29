@@ -7,16 +7,9 @@ class InstructorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-    
-class CoursePrerequisiteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Course
-        fields = ["id", "title", "course_code"]
-
-
 class CourseSerializer(serializers.ModelSerializer):
     instructor_id = serializers.UUIDField(source="instructor.id")
-    prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
+    prerequisites = serializers.ListField(child=serializers.CharField())
     
     class Meta:
         model = Course
@@ -31,7 +24,6 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         instructor_data = validated_data.pop("instructor", None)
-        prerequisites_data = validated_data.pop("prerequisites", [])
 
         if instructor_data:
             instructor = Instructor.objects.get(id=instructor_data["id"])
@@ -40,14 +32,11 @@ class CourseSerializer(serializers.ModelSerializer):
 
         course = Course.objects.create(instructor=instructor, **validated_data)
 
-        if prerequisites_data:
-            course.prerequisites.set(prerequisites_data)
-
         return course
     
     def update(self, instance, validated_data):
+        print("Updating course instance:", instance, validated_data)
         instructor_data = validated_data.pop("instructor", None)
-        prerequisites_data = validated_data.pop("prerequisites", None)
 
         if instructor_data:
             instructor = Instructor.objects.get(id=instructor_data["id"])
@@ -58,16 +47,13 @@ class CourseSerializer(serializers.ModelSerializer):
 
         instance.save()
 
-        if prerequisites_data is not None:
-            instance.prerequisites.set(prerequisites_data)
-
         return instance
 
 class CourseListSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField(read_only=True)
     enrollment_count = serializers.SerializerMethodField(read_only=True)
     instructor_id = serializers.UUIDField(source="instructor.id", read_only=True)
-    prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
+    prerequisites = serializers.ListField(child=serializers.CharField())
     
     class Meta:
         model = Course
