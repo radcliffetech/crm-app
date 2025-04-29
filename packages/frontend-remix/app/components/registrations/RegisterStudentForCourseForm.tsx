@@ -1,4 +1,4 @@
-import type { Course, Registration } from "~/types"
+import type { Course, Registration } from "~/types";
 
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import { registerStudentToCourse } from "~/loaders/registrations";
@@ -7,7 +7,7 @@ export function RegisterStudentForCourseForm({
   student_id,
   courses,
   registrations,
-  onRegister
+  onRegister,
 }: {
   student_id: string;
   courses: Course[];
@@ -31,14 +31,19 @@ export function RegisterStudentForCourseForm({
         <select name="course_id" className="border p-2 rounded" required>
           <option value="">Select a course</option>
           {courses
-            .filter(course => !registrations.some(r => r.course_id === course.id))
-            .map(course => (
+            .filter(
+              (course) => !registrations.some((r) => r.course_id === course.id),
+            )
+            .map((course) => (
               <option key={course.id} value={course.id}>
                 {course.title}
               </option>
             ))}
         </select>
-        <button type="submit" className="btn-primary py-2 px-4 rounded flex items-center gap-2">
+        <button
+          type="submit"
+          className="btn-primary py-2 px-4 rounded flex items-center gap-2"
+        >
           <PlusCircleIcon className="h-5 w-5" />
           Register
         </button>

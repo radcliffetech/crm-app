@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "@remix-run/react";
 
 import type { MetaFunction } from "@remix-run/node";
 import { PageFrame } from "~/components/ui/PageFrame";
@@ -7,7 +7,6 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import PageSubheader from "~/components/ui/PageSubheader";
 import { SearchResultsList } from "~/components/lists/SearchResultsList";
 import { searchLoader } from "~/loaders/search";
-import { useLocation } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,7 +26,11 @@ function SearchResults({
 
   return (
     <div className="mt-8">
-      {loading && <p className="text-gray-500 italic animate-pulse">Looking for matches...</p>}
+      {loading && (
+        <p className="text-gray-500 italic animate-pulse">
+          Looking for matches...
+        </p>
+      )}
 
       {!loading && results && (
         <div>
@@ -35,7 +38,9 @@ function SearchResults({
             <p className="text-gray-500">No results found.</p>
           ) : (
             <>
-              <p className="text-sm text-gray-600 mb-2">{flatResults.length} results found</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {flatResults.length} results found
+              </p>
               <SearchResultsList results={flatResults} />
             </>
           )}
@@ -87,7 +92,9 @@ export default function SearchPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<{ type: string; label: string; link: string }[] | null>(null);
+  const [results, setResults] = useState<
+    { type: string; label: string; link: string }[] | null
+  >(null);
   const [loading, setLoading] = useState(false);
 
   // Extracted fetchResults function for both debounced and manual search
@@ -114,7 +121,9 @@ export default function SearchPage() {
   useEffect(() => {
     const handler = setTimeout(() => {
       fetchResults();
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`, { replace: true });
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`, {
+        replace: true,
+      });
     }, 500);
 
     return () => clearTimeout(handler);
@@ -123,8 +132,15 @@ export default function SearchPage() {
   return (
     <PageFrame>
       <PageHeader>Search</PageHeader>
-      <PageSubheader>Find students, instructors, courses, and registrations.</PageSubheader>
-      <SearchForm query={query} setQuery={setQuery} onSubmit={fetchResults} loading={loading} />
+      <PageSubheader>
+        Find students, instructors, courses, and registrations.
+      </PageSubheader>
+      <SearchForm
+        query={query}
+        setQuery={setQuery}
+        onSubmit={fetchResults}
+        loading={loading}
+      />
       <SearchResults loading={loading} results={results} />
     </PageFrame>
   );

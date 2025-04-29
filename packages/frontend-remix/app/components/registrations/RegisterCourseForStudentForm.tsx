@@ -1,4 +1,4 @@
-import type { Course, Student } from "~/types"
+import type { Course, Student } from "~/types";
 
 import PageSubheader from "../ui/PageSubheader";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
@@ -28,14 +28,16 @@ export function RegisterCourseForStudentForm({
       >
         <select name="student_id" className="border p-2 rounded" required>
           <option value="">Select student</option>
-          {unregisteredStudents
-            .map(s => (
-              <option key={s.id} value={s.id}>
-                {s.name_first} {s.name_last} ({s.email})
-              </option>
-            ))}
+          {unregisteredStudents.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name_first} {s.name_last} ({s.email})
+            </option>
+          ))}
         </select>
-        <button type="submit" className="btn-primary py-2 px-4 rounded flex items-center gap-2">
+        <button
+          type="submit"
+          className="btn-primary py-2 px-4 rounded flex items-center gap-2"
+        >
           <PlusCircleIcon className="h-5 w-5" />
           Register
         </button>

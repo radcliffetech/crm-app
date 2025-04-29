@@ -1,7 +1,10 @@
-import { ENDPOINTS, fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
-
-import type { Course } from "~/types";
-import type { Instructor } from "~/types";
+import type { Course, Instructor } from "~/types";
+import {
+  ENDPOINTS,
+  fetchListData,
+  fetchPageData,
+  mutateData,
+} from "~/lib/api/fetch";
 
 export async function getAllInstructors(): Promise<Instructor[]> {
   const res = await fetch(`${ENDPOINTS.instructors}/`);
@@ -25,15 +28,20 @@ export async function getInstructorPageData(id: string): Promise<{
   return { instructor, courses };
 }
 
-export async function createInstructor(data: Omit<Instructor, "id">): Promise<Instructor> {
+export async function createInstructor(
+  data: Omit<Instructor, "id">
+): Promise<Instructor> {
   try {
-  return await mutateData("instructors", "/", "POST", data);
+    return await mutateData("instructors", "/", "POST", data);
   } catch (error: any) {
     throw new Error(error.message || "Failed to create instructor.");
   }
 }
 
-export async function updateInstructor(id: string, data: Omit<Instructor, "id" | "created_at" | "updated_at">): Promise<void> {
+export async function updateInstructor(
+  id: string,
+  data: Omit<Instructor, "id" | "created_at" | "updated_at">
+): Promise<void> {
   try {
     await mutateData("instructors", `/${id}/`, "PUT", {
       ...data,

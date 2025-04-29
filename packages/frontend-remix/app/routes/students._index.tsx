@@ -1,4 +1,9 @@
-import { createStudent, deleteStudent, getAllStudents, updateStudent } from "~/loaders/students";
+import {
+  createStudent,
+  deleteStudent,
+  getAllStudents,
+  updateStudent,
+} from "~/loaders/students";
 import { useEffect, useState } from "react";
 
 import { AddButton } from "~/components/ui/AddButton";
@@ -18,7 +23,10 @@ import { useConfirmDialog } from "~/components/ConfirmDialogProvider";
 export const meta: MetaFunction = () => {
   return [
     { title: "Students - MiiM CRM" },
-    { name: "description", content: "Manage and view student records in the MiiM CRM platform." },
+    {
+      name: "description",
+      content: "Manage and view student records in the MiiM CRM platform.",
+    },
   ];
 };
 
@@ -29,16 +37,17 @@ const initialFormData = {
   phone: "",
   company: "",
   notes: "",
-}
+};
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [editingstudent_id, setEditingstudent_id] = useState<string | null>(null);
+  const [editingstudent_id, setEditingstudent_id] = useState<string | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const confirm = useConfirmDialog();
@@ -61,7 +70,7 @@ export default function StudentsPage() {
   const resetForm = () => {
     setFormData(initialFormData);
     setEditingstudent_id(null);
-  }
+  };
 
   const handleUpdateStudent = async (id: string) => {
     try {
@@ -103,7 +112,6 @@ export default function StudentsPage() {
           setFormData={setFormData}
           onSubmit={async (e) => {
             e.preventDefault();
-            setSaving(true);
             try {
               if (editingstudent_id) {
                 await handleUpdateStudent(editingstudent_id);
@@ -116,7 +124,6 @@ export default function StudentsPage() {
               console.error(err);
               toast.error("Failed to create student.");
             } finally {
-              setSaving(false);
               setShowForm(false);
             }
           }}

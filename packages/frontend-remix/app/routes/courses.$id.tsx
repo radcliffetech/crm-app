@@ -1,8 +1,17 @@
-import type { Course, CourseFormData, Instructor, Registration, Student } from "~/types";
+import type {
+  Course,
+  CourseFormData,
+  Instructor,
+  Registration,
+  Student,
+} from "~/types";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useParams } from "@remix-run/react";
 import { getCoursePageData, updateCourse } from "~/loaders/courses";
-import { registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
+import {
+  registerStudentToCourse,
+  unregisterStudent,
+} from "~/loaders/registrations";
 
 import { CourseForm } from "~/components/forms/CourseForm";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -23,10 +32,13 @@ import { useAuth } from "~/root";
 export const meta: MetaFunction = ({ params }) => {
   return [
     { title: `Course: ${params.slug} – MiiM CRM` },
-    { name: "description", content: "View course details, instructor info, and student registration." },
+    {
+      name: "description",
+      content:
+        "View course details, instructor info, and student registration.",
+    },
   ];
 };
-
 
 export default function CourseDetailPage() {
   const { id } = useParams();
@@ -36,7 +48,9 @@ export default function CourseDetailPage() {
   const [instructor, setInstructor] = useState<Instructor | null>(null);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [unregisteredStudents, setUnregisteredStudents] = useState<Student[]>([]);
+  const [unregisteredStudents, setUnregisteredStudents] = useState<Student[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,15 +62,23 @@ export default function CourseDetailPage() {
       setLoading(true);
       setError(null);
       getCoursePageData(id)
-        .then(({ course, instructor, registrations, unregisteredStudents,
-          instructors, courses }) => {
-          setCourse(course);
-          setCourses(courses);
-          setInstructor(instructor);
-          setInstructors(instructors);
-          setRegistrations(registrations);
-          setUnregisteredStudents(unregisteredStudents);
-        })
+        .then(
+          ({
+            course,
+            instructor,
+            registrations,
+            unregisteredStudents,
+            instructors,
+            courses,
+          }) => {
+            setCourse(course);
+            setCourses(courses);
+            setInstructor(instructor);
+            setInstructors(instructors);
+            setRegistrations(registrations);
+            setUnregisteredStudents(unregisteredStudents);
+          }
+        )
         .catch((err) => {
           console.error(err);
           setError("Failed to load course data " + err);
@@ -68,19 +90,20 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     reloadData();
-
   }, [id]);
 
   const registerForCourse = (student_id: string, course: Course) => {
-    registerStudentToCourse(student_id, course.id).then(() => {
-      toast.success("Student registered successfully!");
-      reloadData();
-    }).catch((err) => {
-      console.error(err);
-      setError("Failed to register student for course: " + err);
-      toast.error("Failed to register student for course.");
-    });
-  }
+    registerStudentToCourse(student_id, course.id)
+      .then(() => {
+        toast.success("Student registered successfully!");
+        reloadData();
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to register student for course: " + err);
+        toast.error("Failed to register student for course.");
+      });
+  };
 
   const openEditForm = () => {
     if (course) {
@@ -128,17 +151,21 @@ export default function CourseDetailPage() {
           )}
           {course && (
             <p className="mb-4 text-sm text-gray-500">
-              {new Date(course.start_date).toLocaleDateString()} – {new Date(course.end_date).toLocaleDateString()}
+              {new Date(course.start_date).toLocaleDateString()} –{" "}
+              {new Date(course.end_date).toLocaleDateString()}
             </p>
           )}
-                {instructor && (
-        <p className="mb-2 text-sm text-gray-600">
-          Instructor:{" "}
-          <Link to={`/instructors/${instructor.id}`} className="text-blue-600 hover:underline">
-            {instructor.name_first} {instructor.name_last}
-          </Link>
-        </p>
-      )}
+          {instructor && (
+            <p className="mb-2 text-sm text-gray-600">
+              Instructor:{" "}
+              <Link
+                to={`/instructors/${instructor.id}`}
+                className="text-blue-600 hover:underline"
+              >
+                {instructor.name_first} {instructor.name_last}
+              </Link>
+            </p>
+          )}
         </PageHeader>
       </div>
       {canAccessAdmin(auth) && course && (
@@ -160,7 +187,9 @@ export default function CourseDetailPage() {
           <p className="mb-1 text-xl  text-gray-600">{course.description}</p>
           {course.prerequisites.length > 0 && (
             <div className="mt-6 border border-gray-300 rounded p-4">
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">Prerequisites</h2>
+              <h2 className="text-lg font-semibold text-gray-700 mb-2">
+                Prerequisites
+              </h2>
               {course.prerequisites.map((prereq) => (
                 <p key={prereq} className="text-gray-600">
                   {prereq}
@@ -168,14 +197,15 @@ export default function CourseDetailPage() {
               ))}
             </div>
           )}
-          <div
-            className="prose my-4 text-gray-700">
-            <RenderMarkdown>
-              {course.description_full}
-            </RenderMarkdown>
+          <div className="prose my-4 text-gray-700">
+            <RenderMarkdown>{course.description_full}</RenderMarkdown>
           </div>
           <p className="text-xl font-bold text-gray-800 mt-6">
-            Course Fee: ${Number(course.course_fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            Course Fee: $
+            {Number(course.course_fee).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
 
           <RegisterCourseForStudentForm
@@ -189,22 +219,23 @@ export default function CourseDetailPage() {
               <p className="text-gray-500 italic">No students registered.</p>
             ) : (
               <RegistrationsForCourseList
-                course={course}
                 registrations={registrations}
                 unregisterAction={(reg: Registration) => {
-                  unregisterStudent(reg).then(() => {
-                    toast.success("Student unregistered successfully!");
-                    reloadData();
-                  }).catch((err) => {
-                    console.error(err);
-                    setError("Failed to unregister student: " + err);
-                  });
+                  unregisterStudent(reg)
+                    .then(() => {
+                      toast.success("Student unregistered successfully!");
+                      reloadData();
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      setError("Failed to unregister student: " + err);
+                    });
                 }}
               />
             )}
           </div>
-         
-        </>)}
+        </>
+      )}
 
       {showForm && formData && (
         <Modal isOpen={true} onClose={() => setShowForm(false)}>
@@ -219,7 +250,6 @@ export default function CourseDetailPage() {
           />
         </Modal>
       )}
-
     </PageFrame>
   );
 }

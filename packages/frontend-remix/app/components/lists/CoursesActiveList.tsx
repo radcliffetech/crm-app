@@ -1,7 +1,7 @@
 import {
-    createColumnHelper,
-    getCoreRowModel,
-    useReactTable
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 
 import { BasicTable } from "~/components/ui/BasicTable";
@@ -11,11 +11,7 @@ import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Course>();
 
-export function CoursesActiveList({
-  courses,
-}: {
-  courses: Course[];
-}) {
+export function CoursesActiveList({ courses }: { courses: Course[] }) {
   const data = useMemo(() => courses, [courses]);
 
   const columns = useMemo(
@@ -40,7 +36,8 @@ export function CoursesActiveList({
       columnHelper.display({
         id: "start_date",
         header: "Start Date",
-        cell: ({ row }) => new Date(row.original.start_date).toLocaleDateString(),
+        cell: ({ row }) =>
+          new Date(row.original.start_date).toLocaleDateString(),
       }),
       columnHelper.display({
         id: "end_date",
@@ -53,7 +50,7 @@ export function CoursesActiveList({
         cell: ({ row }) => row.original.enrollment_count,
       }),
     ],
-    []
+    [],
   );
 
   const table = useReactTable({
@@ -62,7 +59,5 @@ export function CoursesActiveList({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  return (
-      <BasicTable table={table} />
-  );
+  return <BasicTable table={table} />;
 }

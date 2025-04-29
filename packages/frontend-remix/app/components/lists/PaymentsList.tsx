@@ -19,17 +19,23 @@ export function PaymentsList({ payments }: { payments: PaymentWithLabels[] }) {
       columnHelper.accessor("student_name", {
         header: "Student",
         cell: ({ row }) => (
-            <Link to={`/students/${row.original.student_id}`} className="text-blue-600 hover:underline">
-              {row.original.student_name}
-            </Link>
+          <Link
+            to={`/students/${row.original.student_id}`}
+            className="text-blue-600 hover:underline"
+          >
+            {row.original.student_name}
+          </Link>
         ),
       }),
       columnHelper.accessor("course_name", {
         header: "Course",
         cell: ({ row }) => (
-            <Link to={`/courses/${row.original.course_id}`} className="text-blue-600 hover:underline">
-              {row.original.course_name}
-            </Link>
+          <Link
+            to={`/courses/${row.original.course_id}`}
+            className="text-blue-600 hover:underline"
+          >
+            {row.original.course_name}
+          </Link>
         ),
       }),
       columnHelper.accessor("amount", {
@@ -48,11 +54,10 @@ export function PaymentsList({ payments }: { payments: PaymentWithLabels[] }) {
       }),
       columnHelper.accessor("created_at", {
         header: "Created At",
-        cell: ({ getValue }) =>
-          new Date(getValue()).toLocaleDateString(),
+        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
       }),
     ],
-    []
+    [],
   );
 
   const table = useReactTable({
@@ -61,7 +66,5 @@ export function PaymentsList({ payments }: { payments: PaymentWithLabels[] }) {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  return (
-      <BasicTable table={table} />
-  );
+  return <BasicTable table={table} />;
 }

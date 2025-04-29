@@ -5,13 +5,15 @@ import { PageHeader } from "~/components/ui/PageHeader";
 export const meta: MetaFunction = () => {
   return [
     { title: "Settings - MiiM CRM" },
-    { name: "description", content: "Manage your personal settings and preferences in the MiiM CRM system." },
+    {
+      name: "description",
+      content:
+        "Manage your personal settings and preferences in the MiiM CRM system.",
+    },
   ];
 };
 
-
 export default function SettingsPage() {
-
   return (
     <PageFrame>
       <PageHeader>Settings</PageHeader>

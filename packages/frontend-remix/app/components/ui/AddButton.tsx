@@ -1,6 +1,12 @@
 import { PlusIcon } from "@heroicons/react/24/solid";
 
-export function AddButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+export function AddButton({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}

@@ -1,9 +1,11 @@
 node_modules
 
 /.cache
-/build
-.env
 
 tmp/
+.env
 .DS_Store
 service-account.json
+
+build/
+node_modules/

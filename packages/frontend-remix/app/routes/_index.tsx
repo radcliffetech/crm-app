@@ -26,7 +26,6 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   function reloadData() {
     setLoading(true);
     setError(null);
@@ -48,21 +47,40 @@ export default function Index() {
     reloadData();
   }, []);
 
-
   return (
-      <PageFrame>
-        <PageHeader>Dashboard</PageHeader>
-        <DataLoaderState loading={loading} error={error} />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <DashboardCard title="Students" count={studentCount} link="/students" linkText="View Students" />
-          <DashboardCard title="Instructors" count={instructorCount} link="/instructors" linkText="View Instructors" />
-          <DashboardCard title="Courses" count={courseCount} link="/courses" linkText="View Courses" />
-          <div className="flex justify-center items-center">
-            <img src="/images/logo.png" alt="Logo" className="w-48 m-4" height="150" />
-          </div>
+    <PageFrame>
+      <PageHeader>Dashboard</PageHeader>
+      <DataLoaderState loading={loading} error={error} />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <DashboardCard
+          title="Students"
+          count={studentCount}
+          link="/students"
+          linkText="View Students"
+        />
+        <DashboardCard
+          title="Instructors"
+          count={instructorCount}
+          link="/instructors"
+          linkText="View Instructors"
+        />
+        <DashboardCard
+          title="Courses"
+          count={courseCount}
+          link="/courses"
+          linkText="View Courses"
+        />
+        <div className="flex justify-center items-center">
+          <img
+            src="/images/logo.png"
+            alt="Logo"
+            className="w-48 m-4"
+            height="150"
+          />
         </div>
-        <PageSubheader>Active Courses</PageSubheader>
-        <CoursesActiveList courses={courses} />
-      </PageFrame>
+      </div>
+      <PageSubheader>Active Courses</PageSubheader>
+      <CoursesActiveList courses={courses} />
+    </PageFrame>
   );
 }

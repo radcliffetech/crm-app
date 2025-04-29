@@ -9,7 +9,9 @@ export function CatchBoundary() {
         <h1 className="text-4xl font-bold mb-4">
           {error.status} - {error.statusText}
         </h1>
-        <p className="mb-4">Sorry, we couldn't find the page you're looking for.</p>
+        <p className="mb-4">
+          Sorry, we couldn't find the page you're looking for.
+        </p>
         <Link to="/" className="btn-primary">
           Go back home
         </Link>
