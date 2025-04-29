@@ -1,5 +1,6 @@
 import type { Course, Registration } from "~/types";
 
+import { FormField } from "~/components/Common/FormField";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
 export function RegisterStudentForCourseForm({
@@ -14,7 +15,7 @@ export function RegisterStudentForCourseForm({
   onRegister: (courseId: string) => Promise<void>;
 }) {
   return (
-    <div className="">
+    <div>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -24,23 +25,31 @@ export function RegisterStudentForCourseForm({
             await onRegister(course_id);
           }
         }}
-        className="flex items-center gap-4"
+        className="flex items-end gap-4"
       >
-        <select name="course_id" className="border p-2 rounded" required>
-          <option value="">Select a course</option>
-          {courses
-            .filter(
-              (course) => !registrations.some((r) => r.course_id === course.id)
-            )
-            .map((course) => (
-              <option key={course.id} value={course.id}>
-                {course.title}
-              </option>
-            ))}
-        </select>
+        <FormField label="Course" required className="w-full">
+          <select
+            name="course_id"
+            className="border p-2 rounded w-full"
+            required
+          >
+            <option value="">Select a course</option>
+            {courses
+              .filter(
+                (course) =>
+                  !registrations.some((r) => r.course_id === course.id)
+              )
+              .map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.title}
+                </option>
+              ))}
+          </select>
+        </FormField>
+
         <button
           type="submit"
-          className="btn-primary py-2 px-4 rounded flex items-center gap-2"
+          className="btn-primary rounded flex items-center gap-2"
         >
           <PlusCircleIcon className="h-5 w-5" />
           Register

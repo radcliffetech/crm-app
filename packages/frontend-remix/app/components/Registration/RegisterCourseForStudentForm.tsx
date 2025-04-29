@@ -1,6 +1,6 @@
 import type { Course, Student } from "~/types";
 
-import { PageSubheader } from "../Common/PageSubheader";
+import { FormField } from "~/components/Common/FormField";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
 export function RegisterCourseForStudentForm({
@@ -23,16 +23,23 @@ export function RegisterCourseForStudentForm({
             onRegister(student_id, course);
           }
         }}
-        className="flex items-center gap-4"
+        className="flex items-end gap-4"
       >
-        <select name="student_id" className="border p-2 rounded" required>
-          <option value="">Select student</option>
-          {unregisteredStudents.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name_first} {s.name_last} ({s.email})
-            </option>
-          ))}
-        </select>
+        <FormField label="Student" required className="w-full">
+          <select
+            name="student_id"
+            className="border p-2 rounded w-full"
+            required
+          >
+            <option value="">Select student</option>
+            {unregisteredStudents.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name_first} {s.name_last} ({s.email})
+              </option>
+            ))}
+          </select>
+        </FormField>
+
         <button
           type="submit"
           className="btn-primary py-2 px-4 rounded flex items-center gap-2"
