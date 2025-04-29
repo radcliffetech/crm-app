@@ -15,7 +15,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 100
 
 class InstructorViewSet(viewsets.ModelViewSet):
-    queryset = Instructor.objects.all().order_by("-created_at")
+    queryset = Instructor.objects.filter(is_active=True).order_by("-created_at")
     serializer_class = InstructorSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
@@ -45,7 +45,7 @@ class InstructorViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
 class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.order_by("-created_at")
+    queryset = Course.objects.filter(is_active=True).order_by("-created_at")
     serializer_class = CourseSerializer
     pagination_class = StandardResultsSetPagination
 
@@ -78,7 +78,7 @@ class CourseViewSet(viewsets.ModelViewSet):
         return Response(status=204)
     
 class StudentViewSet(viewsets.ModelViewSet):
-    queryset = Student.objects.all().order_by("-created_at")
+    queryset = Student.objects.filter(is_active=True).order_by("-created_at")
     serializer_class = StudentSerializer
     pagination_class = StandardResultsSetPagination
 
@@ -131,7 +131,7 @@ class StudentViewSet(viewsets.ModelViewSet):
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):
-    queryset = Registration.objects.all().order_by("-created_at")
+    queryset = Registration.objects.filter(is_active=True).order_by("-created_at")
     serializer_class = RegistrationSerializer
     pagination_class = StandardResultsSetPagination
 
