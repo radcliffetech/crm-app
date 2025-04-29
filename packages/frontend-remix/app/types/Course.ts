@@ -13,7 +13,7 @@ export type CoursePrerequisite = {
 export type Course = {
   id: string;
   course_code: string;
-  title: string;
+  title: string;  
   description: string;
   description_full: string;
   instructor_id: string;

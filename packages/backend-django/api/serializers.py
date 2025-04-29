@@ -15,15 +15,17 @@ class CoursePrerequisiteSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    instructor_id = serializers.UUIDField(write_only=True)
+    instructor_id = serializers.UUIDField(source="instructor.id", read_only=True)
     prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
     
     class Meta:
         model = Course
         fields = [
             "id", "course_code", "title", "description", "description_full",
-            "instructor", "instructor_id", "start_date", "end_date", "course_fee",
-            "syllabus_url", "prerequisites", "created_at", "updated_at", "is_active"
+            "instructor_id", 
+            "start_date", "end_date", "course_fee",
+            "syllabus_url", "prerequisites", "created_at", 
+            "updated_at", "is_active"
         ]
         read_only_fields = ["id", "instructor", "created_at", "updated_at", "is_active"]
 

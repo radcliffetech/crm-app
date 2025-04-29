@@ -57,14 +57,13 @@ export async function getCourses(): Promise<Course[]> {
 }
 
 export async function getCoursePageData(id: string): Promise<{
-  course: Course | null;
+  course: Course;
   instructor: Instructor | null;
   registrations: Registration[];
   unregisteredStudents: Student[];
   instructors: Instructor[];
   courses: Course[];
 }> {
-  console.log("Fetching course data for ID:", id);
   const [course, registrations, unregisteredStudents, instructors, courses] = await Promise.all([
     fetchPageData<Course>("courses", `/${id}/`),
     fetchListData<Registration>("registrations", "/", { course_id: id }),
@@ -73,8 +72,10 @@ export async function getCoursePageData(id: string): Promise<{
     fetchListData<Course>("courses", "/")
   ]);
 
-  console.log("Course data fetched:", course);
-  const instructor = course?.instructor_id
+  if (!course) {
+    throw new Error("Course not found or invalid ID. " + id);
+  }
+  const instructor = course.instructor_id
     ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
     : null;
 

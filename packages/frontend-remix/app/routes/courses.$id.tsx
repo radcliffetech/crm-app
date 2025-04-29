@@ -1,8 +1,7 @@
 import type { Course, CourseFormData, Instructor, Registration, Student } from "~/types";
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useParams } from "@remix-run/react";
-import { getCoursePageData, getCourses } from "~/loaders/courses";
-import { getRegistrationsForCourse, registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
+import { registerStudentToCourse, unregisterStudent } from "~/loaders/registrations";
 
 import { CourseForm } from "~/components/forms/CourseForm";
 import { DataLoaderState } from "~/components/ui/DataLoaderState";
@@ -16,8 +15,7 @@ import { RegistrationsForCourseList } from "~/components/lists/RegistrationsForC
 import RenderMarkdown from "~/components/ui/RenderMarkdown";
 import { canAccessAdmin } from "~/lib/permissions";
 import { emptyCourseForm } from "./courses._index";
-import { getAllInstructors } from "~/loaders/instructors";
-import { getAllStudents } from "~/loaders/students";
+import { getCoursePageData } from "~/loaders/courses";
 import { toast } from "react-hot-toast";
 import { updateCourse } from "~/loaders/courses";
 import { useAuth } from "~/root";
@@ -61,7 +59,8 @@ export default function CourseDetailPage() {
         })
         .catch((err) => {
           console.error(err);
-          setError("Failed to load course data.");
+          setError("Failed to load course data " + err);
+          toast.error("Failed to load course data.");
         })
         .finally(() => setLoading(false));
     }
@@ -177,7 +176,7 @@ export default function CourseDetailPage() {
             </RenderMarkdown>
           </div>
           <p className="text-xl font-bold text-gray-800 mt-6">
-            Course Fee: ${course.course_fee.toLocaleString()}
+            Course Fee: ${Number(course.course_fee).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
 
           <div className="py-4">
