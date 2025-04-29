@@ -1,48 +1,55 @@
-import { EllipsisVerticalIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
+import {
+  EllipsisVerticalIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/solid";
 import { useEffect, useRef, useState } from "react";
 
 export function DropdownActions({
-    canEdit,
-    canDelete,
-    onEdit,
-    onDelete,
-  }: {
-    canEdit: boolean;
-    canDelete: boolean;
-    onEdit: () => void;
-    onDelete: () => void;
-  }) {
-    const [open, setOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-  
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setOpen(false);
-        }
+  canEdit,
+  canDelete,
+  onEdit,
+  onDelete,
+}: {
+  canEdit: boolean;
+  canDelete: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
       }
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
-  
-    if (!canEdit && !canDelete) {
-      return null;
     }
-    
-    return (
-      <div className="relative text-right" ref={dropdownRef}>
-        <button
-          onClick={() => setOpen(!open)}
-          className="text-gray-600 hover:text-gray-800"
-          aria-label="Actions"
-        >
-          <EllipsisVerticalIcon className="h-5 w-5" />
-        </button>
-        {open && (
-          <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-10">
-            {canEdit && (
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  if (!canEdit && !canDelete) {
+    return null;
+  }
+
+  return (
+    <div className="relative text-right" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="text-gray-600 hover:text-gray-800"
+        aria-label="Actions"
+      >
+        <EllipsisVerticalIcon className="h-5 w-5" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-10">
+          {canEdit && (
             <button
               onClick={() => {
                 onEdit();
@@ -53,8 +60,8 @@ export function DropdownActions({
               <PencilSquareIcon className="h-4 w-4 text-gray-600" />
               Edit
             </button>
-            )}
-            {canDelete && (
+          )}
+          {canDelete && (
             <button
               onClick={() => {
                 onDelete();
@@ -65,10 +72,9 @@ export function DropdownActions({
               <TrashIcon className="h-4 w-4" />
               Delete
             </button>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  }
-  
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

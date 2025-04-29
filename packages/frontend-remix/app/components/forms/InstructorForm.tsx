@@ -7,13 +7,20 @@ export function InstructorForm({
   onCancel,
   editingInstructor,
 }: {
-  formData: { name_first: string; name_last: string; email: string; bio: string };
-  setFormData: React.Dispatch<React.SetStateAction<{
+  formData: {
     name_first: string;
     name_last: string;
     email: string;
     bio: string;
-  }>>;
+  };
+  setFormData: React.Dispatch<
+    React.SetStateAction<{
+      name_first: string;
+      name_last: string;
+      email: string;
+      bio: string;
+    }>
+  >;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
   editingInstructor: Instructor | null;
@@ -24,7 +31,9 @@ export function InstructorForm({
         type="text"
         placeholder="First Name"
         value={formData.name_first}
-        onChange={(e) => setFormData({ ...formData, name_first: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, name_first: e.target.value })
+        }
         className="border p-2"
         required
       />
@@ -32,7 +41,9 @@ export function InstructorForm({
         type="text"
         placeholder="Last Name"
         value={formData.name_last}
-        onChange={(e) => setFormData({ ...formData, name_last: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, name_last: e.target.value })
+        }
         className="border p-2"
         required
       />

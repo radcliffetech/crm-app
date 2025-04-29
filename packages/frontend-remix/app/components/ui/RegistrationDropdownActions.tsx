@@ -3,13 +3,22 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Registration } from "~/types";
 
-export function RegistrationDropdownActions({ registration, onUnregister }: { registration: Registration, onUnregister: (reg: Registration) => void }) {
+export function RegistrationDropdownActions({
+  registration,
+  onUnregister,
+}: {
+  registration: Registration;
+  onUnregister: (reg: Registration) => void;
+}) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -36,7 +45,11 @@ export function RegistrationDropdownActions({ registration, onUnregister }: { re
         <div className="absolute right-0 mt-2 w-36 bg-white border rounded shadow-md z-10">
           <button
             onClick={async () => {
-              if (window.confirm("Are you sure you want to unregister this student from the course?")) {
+              if (
+                window.confirm(
+                  "Are you sure you want to unregister this student from the course?",
+                )
+              ) {
                 await onUnregister(registration);
               }
               setOpen(false);

@@ -23,17 +23,22 @@ import { useConfirmDialog } from "~/components/ConfirmDialogProvider";
 export const meta: MetaFunction = () => {
   return [
     { title: "Instructors - MiiM CRM" },
-    { name: "description", content: "Manage instructor profiles and view their associated course information." },
+    {
+      name: "description",
+      content:
+        "Manage instructor profiles and view their associated course information.",
+    },
   ];
 };
 
-
 export default function InstructorsPage() {
-  const user  = useAuth();
+  const user = useAuth();
   const confirm = useConfirmDialog();
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(null);
+  const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(
+    null,
+  );
   const [formData, setFormData] = useState({
     name_first: "",
     name_last: "",
@@ -72,7 +77,11 @@ export default function InstructorsPage() {
         setEditingInstructor(null);
       } else {
         const now = new Date().toISOString();
-        await createInstructor({ ...formData, created_at: now, updated_at: now });
+        await createInstructor({
+          ...formData,
+          created_at: now,
+          updated_at: now,
+        });
       }
       reloadData();
       setFormData({ name_first: "", name_last: "", email: "", bio: "" });
@@ -135,7 +144,7 @@ export default function InstructorsPage() {
           setShowForm(true);
         }}
         onDelete={async (id) => {
-          const instructor = instructors.find(i => i.id === id);
+          const instructor = instructors.find((i) => i.id === id);
           if (instructor) {
             setDeletingId(id);
             const confirmed = await confirm({

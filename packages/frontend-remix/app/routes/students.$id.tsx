@@ -18,7 +18,7 @@ import { unregisterStudent } from "~/loaders/registrations";
 import { useAuth } from "~/root";
 import { useParams } from "@remix-run/react";
 
-export const meta: MetaFunction = ({ }) => {
+export const meta: MetaFunction = ({}) => {
   return [
     {
       title: "Student Detail – MiiM CRM",
@@ -53,7 +53,12 @@ export default function StudentDetailPage() {
     reloadData();
   }, [id]);
 
-  if (!student) return <div className="p-8"><DataLoaderState loading={loading} error={error} /></div>;
+  if (!student)
+    return (
+      <div className="p-8">
+        <DataLoaderState loading={loading} error={error} />
+      </div>
+    );
 
   function reloadData() {
     if (id) {
@@ -84,10 +89,11 @@ export default function StudentDetailPage() {
     }
   }
 
-
   return (
     <PageFrame>
-      <PageHeader>{student.name_first} {student.name_last}</PageHeader>
+      <PageHeader>
+        {student.name_first} {student.name_last}
+      </PageHeader>
       {canAccessAdmin(user) && (
         <div className="flex justify-end mb-4">
           <button
@@ -99,8 +105,12 @@ export default function StudentDetailPage() {
           </button>
         </div>
       )}
-      <p className="mb-2"><strong>Email:</strong> {student.email}</p>
-      <p className="mb-2"><strong>Notes:</strong> {student.notes || "—"}</p>
+      <p className="mb-2">
+        <strong>Email:</strong> {student.email}
+      </p>
+      <p className="mb-2">
+        <strong>Notes:</strong> {student.notes || "—"}
+      </p>
 
       {editing && (
         <Modal isOpen={editing} onClose={() => setEditing(false)}>

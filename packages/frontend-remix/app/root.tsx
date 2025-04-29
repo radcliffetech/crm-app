@@ -27,7 +27,6 @@ export const mockUser: User = {
   name: "Admin User",
 };
 
-
 // export const mockUser: User = {
 //   id: "123",
 //   email: "student@miim.edu",
@@ -45,7 +44,6 @@ export const mockUser: User = {
 export const AuthContext = createContext(mockUser);
 export const useAuth = () => useContext(AuthContext);
 
-
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -59,31 +57,20 @@ export const links: LinksFunction = () => [
   },
 ];
 
-
-function LandingPage({
-  handleLogin,
-}: {
-  handleLogin: () => void;
-}) {
+function LandingPage({ handleLogin }: { handleLogin: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-2">
       <img src="/images/logo.png" alt="Logo" width="500" />
-      <button
-        onClick={handleLogin}
-        className="px-6 py-2 btn-primary"
-      >
+      <button onClick={handleLogin} className="px-6 py-2 btn-primary">
         Log In
       </button>
     </div>
   );
 }
 
-
-
 export function Layout({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState(mockUser);
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogin = () => {
     console.log("Logging in...");
@@ -111,11 +98,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <body className="min-h-screen flex flex-col">
           {isLoggedIn ? (
             <>
-              <Navbar handleLogin={handleLogin} handleLogout={handleLogout} user={user} switchRole={switchRole} />
-<Toaster position="top-right" reverseOrder={false} />
-              <div className="flex-grow">
-                {children}
-              </div>
+              <Navbar
+                handleLogin={handleLogin}
+                handleLogout={handleLogout}
+                user={user}
+                switchRole={switchRole}
+              />
+              <Toaster position="top-right" reverseOrder={false} />
+              <div className="flex-grow">{children}</div>
               <Footer />
             </>
           ) : (
@@ -137,7 +127,6 @@ export default function App() {
   );
 }
 
-
 export function ErrorBoundary() {
   const error = useRouteError();
 
@@ -150,7 +139,9 @@ export function ErrorBoundary() {
           <Links />
         </head>
         <body>
-          <h1>{error.status} - {error.statusText}</h1>
+          <h1>
+            {error.status} - {error.statusText}
+          </h1>
           <p>Sorry, an unexpected error occurred.</p>
           <Scripts />
         </body>

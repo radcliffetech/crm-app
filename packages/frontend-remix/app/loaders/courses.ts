@@ -1,4 +1,10 @@
-import type { Course, CoursePayload, Instructor, Registration, Student } from "~/types";
+import type {
+  Course,
+  CoursePayload,
+  Instructor,
+  Registration,
+  Student,
+} from "~/types";
 import { fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
 
 export async function getCoursesForInstructor(instructor_id: string): Promise<{
@@ -9,16 +15,16 @@ export async function getCoursesForInstructor(instructor_id: string): Promise<{
   const [courses, registrations, allStudents] = await Promise.all([
     fetchListData<Course>("courses", "/", { instructor_id }),
     fetchListData<Registration>("registrations", "/"),
-    fetchListData<Student>("students", "/")
+    fetchListData<Student>("students", "/"),
   ]);
 
   const student_ids = new Set(
     registrations
-      .filter(r => courses.some(c => c.id === r.course_id))
-      .map(r => r.student_id)
+      .filter((r) => courses.some((c) => c.id === r.course_id))
+      .map((r) => r.student_id),
   );
 
-  const students = allStudents.filter(s => student_ids.has(s.id));
+  const students = allStudents.filter((s) => student_ids.has(s.id));
   return { courses, registrations, students };
 }
 
@@ -49,22 +55,36 @@ export async function getCoursePageData(id: string): Promise<{
   instructors: Instructor[];
   courses: Course[];
 }> {
-  const [course, registrations, unregisteredStudents, instructors, courses] = await Promise.all([
-    fetchPageData<Course>("courses", `/${id}/`),
-    fetchListData<Registration>("registrations", "/", { course_id: id }),
-    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true }),
-    fetchListData<Instructor>("instructors", "/"),
-    fetchListData<Course>("courses", "/")
-  ]);
+  const [course, registrations, unregisteredStudents, instructors, courses] =
+    await Promise.all([
+      fetchPageData<Course>("courses", `/${id}/`),
+      fetchListData<Registration>("registrations", "/", { course_id: id }),
+      fetchListData<Student>("students", "/", {
+        course_id: id,
+        eligible_for_course: true,
+      }),
+      fetchListData<Instructor>("instructors", "/"),
+      fetchListData<Course>("courses", "/"),
+    ]);
 
   if (!course) {
     throw new Error("Course not found or invalid ID. " + id);
   }
   const instructor = course.instructor_id
-    ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
+    ? await fetchPageData<Instructor>(
+        "instructors",
+        `/${course.instructor_id}/`,
+      )
     : null;
 
-  const output = { course, instructor, registrations, unregisteredStudents, instructors, courses };
+  const output = {
+    course,
+    instructor,
+    registrations,
+    unregisteredStudents,
+    instructors,
+    courses,
+  };
   return output;
 }
 
@@ -76,7 +96,10 @@ export async function createCourse(data: CoursePayload): Promise<Course> {
   }
 }
 
-export async function updateCourse(id: string, data: CoursePayload): Promise<void> {
+export async function updateCourse(
+  id: string,
+  data: CoursePayload,
+): Promise<void> {
   console.log("updateCourse", id, data);
   try {
     await mutateData("courses", `/${id}/`, "PUT", data);

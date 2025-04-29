@@ -24,6 +24,16 @@ module.exports = {
   // Base config
   extends: ["eslint:recommended"],
 
+  plugins: ["unused-imports", "tailwindcss"],
+
+  rules: {
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "error",
+      { vars: "all", varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
+    ],
+    "tailwindcss/no-custom-classname": "off",
+  },
   overrides: [
     // React
     {

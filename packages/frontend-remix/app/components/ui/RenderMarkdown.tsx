@@ -6,10 +6,7 @@ export default function RenderMarkdown({ children }: { children: string }) {
   const processedChildren = children.replace(/\n/gi, "&nbsp; \n");
 
   return (
-    <Markdown
-      rehypePlugins={[rehypeRaw]}
-      remarkPlugins={[remarkBreaks]}
-    >
+    <Markdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkBreaks]}>
       {processedChildren}
     </Markdown>
   );
