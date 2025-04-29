@@ -3,7 +3,7 @@
     "id": "8b0bd6d7-0809-45a4-8457-baa46300da0a",
     "name_first": "Luna",
     "name_last": "Stargazer",
-    "email": "luna@example.com",
+    "email": "luna@faculty.miim.edu",
     "bio": "Astrological insights and practical constellation design. Known for captivating lectures and unconventional teaching tools.",
     "created_at": "2024-07-11",
     "updated_at": "2024-05-13"
@@ -12,7 +12,7 @@
     "id": "840629a0-ed4f-4a82-8f1f-5ca983d39234",
     "name_first": "Max",
     "name_last": "Nimbus",
-    "email": "max@example.com",
+    "email": "max@faculty.miim.edu",
     "bio": "Certified cloud whisperer and aerial navigation expert. Believes in teaching through immersive storytelling and whimsical labs.",
     "created_at": "2025-03-05",
     "updated_at": "2024-08-12"
@@ -21,7 +21,7 @@
     "id": "64657990-b0eb-429f-9a8f-fdf4a4066e93",
     "name_first": "Echo",
     "name_last": "Whistlewind",
-    "email": "echo@whimsy.edu",
+    "email": "echo@faculty.miim.edu",
     "bio": "Teaches echolocation to musicians and poets. Frequently collaborates with interdimensional scholars.",
     "created_at": "2024-07-17",
     "updated_at": "2024-06-19"
@@ -30,7 +30,7 @@
     "id": "6f4cb2f7-37b1-4450-988f-088cf7fbc1b5",
     "name_first": "Zephyr",
     "name_last": "Moonquill",
-    "email": "zephyr@whimsy.edu",
+    "email": "zephyr@faculty.miim.edu",
     "bio": "Narrates dreamscapes for bedtime learning. Frequently collaborates with interdimensional scholars.",
     "created_at": "2024-07-14",
     "updated_at": "2024-10-24"
@@ -39,7 +39,7 @@
     "id": "2c6d4c8b-2c0f-4cf4-b4dc-df885b35a9d1",
     "name_first": "Tinker",
     "name_last": "Sprocket",
-    "email": "tinker@whimsy.edu",
+    "email": "tinker@faculty.miim.edu",
     "bio": "Builds learning machines out of recycled tea kettles. A favorite among students for her eccentric yet effective style.",
     "created_at": "2024-11-13",
     "updated_at": "2024-06-29"
@@ -48,7 +48,7 @@
     "id": "c9e1080f-c008-40b1-a4e7-05c00a8eae4e",
     "name_first": "Flora",
     "name_last": "Meadowlark",
-    "email": "flora@whimsy.edu",
+    "email": "flora@faculty.miim.edu",
     "bio": "Teaches botany through interpretive puppetry. Known for captivating lectures and unconventional teaching tools.",
     "created_at": "2024-05-22",
     "updated_at": "2024-11-14"
@@ -57,7 +57,7 @@
     "id": "b08d0e33-b5ec-4d8d-83cd-7efb282d3189",
     "name_first": "Glint",
     "name_last": "Sparkwhistle",
-    "email": "glint@whimsy.edu",
+    "email": "glint@faculty.miim.edu",
     "bio": "Conducts seminars entirely by flashlight shadow art. Frequently collaborates with interdimensional scholars.",
     "created_at": "2024-09-28",
     "updated_at": "2024-07-10"
@@ -66,7 +66,7 @@
     "id": "72919404-8317-4a8a-b12f-9a6c4d2087a3",
     "name_first": "Nimbus",
     "name_last": "Featherloop",
-    "email": "nimbusf@whimsy.edu",
+    "email": "nimbusf@faculty.miim.edu",
     "bio": "Gravity-defying instructor of vertical logic puzzles. Known for captivating lectures and unconventional teaching tools.",
     "created_at": "2024-08-01",
     "updated_at": "2024-12-25"

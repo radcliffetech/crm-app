@@ -98,8 +98,8 @@ export default function InstructorDetailPage() {
               )}
             </>
           )}
-          <div className="pt-4">
-            <PageSubheader>Courses Teaching</PageSubheader>
+          <div className="py-4">
+            <PageSubheader>Courses</PageSubheader>
             {courses.length > 0 ? (
               <CoursesForInstructorList courses={courses} />
             ) : (
@@ -107,7 +107,7 @@ export default function InstructorDetailPage() {
             )}
           </div>
 
-          <PageSubheader>Active Students</PageSubheader>
+          <PageSubheader>Students</PageSubheader>
           <StudentsForInstructorList instructor_id={instructor.id} />
         </>
       )}
