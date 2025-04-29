@@ -29,7 +29,7 @@ class InstructorViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         print("Incoming data:", request.data)   
-        return super().update(request, *args, **kwargs)
+        return super( ).update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

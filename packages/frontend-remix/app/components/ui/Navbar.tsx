@@ -43,7 +43,7 @@ export function Navbar({
   return (
     <div>
       <nav
-        className="flex justify-between items-center p-4 text-white mb-0"
+        className="flex justify-between items-center p-4 text-white mb-4"
         style={{ backgroundColor: "rgb(33, 74, 55)" }}
       >
         <div className="flex items-center gap-4">
