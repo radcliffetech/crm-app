@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import { Link } from "@remix-run/react";
 import { getStudentsForInstructor } from "~/loaders/students";
 
@@ -27,7 +27,7 @@ export function StudentsForInstructorList({
         setStudents(students);
         setRegistrations(registrations);
         setAllCourses(courses);
-      },
+      }
     );
   }, [instructor_id]);
 
@@ -59,8 +59,8 @@ export function StudentsForInstructorList({
             .filter((course) =>
               registrations.some(
                 (r) =>
-                  r.course_id === course.id && r.student_id === row.original.id,
-              ),
+                  r.course_id === course.id && r.student_id === row.original.id
+              )
             )
             .map((course) => (
               <Link
@@ -81,7 +81,7 @@ export function StudentsForInstructorList({
         },
       }),
     ],
-    [allCourses, instructor_id, registrations],
+    [allCourses, instructor_id, registrations]
   );
 
   const table = useReactTable({

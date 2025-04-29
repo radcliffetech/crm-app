@@ -4,7 +4,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import type { Course } from "~/types";
 import { Link } from "@remix-run/react";
 import { useMemo } from "react";
@@ -50,7 +50,7 @@ export function CoursesActiveList({ courses }: { courses: Course[] }) {
         cell: ({ row }) => row.original.enrollment_count,
       }),
     ],
-    [],
+    []
   );
 
   const table = useReactTable({

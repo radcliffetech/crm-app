@@ -1,6 +1,6 @@
 import type { Course, Student } from "~/types";
 
-import PageSubheader from "../ui/PageSubheader";
+import { PageSubheader } from "../Common/PageSubheader";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
 export function RegisterCourseForStudentForm({

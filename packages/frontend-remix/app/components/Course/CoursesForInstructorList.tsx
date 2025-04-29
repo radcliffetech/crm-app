@@ -4,7 +4,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Course } from "~/types";
 import { Link } from "@remix-run/react";
@@ -44,7 +44,7 @@ export function CoursesForInstructorList({ courses }: { courses: Course[] }) {
         cell: () => <div className="text-right"></div>,
       }),
     ],
-    [],
+    []
   );
 
   const table = useReactTable({

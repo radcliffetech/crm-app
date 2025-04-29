@@ -4,7 +4,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { BasicTable } from "~/components/ui/BasicTable";
+import { BasicTable } from "~/components/Common/BasicTable";
 import { Link } from "@remix-run/react";
 import type { PaymentWithLabels } from "~/types/Payment";
 import { useMemo } from "react";
@@ -57,7 +57,7 @@ export function PaymentsList({ payments }: { payments: PaymentWithLabels[] }) {
         cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
       }),
     ],
-    [],
+    []
   );
 
   const table = useReactTable({
