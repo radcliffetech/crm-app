@@ -25,17 +25,13 @@ class CourseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         instructor_data = validated_data.pop("instructor", None)
 
-        if instructor_data:
-            instructor = Instructor.objects.get(id=instructor_data["id"])
-        else:
-            raise serializers.ValidationError({"instructor_id": "Instructor must be provided."})
+        instructor = Instructor.objects.get(id=instructor_data["id"])
 
         course = Course.objects.create(instructor=instructor, **validated_data)
 
         return course
     
     def update(self, instance, validated_data):
-        print("Updating course instance:", instance, validated_data)
         instructor_data = validated_data.pop("instructor", None)
 
         if instructor_data:
