@@ -1,6 +1,7 @@
 import {
   createColumnHelper,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -19,11 +20,13 @@ export function SearchResultsList({ results }: { results: ResultRow[] }) {
   const columns = [
     columnHelper.accessor("type", {
       header: () => "Result Type",
+      enableSorting: true,
       cell: (info) => info.getValue(),
     }),
     columnHelper.display({
       id: "label",
       header: () => "Result",
+      enableSorting: true,
       cell: (info) => {
         const row = info.row.original;
         return (
@@ -39,6 +42,8 @@ export function SearchResultsList({ results }: { results: ResultRow[] }) {
     data: results,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    enableSorting: true,
   });
 
   return <BasicTable table={table} />;

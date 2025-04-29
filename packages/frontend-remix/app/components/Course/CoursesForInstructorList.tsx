@@ -18,6 +18,7 @@ export function CoursesForInstructorList({ courses }: { courses: Course[] }) {
       columnHelper.display({
         id: "title",
         header: "Title",
+        enableSorting: true,
         cell: ({ row }) => (
           <Link
             to={`/courses/${row.original.id}`}
@@ -30,17 +31,20 @@ export function CoursesForInstructorList({ courses }: { courses: Course[] }) {
       columnHelper.display({
         id: "start_date",
         header: "Start Date",
+        enableSorting: true,
         cell: ({ row }) =>
           new Date(row.original.start_date).toLocaleDateString(),
       }),
       columnHelper.display({
         id: "end_date",
         header: "End Date",
+        enableSorting: true,
         cell: ({ row }) => new Date(row.original.end_date).toLocaleDateString(),
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Actions</div>,
+        enableSorting: false,
         cell: () => <div className="text-right"></div>,
       }),
     ],
@@ -51,6 +55,7 @@ export function CoursesForInstructorList({ courses }: { courses: Course[] }) {
     data: courses,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    enableSorting: true,
   });
 
   return (

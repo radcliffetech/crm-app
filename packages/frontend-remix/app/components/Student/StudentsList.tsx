@@ -12,6 +12,7 @@ import type { Student } from "~/types";
 const columnHelper = createColumnHelper<Student>();
 
 import { DropdownActions } from "~/components/Common/DropdownActions";
+import { EditButton } from "~/components/Common/EditButton";
 
 export function StudentsList({
   students,
@@ -31,8 +32,9 @@ export function StudentsList({
   const columns = useMemo<ColumnDef<Student, any>[]>(
     () => [
       columnHelper.display({
-        id: "name",
         header: "Name",
+        id: "name_first",
+        enableSorting: true,
         cell: ({ row }) => (
           <Link
             to={`/students/${row.original.id}`}
@@ -44,23 +46,25 @@ export function StudentsList({
       }),
       columnHelper.accessor("email", {
         header: "Email",
+        enableSorting: true,
       }),
       columnHelper.accessor("company", {
         header: "Company",
+        enableSorting: true,
         cell: (info) => info.getValue() || "-",
       }),
       columnHelper.accessor("phone", {
         header: "Phone",
+        enableSorting: true,
         cell: (info) => info.getValue() || "-",
       }),
       columnHelper.display({
         id: "actions",
         header: () => <div className="text-right">Actions</div>,
+        enableSorting: false,
         cell: ({ row }) =>
           deletingId === row.original.id ? (
-            <div className="flex justify-center p-2">
-              <div className="h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+            <EditButton loading={true} />
           ) : (
             <DropdownActions
               canEdit={canEdit}
@@ -78,6 +82,7 @@ export function StudentsList({
     data: students,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    enableSorting: true,
   });
 
   return <BasicTable table={table} />;
