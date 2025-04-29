@@ -89,6 +89,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         prerequisites_data = self.request.data.get("prerequisites", [])
         print("[perform_update] Raw prerequisites_data:", prerequisites_data)
+        print("[perform_update] Raw instructor_id:", self.request.data.get("instructor_id"))
         course = serializer.save()
         if prerequisites_data:
             prereq_ids = [

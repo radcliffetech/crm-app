@@ -39,6 +39,11 @@ export function CoursesList({
       ),
     }),
     columnHelper.display({
+      id: "course_code",
+      header: "Course Code",
+      cell: info => info.row.original.course_code,
+    }),
+    columnHelper.display({
       id: "instructor_name",
       header: "Instructor",
       cell: ({ row }) => row.original.instructor_name,

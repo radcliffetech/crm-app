@@ -1,4 +1,4 @@
-import type { Course, Instructor } from "~/types";
+import type { Course, CourseFormData, Instructor } from "~/types";
 import { createCourse, deleteCourse, getCoursesPageData, updateCourse } from "~/loaders/courses";
 import { useEffect, useState } from "react";
 
@@ -22,18 +22,6 @@ export const meta: MetaFunction = () => {
     ];
 };
 
-type CourseFormData = {
-  course_code: string;
-  title: string;
-  description: string;
-  description_full: string;
-  instructor_id: string;
-  start_date: string;
-  end_date: string;
-  syllabus_url: string;
-  course_fee: string;
-  prerequisites: string[];
-};
 
 type CoursePayload = Omit<CourseFormData, "prerequisites" | "course_fee"> & {
   course_fee: number;
@@ -42,7 +30,7 @@ type CoursePayload = Omit<CourseFormData, "prerequisites" | "course_fee"> & {
   updated_at?: string;
 };
 
-const emptyCourseForm: CourseFormData = {
+export const emptyCourseForm: CourseFormData = {
   course_code: "",
   title: "",
   description: "",
@@ -52,7 +40,7 @@ const emptyCourseForm: CourseFormData = {
   end_date: "",
   syllabus_url: "",
   course_fee: "",
-  prerequisites: [],
+  prerequisites: [] as string[],
 };
 
 export default function CoursesPage() {
@@ -151,7 +139,7 @@ export default function CoursesPage() {
                     setFormData={setFormData}
                     editingCourse={editingCourse}
                     instructors={instructors}
-                    onSubmit={handleSubmit}
+                    onSubmit={(e) => handleSubmit(e)}
                     onCancel={() => {
                         setFormData(emptyCourseForm);
                         setEditingCourse(null);

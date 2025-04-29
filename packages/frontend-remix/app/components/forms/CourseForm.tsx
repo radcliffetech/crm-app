@@ -6,7 +6,6 @@ export function CourseForm({
   editingCourse,
   instructors,
   onSubmit,
-  onCancel,
   allCourses,
 }: {
   formData: {

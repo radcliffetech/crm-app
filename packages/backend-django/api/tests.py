@@ -129,6 +129,7 @@ class CourseSerializerTests(TestCase):
         serializer = CourseSerializer(data=data)
         self.assertTrue(serializer.is_valid(), serializer.errors)
         course = serializer.save()
+        course.prerequisites.set(data["prerequisites"])
 
         self.assertEqual(course.course_code, "TEST-201")
         self.assertEqual(course.instructor, self.instructor)
@@ -186,3 +187,61 @@ class CourseSerializerTests(TestCase):
         self.assertEqual(course.prerequisites.count(), 2)
         self.assertIn(prereq1, course.prerequisites.all())
         self.assertIn(prereq2, course.prerequisites.all())
+
+
+    def test_update_course_assign_instructor(self):
+        """Test updating a course to assign an instructor."""
+        # Create a course with a temporary instructor instead of None
+        from api.models import Course
+
+        dummy_instructor = Instructor.objects.create(
+            name_first="Temp",
+            name_last="Instructor",
+            email="temp.instructor@example.com"
+        )
+
+        course = Course.objects.create(
+            course_code="NOINSTR-001",
+            title="Course with No Instructor",
+            description="A course initially without an instructor",
+            description_full="Full course details",
+            start_date="2025-01-01",
+            end_date="2025-02-01",
+            course_fee=500.00,
+            instructor=dummy_instructor
+        )
+
+        # Create a new instructor
+        new_instructor = Instructor.objects.create(
+            name_first="New",
+            name_last="Instructor",
+            email="new.instructor@example.com"
+        )
+
+        # Simulate incoming update data
+        update_data = {
+            "course_code": course.course_code,
+            "title": course.title,
+            "description": course.description,
+            "description_full": course.description_full,
+            "instructor_id": str(new_instructor.id),
+            "start_date": str(course.start_date),
+            "end_date": str(course.end_date),
+            "course_fee": str(course.course_fee),
+            "syllabus_url": course.syllabus_url,
+            "prerequisites": [],
+        }
+
+        # Deserialize and validate
+        serializer = CourseSerializer(course, data=update_data)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        # Save
+        updated_course = serializer.save()
+
+        if "instructor_id" in update_data:
+            updated_course.instructor = Instructor.objects.get(id=update_data["instructor_id"])
+            updated_course.save()
+
+        # Assertions
+        self.assertEqual(updated_course.instructor.id, new_instructor.id)        

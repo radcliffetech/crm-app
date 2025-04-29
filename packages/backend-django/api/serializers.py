@@ -6,12 +6,18 @@ class InstructorSerializer(serializers.ModelSerializer):
         model = Instructor
         fields = '__all__'
 
-from rest_framework import serializers
-from .models import Course, Instructor
+
+    
+class CoursePrerequisiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ["id", "title", "course_code"]
+
 
 class CourseSerializer(serializers.ModelSerializer):
     instructor_id = serializers.UUIDField(write_only=True)
-
+    prerequisites = CoursePrerequisiteSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Course
         fields = [
@@ -33,11 +39,6 @@ class CourseSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data.pop("instructor_id", None)  # Don't allow instructor_id to change during update
         return super().update(instance, validated_data)
-    
-class CoursePrerequisiteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Course
-        fields = ["id", "title", "course_code"]
 
 class CourseListSerializer(serializers.ModelSerializer):
     instructor_name = serializers.SerializerMethodField(read_only=True)

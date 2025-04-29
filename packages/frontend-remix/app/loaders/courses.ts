@@ -51,17 +51,26 @@ export async function getCoursesPageData(): Promise<{
   return { courses, instructors, registrations };
 }
 
+export async function getCourses(): Promise<Course[]> {
+  const courses = await fetchListData<Course>("courses", "/");
+  return courses;
+}
+
 export async function getCoursePageData(id: string): Promise<{
   course: Course | null;
   instructor: Instructor | null;
   registrations: Registration[];
   unregisteredStudents: Student[];
+  instructors: Instructor[];
+  courses: Course[];
 }> {
   console.log("Fetching course data for ID:", id);
-  const [course, registrations, unregisteredStudents] = await Promise.all([
+  const [course, registrations, unregisteredStudents, instructors, courses] = await Promise.all([
     fetchPageData<Course>("courses", `/${id}/`),
     fetchListData<Registration>("registrations", "/", { course_id: id }),
-    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true })
+    fetchListData<Student>("students", "/", { course_id: id, eligible_for_course: true }),
+    fetchListData<Instructor>("instructors", "/"),
+    fetchListData<Course>("courses", "/")
   ]);
 
   console.log("Course data fetched:", course);
@@ -69,7 +78,7 @@ export async function getCoursePageData(id: string): Promise<{
     ? await fetchPageData<Instructor>("instructors", `/${course.instructor_id}/`)
     : null;
 
-  const output = { course, instructor, registrations, unregisteredStudents };
+  const output = { course, instructor, registrations, unregisteredStudents, instructors, courses };
   return output;
 }
 
