@@ -1,5 +1,8 @@
 import { Course, Instructor } from "~/types";
 
+import { FormField } from "~/components/Common/FormField";
+import { SaveButton } from "~/components/Common/SaveButton";
+
 export function CourseForm({
   formData,
   setFormData,
@@ -30,13 +33,10 @@ export function CourseForm({
   if (!instructors || instructors.length === 0) {
     return <div className="text-red-500">No instructors available</div>;
   }
-  console.log("CourseForm", formData.prerequisites);
+
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          Course Code <span className="text-red-500">*</span>
-        </span>
+      <FormField label="Course Code" required>
         <input
           type="text"
           value={formData.course_code}
@@ -49,11 +49,9 @@ export function CourseForm({
           required
           disabled={!!editingCourse}
         />
-      </label>
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          Title <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="Title" required>
         <input
           type="text"
           value={formData.title}
@@ -61,11 +59,9 @@ export function CourseForm({
           className="border p-2"
           required
         />
-      </label>
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          Instructor <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="Instructor" required>
         <select
           value={formData.instructor_id}
           onChange={(e) =>
@@ -82,19 +78,16 @@ export function CourseForm({
             </option>
           ))}
         </select>
-      </label>
-      <label className="flex flex-col md:col-span-2">
-        <span className="flex items-center gap-1">
-          Prerequisites{" "}
-          <span className="text-sm text-gray-500">(optional)</span>
-        </span>
+      </FormField>
+
+      <FormField label="Prerequisites">
         <select
           multiple
           value={formData.prerequisites}
           onChange={(e) => {
             const selected = Array.from(
               e.target.selectedOptions,
-              (option) => option.value,
+              (option) => option.value
             );
             setFormData({ ...formData, prerequisites: selected });
           }}
@@ -108,11 +101,9 @@ export function CourseForm({
               </option>
             ))}
         </select>
-      </label>
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          Start Date <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="Start Date" required>
         <input
           type="date"
           value={formData.start_date}
@@ -122,11 +113,9 @@ export function CourseForm({
           className="border p-2"
           required
         />
-      </label>
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          End Date <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="End Date" required>
         <input
           type="date"
           value={formData.end_date}
@@ -136,11 +125,9 @@ export function CourseForm({
           className="border p-2"
           required
         />
-      </label>
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          Course Fee <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="Course Fee" required>
         <input
           type="number"
           value={formData.course_fee}
@@ -151,11 +138,9 @@ export function CourseForm({
           required
           min="0"
         />
-      </label>
-      <label className="flex flex-col">
-        <span className="flex items-center gap-1">
-          Syllabus URL <span className="text-sm text-gray-500">(optional)</span>
-        </span>
+      </FormField>
+
+      <FormField label="Syllabus URL">
         <input
           type="url"
           value={formData.syllabus_url}
@@ -164,11 +149,9 @@ export function CourseForm({
           }
           className="border p-2"
         />
-      </label>
-      <label className="flex flex-col md:col-span-2">
-        <span className="flex items-center gap-1">
-          Description <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="Description" required className="md:col-span-2">
         <textarea
           value={formData.description}
           onChange={(e) =>
@@ -177,11 +160,9 @@ export function CourseForm({
           className="border p-2"
           required
         />
-      </label>
-      <label className="flex flex-col md:col-span-2">
-        <span className="flex items-center gap-1">
-          Full Description <span className="text-red-500">*</span>
-        </span>
+      </FormField>
+
+      <FormField label="Full Description" required className="md:col-span-2">
         <textarea
           value={formData.description_full}
           onChange={(e) =>
@@ -190,13 +171,9 @@ export function CourseForm({
           className="border p-2 h-20"
           required
         />
-      </label>
-      <button
-        type="submit"
-        className="btn-primary py-2 px-4 rounded w-full mt-4"
-      >
-        {editingCourse ? "Update" : "Save"}
-      </button>
+      </FormField>
+
+      <SaveButton isEditing={!!editingCourse} fullWidth />
     </form>
   );
 }

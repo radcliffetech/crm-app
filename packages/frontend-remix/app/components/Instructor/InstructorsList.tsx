@@ -7,6 +7,7 @@ import {
 import { BasicTable } from "~/components/Common/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DropdownActions } from "~/components/Common/DropdownActions";
+import { EditButton } from "~/components/Common/EditButton";
 import type { Instructor } from "~/types";
 import { Link } from "@remix-run/react";
 import { useMemo } from "react";
@@ -57,9 +58,7 @@ export function InstructorsList({
         header: () => <div className="text-right">Actions</div>,
         cell: ({ row }) =>
           deletingId === row.original.id ? (
-            <div className="flex justify-center p-2">
-              <div className="h-5 w-5 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+            <EditButton loading={true} />
           ) : (
             <DropdownActions
               onEdit={() => onEdit(row.original)}
@@ -70,7 +69,7 @@ export function InstructorsList({
           ),
       }),
     ],
-    [onEdit, onDelete, canEdit, canDelete]
+    [onEdit, onDelete, canEdit, canDelete, deletingId]
   );
 
   const table = useReactTable({

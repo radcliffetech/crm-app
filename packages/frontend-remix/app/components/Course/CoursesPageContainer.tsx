@@ -4,13 +4,14 @@ import { createCourse, deleteCourse, updateCourse } from "~/loaders/courses";
 import { AddButton } from "~/components/Common/AddButton";
 import { CourseForm } from "~/components/Course/CourseForm";
 import { CoursesList } from "~/components/Course/CoursesList";
-import { Modal } from "~/components/Common/Modal";
+import { EditModal } from "~/components/Common/EditModal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useConfirmDialog } from "~/components/Common/ConfirmDialogProvider";
+import { useEditState } from "~/components/Common/useEditState";
 import { useState } from "react";
 
 export const emptyCourseForm: CourseFormData = {
@@ -38,7 +39,7 @@ export function CoursesPageContainer({
 }: CoursesPageContainerProps) {
   const [courses, setCourses] = useState<Course[]>(loaderData.courses);
   const [instructors] = useState<Instructor[]>(loaderData.instructors);
-  const [showForm, setShowForm] = useState(false);
+  const { editing, open, close } = useEditState();
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [formData, setFormData] = useState<CourseFormData>(emptyCourseForm);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -66,31 +67,31 @@ export function CoursesPageContainer({
       toast.error("Failed to save course.");
     }
     setFormData(emptyCourseForm);
-    setShowForm(false);
+    close();
   };
 
   return (
     <PageFrame>
       <PageHeader>Courses</PageHeader>
 
-      {!showForm && (
+      {!editing && (
         <AddButton
           onClick={() => {
             setFormData(emptyCourseForm);
             setEditingCourse(null);
-            setShowForm(true);
+            open();
           }}
         >
           Add
         </AddButton>
       )}
 
-      <Modal
-        isOpen={showForm}
+      <EditModal
+        open={editing}
         onClose={() => {
           setFormData(emptyCourseForm);
           setEditingCourse(null);
-          setShowForm(false);
+          close();
         }}
       >
         <CourseForm
@@ -102,11 +103,11 @@ export function CoursesPageContainer({
           onCancel={() => {
             setFormData(emptyCourseForm);
             setEditingCourse(null);
-            setShowForm(false);
+            close();
           }}
           allCourses={courses}
         />
-      </Modal>
+      </EditModal>
 
       <CoursesList
         courses={courses}
@@ -125,7 +126,7 @@ export function CoursesPageContainer({
             course_fee: course.course_fee?.toString() || "",
             prerequisites: course.prerequisites,
           });
-          setShowForm(true);
+          open();
         }}
         onDelete={async (id) => {
           const course = courses.find((c) => c.id === id);

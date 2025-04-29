@@ -6,16 +6,17 @@ import {
 
 import { AddButton } from "~/components/Common/AddButton";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
+import { EditModal } from "~/components/Common/EditModal";
 import type { Instructor } from "~/types";
 import { InstructorForm } from "~/components/Instructor/InstructorForm";
 import { InstructorsList } from "~/components/Instructor/InstructorsList";
-import { Modal } from "~/components/Common/Modal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
 import { useConfirmDialog } from "~/components/Common/ConfirmDialogProvider";
+import { useEditState } from "~/components/Common/useEditState";
 import { useState } from "react";
 
 const initialFormData = {
@@ -40,7 +41,7 @@ export function InstructorsPageContainer({
   const [instructors, setInstructors] = useState<Instructor[]>(
     loaderData.instructors
   );
-  const [showForm, setShowForm] = useState(false);
+  const { editing, open, close } = useEditState();
   const [editingInstructor, setEditingInstructor] = useState<Instructor | null>(
     null
   );
@@ -73,7 +74,7 @@ export function InstructorsPageContainer({
         setInstructors((prev) => [...prev, newInstructor]);
       }
       resetForm();
-      setShowForm(false);
+      close();
       toast.success("Instructor saved successfully!");
     } catch (err) {
       console.error(err);
@@ -85,22 +86,22 @@ export function InstructorsPageContainer({
     <PageFrame>
       <PageHeader>Instructors</PageHeader>
 
-      {!showForm && (
+      {!editing && (
         <AddButton
           onClick={() => {
             resetForm();
-            setShowForm(true);
+            open();
           }}
         >
           Add
         </AddButton>
       )}
 
-      <Modal
-        isOpen={showForm}
+      <EditModal
+        open={editing}
         onClose={() => {
           resetForm();
-          setShowForm(false);
+          close();
         }}
       >
         <InstructorForm
@@ -109,11 +110,11 @@ export function InstructorsPageContainer({
           onSubmit={handleSubmit}
           onCancel={() => {
             resetForm();
-            setShowForm(false);
+            close();
           }}
           editingInstructor={editingInstructor}
         />
-      </Modal>
+      </EditModal>
 
       <InstructorsList
         instructors={instructors}
@@ -126,7 +127,7 @@ export function InstructorsPageContainer({
             email: instructor.email,
             bio: instructor.bio || "",
           });
-          setShowForm(true);
+          open();
         }}
         onDelete={async (id) => {
           const instructor = instructors.find((i) => i.id === id);

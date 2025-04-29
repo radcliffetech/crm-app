@@ -10,11 +10,11 @@ import { Link, useRevalidator } from "@remix-run/react";
 
 import { CourseForm } from "~/components/Course/CourseForm";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";
-import { Modal } from "~/components/Common/Modal";
+import { EditButton } from "~/components/Common/EditButton";
+import { EditModal } from "~/components/Common/EditModal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
-import { PageSubheader } from "~/components/Common/PageSubheader";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
+import { PageSection } from "~/components/Common/PageSection";
 import { RegistrationsForCourseList } from "~/components/Registration/RegistrationsForCourseList";
 import RenderMarkdown from "~/components/Common/RenderMarkdown";
 import { canAccessAdmin } from "~/lib/permissions";
@@ -22,6 +22,7 @@ import { toast } from "react-hot-toast";
 import { unregisterStudent } from "~/loaders/registrations";
 import { updateCourse } from "~/loaders/courses";
 import { useAuth } from "~/root";
+import { useEditState } from "~/components/Common/useEditState";
 
 const emptyCourseForm: CourseFormData = {
   course_code: "",
@@ -50,21 +51,15 @@ type CourseDetailContainerProps = {
 export function CourseDetailContainer({
   loaderData,
 }: CourseDetailContainerProps) {
-  const {
-    course,
-    instructor,
-    registrations,
-    unregisteredStudents,
-    instructors,
-    courses,
-  } = loaderData;
+  const { course, instructor, registrations, instructors, courses } =
+    loaderData;
   const auth = useAuth();
   const { revalidate } = useRevalidator();
 
-  const [showForm, setShowForm] = useState(false);
+  const { editing, open, close } = useEditState();
   const [formData, setFormData] = useState<CourseFormData>(emptyCourseForm);
 
-  const openEditForm = () => {
+  const handleEditOpen = () => {
     if (!course) return;
     setFormData({
       title: course.title ?? "",
@@ -78,7 +73,7 @@ export function CourseDetailContainer({
       instructor_id: course.instructor_id ?? "",
       syllabus_url: course.syllabus_url ?? "",
     });
-    setShowForm(true);
+    open();
   };
 
   const handleFormSubmit = (event: FormEvent) => {
@@ -87,7 +82,7 @@ export function CourseDetailContainer({
     updateCourse(course.id, formData)
       .then(() => {
         toast.success("Course updated successfully!");
-        setShowForm(false);
+        close();
         revalidate();
       })
       .catch((err) => {
@@ -118,74 +113,71 @@ export function CourseDetailContainer({
               {course.course_code}
             </span>
           )}
-          {course && (
+        </PageHeader>
+      </div>
+      {canAccessAdmin(auth) && (
+        <div className="mb-4">
+          <EditButton loading={false} onClick={handleEditOpen} />
+        </div>
+      )}
+
+      <PageSection title="Course Info">
+        {course && (
+          <>
+            <p className="mb-1 text-xl text-gray-600">{course.description}</p>
             <p className="mb-4 text-sm text-gray-500">
               {new Date(course.start_date).toLocaleDateString()} –{" "}
               {new Date(course.end_date).toLocaleDateString()}
             </p>
-          )}
-          {instructor && (
-            <p className="mb-2 text-sm text-gray-600">
-              Instructor:{" "}
-              <Link
-                to={`/instructors/${instructor.id}`}
-                className="text-blue-600 hover:underline"
-              >
-                {instructor.name_first} {instructor.name_last}
-              </Link>
-            </p>
-          )}
-        </PageHeader>
-      </div>
-
-      {canAccessAdmin(auth) && (
-        <div className="mb-4">
-          <button
-            onClick={openEditForm}
-            className="btn-primary rounded px-4 py-2"
-          >
-            <PencilSquareIcon className="h-4 w-4 inline-block mr-1" />
-            Edit
-          </button>
-        </div>
-      )}
+          </>
+        )}
+        {instructor && (
+          <p className="mb-2 text-sm text-gray-600">
+            Instructor:{" "}
+            <Link
+              to={`/instructors/${instructor.id}`}
+              className="text-blue-600 hover:underline"
+            >
+              {instructor.name_first} {instructor.name_last}
+            </Link>
+          </p>
+        )}
+      </PageSection>
 
       <DataLoaderState loading={false} error={null} />
 
       {course && (
         <>
-          <p className="mb-1 text-xl text-gray-600">{course.description}</p>
-
-          {course.prerequisites.length > 0 && (
-            <div className="mt-6 border border-gray-300 rounded p-4">
-              <h2 className="text-lg font-light text-gray-700 mb-2">
-                Prerequisites
-              </h2>
-              {course.prerequisites.map((prereq) => (
+          <PageSection title="Prerequisites">
+            {course.prerequisites.length > 0 ? (
+              course.prerequisites.map((prereq) => (
                 <p key={prereq} className="text-gray-600">
                   {prereq}
                 </p>
-              ))}
-            </div>
-          )}
+              ))
+            ) : (
+              <p className="text-gray-500 italic">No prerequisites.</p>
+            )}
+          </PageSection>
 
-          <div className="prose my-4 text-gray-700  border border-gray-300 rounded p-4">
+          <PageSection
+            title="Course Description"
+            className="prose my-4 text-gray-700"
+          >
             <RenderMarkdown>{course.description_full}</RenderMarkdown>
-          </div>
+          </PageSection>
 
-          <p className="text-xl font-light text-gray-800 mt-4  border border-gray-300 rounded p-4">
-            <h2 className="text-lg font-light text-gray-700 mb-2">
-              Course Fee
-            </h2>
-            $
-            {Number(course.course_fee).toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </p>
+          <PageSection title="Course Fee">
+            <span className="text-xl font-light text-gray-800">
+              $
+              {Number(course.course_fee).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+          </PageSection>
 
-          <div className="my-4 border border-gray-300 rounded p-4">
-            <PageSubheader>Registered Students</PageSubheader>
+          <PageSection title="Registered Students">
             {registrations.length === 0 ? (
               <p className="text-gray-500 italic">No students registered.</p>
             ) : (
@@ -194,23 +186,21 @@ export function CourseDetailContainer({
                 unregisterAction={handleUnregisterStudent}
               />
             )}
-          </div>
+          </PageSection>
         </>
       )}
 
-      {showForm && (
-        <Modal isOpen onClose={() => setShowForm(false)}>
-          <CourseForm
-            formData={formData}
-            setFormData={setFormData}
-            editingCourse={course}
-            instructors={instructors}
-            onSubmit={handleFormSubmit}
-            onCancel={() => setShowForm(false)}
-            allCourses={courses}
-          />
-        </Modal>
-      )}
+      <EditModal open={editing} onClose={close}>
+        <CourseForm
+          formData={formData}
+          setFormData={setFormData}
+          editingCourse={course}
+          instructors={instructors}
+          onSubmit={handleFormSubmit}
+          onCancel={close}
+          allCourses={courses}
+        />
+      </EditModal>
     </PageFrame>
   );
 }
