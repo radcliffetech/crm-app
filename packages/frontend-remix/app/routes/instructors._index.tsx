@@ -18,7 +18,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
-import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
+import { useConfirmDialog } from "~/components/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
   return [

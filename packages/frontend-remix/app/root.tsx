@@ -12,7 +12,7 @@ import {
 import type { User, UserRole } from "./types";
 import { createContext, useContext } from "react";
 
-import { ConfirmDialogProvider } from "./lib/ConfirmDialogProvider";
+import { ConfirmDialogProvider } from "./components/ConfirmDialogProvider";
 import { Footer } from "./components/ui/Footer";
 import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "./components/ui/Navbar";

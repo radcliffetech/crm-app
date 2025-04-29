@@ -13,7 +13,7 @@ import { StudentsList } from "~/components/lists/StudentsList";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
-import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
+import { useConfirmDialog } from "~/components/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
   return [
@@ -34,14 +34,7 @@ const initialFormData = {
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name_first: "",
-    name_last: "",
-    email: "",
-    phone: "",
-    company: "",
-    notes: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
   const [editingstudent_id, setEditingstudent_id] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

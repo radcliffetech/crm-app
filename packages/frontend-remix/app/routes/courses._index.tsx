@@ -1,4 +1,4 @@
-import type { Course, CourseFormData, CoursePayload, Instructor } from "~/types";
+import type { Course, CourseFormData, Instructor } from "~/types";
 import { createCourse, deleteCourse, getCoursesPageData, updateCourse } from "~/loaders/courses";
 import { useEffect, useState } from "react";
 
@@ -13,7 +13,7 @@ import { PageHeader } from "~/components/ui/PageHeader";
 import { canAccessAdmin } from "~/lib/permissions";
 import { toast } from "react-hot-toast";
 import { useAuth } from "~/root";
-import { useConfirmDialog } from "~/lib/ConfirmDialogProvider";
+import { useConfirmDialog } from "~/components/ConfirmDialogProvider";
 
 export const meta: MetaFunction = () => {
     return [
