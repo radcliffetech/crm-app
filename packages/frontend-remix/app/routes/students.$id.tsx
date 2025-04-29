@@ -93,7 +93,7 @@ export default function StudentDetailPage() {
           <button
             onClick={() => setEditing(true)}
             className="mb-4 px-4 py-2 btn-primary flex items-center gap-2"
-          >s
+          >
             <PencilSquareIcon className="h-5 w-5" />
             Edit
           </button>
