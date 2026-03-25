@@ -6,7 +6,7 @@ import {
 
 import { BasicTable } from "~/components/Common/BasicTable";
 import type { Course } from "~/types";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Course>();

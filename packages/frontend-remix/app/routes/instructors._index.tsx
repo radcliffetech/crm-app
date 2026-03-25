@@ -1,10 +1,8 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { InstructorsPageContainer } from "~/components/Instructor/InstructorsPageContainer";
 import { getAllInstructors } from "~/loaders/instructors";
-// routes/instructors._index.tsx
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,7 +17,7 @@ export const meta: MetaFunction = () => {
 
 export async function loader(args: LoaderFunctionArgs) {
   const instructors = await getAllInstructors();
-  return json({ instructors });
+  return { instructors };
 }
 
 export default function InstructorsIndexPage() {

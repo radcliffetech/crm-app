@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "react-router";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";

@@ -6,7 +6,7 @@ import type {
   Student,
 } from "~/types";
 import { FormEvent, useState } from "react";
-import { Link, useRevalidator } from "@remix-run/react";
+import { Link, useRevalidator } from "react-router";
 
 import { CourseForm } from "~/components/Course/CourseForm";
 import { DataLoaderState } from "~/components/Common/DataLoaderState";

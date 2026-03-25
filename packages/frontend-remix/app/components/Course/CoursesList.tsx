@@ -9,7 +9,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { Course } from "~/types";
 import { DropdownActions } from "~/components/Common/DropdownActions";
 import { EditButton } from "~/components/Common/EditButton";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<Course>();

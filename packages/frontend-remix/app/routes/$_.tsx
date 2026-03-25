@@ -1,4 +1,4 @@
-import { Link, isRouteErrorResponse, useRouteError } from "@remix-run/react";
+import { Link, isRouteErrorResponse, useRouteError } from "react-router";
 
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";

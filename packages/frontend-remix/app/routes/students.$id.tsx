@@ -1,9 +1,8 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { StudentDetailContainer } from "~/components/Student/StudentDetailContainer";
 import { getStudentPageData } from "~/loaders/students";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 
 export const meta: MetaFunction = () => {
   return [
@@ -26,7 +25,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Response("Student not found", { status: 404 });
   }
 
-  return json(data);
+  return data;
 }
 
 export default function StudentDetailPage() {

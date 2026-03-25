@@ -4,7 +4,7 @@ import {
   HomeIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/solid";
-import { Link, useLocation, useMatches } from "@remix-run/react";
+import { Link, useLocation, useMatches } from "react-router";
 import { User, UserRole } from "~/types";
 import { useEffect, useRef, useState } from "react";
 

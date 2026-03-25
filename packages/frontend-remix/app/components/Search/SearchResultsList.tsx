@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-table";
 
 import { BasicTable } from "~/components/Common/BasicTable";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 type ResultRow = {
   type: string;
