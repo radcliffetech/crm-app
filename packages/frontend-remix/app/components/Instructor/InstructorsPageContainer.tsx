@@ -5,7 +5,6 @@ import {
 } from "~/loaders/instructors";
 
 import { AddButton } from "~/components/Common/AddButton";
-import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { EditModal } from "~/components/Common/EditModal";
 import type { Instructor } from "~/types";
 import { InstructorForm } from "~/components/Instructor/InstructorForm";

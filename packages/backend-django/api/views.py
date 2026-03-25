@@ -1,13 +1,33 @@
 from .models import Instructor, Course, Student, Registration
-from .serializers import InstructorSerializer, CourseSerializer, StudentSerializer, RegistrationSerializer, CourseListSerializer
+from .serializers import InstructorSerializer, CourseSerializer, StudentSerializer, RegistrationSerializer, CourseListSerializer, CustomTokenObtainPairSerializer
 from rest_framework import viewsets, filters
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import api_view, action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, action, permission_classes
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.utils.timezone import now
 from django.db import transaction
 from .services.email_service import EmailService
 from django.core.exceptions import ValidationError
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    user = request.user
+    return Response({
+        'id': str(user.id),
+        'email': user.email,
+        'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+        'role': 'admin' if user.is_superuser else (
+            user.groups.first().name if user.groups.exists() else 'student'
+        ),
+    })
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25

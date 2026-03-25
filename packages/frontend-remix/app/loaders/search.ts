@@ -2,9 +2,9 @@ import type { Course, Instructor, Student } from "~/types";
 
 import { fetchPageData } from "~/lib/api/fetch";
 
-export async function searchLoader(query: string) {
+export async function searchLoader(query: string, token?: string) {
   try {
-    const response = await fetchPageData<any>("org", `/search?q=${query}`);
+    const response = await fetchPageData<any>("org", `/search?q=${query}`, undefined, token);
 
     const results = [
       ...response.students.map((student: Student) => ({

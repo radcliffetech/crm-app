@@ -7,15 +7,15 @@ import type {
 } from "~/types";
 import { fetchListData, fetchPageData, mutateData } from "~/lib/api/fetch";
 
-export async function getCoursesForInstructor(instructor_id: string): Promise<{
+export async function getCoursesForInstructor(instructor_id: string, token?: string): Promise<{
   courses: Course[];
   registrations: Registration[];
   students: Student[];
 }> {
   const [courses, registrations, allStudents] = await Promise.all([
-    fetchListData<Course>("courses", "/", { instructor_id }),
-    fetchListData<Registration>("registrations", "/"),
-    fetchListData<Student>("students", "/"),
+    fetchListData<Course>("courses", "/", { instructor_id }, token),
+    fetchListData<Registration>("registrations", "/", undefined, token),
+    fetchListData<Student>("students", "/", undefined, token),
   ]);
 
   const student_ids = new Set(
@@ -28,26 +28,26 @@ export async function getCoursesForInstructor(instructor_id: string): Promise<{
   return { courses, registrations, students };
 }
 
-export async function getCoursesPageData(): Promise<{
+export async function getCoursesPageData(token?: string): Promise<{
   courses: Course[];
   instructors: Instructor[];
   registrations: Registration[];
 }> {
   const [courses, instructors, registrations] = await Promise.all([
-    fetchListData<Course>("courses", "/"),
-    fetchListData<Instructor>("instructors", "/"),
-    fetchListData<Registration>("registrations", "/"),
+    fetchListData<Course>("courses", "/", undefined, token),
+    fetchListData<Instructor>("instructors", "/", undefined, token),
+    fetchListData<Registration>("registrations", "/", undefined, token),
   ]);
 
   return { courses, instructors, registrations };
 }
 
-export async function getCourses(): Promise<Course[]> {
-  const courses = await fetchListData<Course>("courses", "/");
+export async function getCourses(token?: string): Promise<Course[]> {
+  const courses = await fetchListData<Course>("courses", "/", undefined, token);
   return courses;
 }
 
-export async function getCoursePageData(id: string): Promise<{
+export async function getCoursePageData(id: string, token?: string): Promise<{
   course: Course;
   instructor: Instructor | null;
   registrations: Registration[];
@@ -57,14 +57,14 @@ export async function getCoursePageData(id: string): Promise<{
 }> {
   const [course, registrations, unregisteredStudents, instructors, courses] =
     await Promise.all([
-      fetchPageData<Course>("courses", `/${id}/`),
-      fetchListData<Registration>("registrations", "/", { course_id: id }),
+      fetchPageData<Course>("courses", `/${id}/`, undefined, token),
+      fetchListData<Registration>("registrations", "/", { course_id: id }, token),
       fetchListData<Student>("students", "/", {
         course_id: id,
         eligible_for_course: true,
-      }),
-      fetchListData<Instructor>("instructors", "/"),
-      fetchListData<Course>("courses", "/"),
+      }, token),
+      fetchListData<Instructor>("instructors", "/", undefined, token),
+      fetchListData<Course>("courses", "/", undefined, token),
     ]);
 
   if (!course) {
@@ -73,7 +73,9 @@ export async function getCoursePageData(id: string): Promise<{
   const instructor = course.instructor_id
     ? await fetchPageData<Instructor>(
         "instructors",
-        `/${course.instructor_id}/`
+        `/${course.instructor_id}/`,
+        undefined,
+        token,
       )
     : null;
 
@@ -88,9 +90,9 @@ export async function getCoursePageData(id: string): Promise<{
   return output;
 }
 
-export async function createCourse(data: CoursePayload): Promise<Course> {
+export async function createCourse(data: CoursePayload, token?: string): Promise<Course> {
   try {
-    return await mutateData("courses", "/", "POST", data);
+    return await mutateData("courses", "/", "POST", data, token);
   } catch (error: any) {
     throw new Error(error.message || "Failed to create course.");
   }
@@ -98,19 +100,19 @@ export async function createCourse(data: CoursePayload): Promise<Course> {
 
 export async function updateCourse(
   id: string,
-  data: CoursePayload
+  data: CoursePayload,
+  token?: string,
 ): Promise<void> {
-  console.log("updateCourse", id, data);
   try {
-    await mutateData("courses", `/${id}/`, "PUT", data);
+    await mutateData("courses", `/${id}/`, "PUT", data, token);
   } catch (error: any) {
     throw new Error(error.message || "Failed to update course.");
   }
 }
 
-export async function deleteCourse(id: string): Promise<void> {
+export async function deleteCourse(id: string, token?: string): Promise<void> {
   try {
-    await mutateData("courses", `/${id}/`, "DELETE", {});
+    await mutateData("courses", `/${id}/`, "DELETE", {}, token);
   } catch (error: any) {
     throw new Error(error.message || "Failed to delete course.");
   }

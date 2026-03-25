@@ -1,5 +1,21 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Instructor, Course, Student, Registration
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = self.user
+        data['user'] = {
+            'id': str(user.id),
+            'email': user.email,
+            'name': f"{user.first_name} {user.last_name}".strip() or user.username,
+            'role': 'admin' if user.is_superuser else (
+                user.groups.first().name if user.groups.exists() else 'student'
+            ),
+        }
+        return data
 
 class InstructorSerializer(serializers.ModelSerializer):
     class Meta:

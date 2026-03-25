@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { StudentDetailContainer } from "~/components/Student/StudentDetailContainer";
 import { getStudentPageData } from "~/loaders/students";
+import { getTokenFromRequest } from "~/lib/auth";
 import { useLoaderData } from "react-router";
 
 export const meta: MetaFunction = () => {
@@ -16,10 +17,10 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   if (!params.id) throw new Response("Missing student id", { status: 400 });
-
-  const data = await getStudentPageData(params.id);
+  const token = getTokenFromRequest(request) ?? undefined;
+  const data = await getStudentPageData(params.id, token);
 
   if (!data.student) {
     throw new Response("Student not found", { status: 404 });

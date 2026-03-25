@@ -4,12 +4,10 @@ import { FormField } from "~/components/Common/FormField";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
 export function RegisterStudentForCourseForm({
-  student_id,
   courses,
   registrations,
   onRegister,
 }: {
-  student_id: string;
   courses: Course[];
   registrations: Registration[];
   onRegister: (courseId: string) => Promise<void>;

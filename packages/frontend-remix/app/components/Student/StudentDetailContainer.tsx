@@ -91,7 +91,6 @@ export function StudentDetailContainer({
 
       <PageSection title="Registration">
         <RegisterStudentForCourseForm
-          student_id={student.id}
           courses={courses}
           registrations={registrations}
           onRegister={async (courseId: string) => {

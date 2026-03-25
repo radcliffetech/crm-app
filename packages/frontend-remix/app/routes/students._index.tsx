@@ -2,6 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { StudentsPageContainer } from "~/components/Student/StudentsPageContainer";
 import { getAllStudents } from "~/loaders/students";
+import { getTokenFromRequest } from "~/lib/auth";
 import { useLoaderData } from "react-router";
 
 export const meta: MetaFunction = () => {
@@ -14,8 +15,9 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader(args: LoaderFunctionArgs) {
-  const students = await getAllStudents();
+export async function loader({ request }: LoaderFunctionArgs) {
+  const token = getTokenFromRequest(request) ?? undefined;
+  const students = await getAllStudents(token);
   return { students };
 }
 

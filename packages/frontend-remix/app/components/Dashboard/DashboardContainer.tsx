@@ -2,7 +2,6 @@ import type { Course } from "~/types";
 import { CoursesActiveList } from "~/components/Course/CoursesActiveList";
 import { DashboardCard } from "~/components/Dashboard/DashboardCard";
 import { PageFrame } from "~/components/Common/PageFrame";
-import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
 
 type DashboardContainerProps = {

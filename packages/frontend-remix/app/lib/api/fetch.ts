@@ -12,6 +12,12 @@
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+if (!API_URL) {
+  throw new Error(
+    "VITE_API_BASE_URL is not set. Add it to your .env file (e.g. VITE_API_BASE_URL=http://localhost:8080/api)",
+  );
+}
+
 export const ENDPOINTS = {
   org: API_URL,
   courses: `${API_URL}/courses`,
@@ -21,6 +27,14 @@ export const ENDPOINTS = {
   dashboardSummary: `${API_URL}/dashboard-summary`,
 };
 
+function buildHeaders(token?: string): Record<string, string> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 /**
  * Fetches all paginated results from a list endpoint.
  * Accepts optional query parameters and accumulates all pages into a single array.
@@ -29,6 +43,7 @@ export async function fetchListData<T = any>(
   slug: keyof typeof ENDPOINTS,
   route: string,
   data?: Record<string, any>,
+  token?: string,
 ): Promise<T[]> {
   const endpoint = ENDPOINTS[slug];
   if (!endpoint) {
@@ -47,7 +62,7 @@ export async function fetchListData<T = any>(
   while (url) {
     const res = await fetch(url, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: buildHeaders(token),
     });
 
     if (!res.ok) {
@@ -73,10 +88,11 @@ async function fetchData<T = any>(
   url: string,
   method: string = "GET",
   data?: unknown,
+  token?: string,
 ): Promise<T> {
   const res = await fetch(url, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: buildHeaders(token),
     body: data ? JSON.stringify(data) : undefined,
   });
 
@@ -101,13 +117,14 @@ export async function fetchPageData<T = any>(
   slug: keyof typeof ENDPOINTS,
   route: string,
   data?: unknown,
+  token?: string,
 ): Promise<T> {
   const endpoint = ENDPOINTS[slug];
   if (!endpoint) {
     throw new Error(`Invalid endpoint slug: ${slug}`);
   }
   const url = `${endpoint}${route}`;
-  const res = await fetchData<T>(url, "GET", data);
+  const res = await fetchData<T>(url, "GET", data, token);
   return res;
 }
 
@@ -119,11 +136,12 @@ export async function mutateData<I = any, O = any>(
   route: string,
   method: string,
   data: I,
+  token?: string,
 ): Promise<O> {
   const endpoint = ENDPOINTS[slug];
   if (!endpoint) {
     throw new Error(`Invalid endpoint slug: ${slug}`);
   }
   const url = `${endpoint}${route}`;
-  return await fetchData<O>(url, method, data);
+  return await fetchData<O>(url, method, data, token);
 }

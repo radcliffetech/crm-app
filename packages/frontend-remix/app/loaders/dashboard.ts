@@ -2,7 +2,7 @@ import { fetchListData, fetchPageData } from "~/lib/api/fetch";
 
 import type { Course } from "~/types";
 
-export async function getDashboardData(): Promise<{
+export async function getDashboardData(token?: string): Promise<{
   studentCount: number;
   courseCount: number;
   instructorCount: number;
@@ -10,8 +10,8 @@ export async function getDashboardData(): Promise<{
 }> {
   try {
     const [summary, courses] = await Promise.all([
-      fetchPageData("org", "/dashboard-summary/"),
-      fetchListData<Course>("courses", "/", { active_courses: "true" }),
+      fetchPageData("org", "/dashboard-summary/", undefined, token),
+      fetchListData<Course>("courses", "/", { active_courses: "true" }, token),
     ]);
 
     return {
