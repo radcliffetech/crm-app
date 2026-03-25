@@ -5,7 +5,6 @@ import {
 } from "~/loaders/students";
 
 import { AddButton } from "~/components/Common/AddButton";
-import { DataLoaderState } from "~/components/Common/DataLoaderState";
 import { EditModal } from "~/components/Common/EditModal";
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";

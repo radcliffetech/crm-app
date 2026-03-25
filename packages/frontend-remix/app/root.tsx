@@ -8,38 +8,22 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useRouteError,
-} from "@remix-run/react";
+  useLoaderData,
+  useNavigate,
+} from "react-router";
 import type { User, UserRole } from "./types";
-import { createContext, useContext, useState } from "react";
+import type { LoaderFunctionArgs, LinksFunction } from "react-router";
+import { createContext, useContext } from "react";
 
 import { ConfirmDialogProvider } from "~/components/Common/ConfirmDialogProvider";
 import { Footer } from "~/components/Common/Footer";
-import type { LinksFunction } from "@remix-run/node";
 import { Navbar } from "~/components/Common/Navbar";
 import { Toaster } from "react-hot-toast";
+import { getUserFromRequest } from "~/lib/auth";
 
-export const mockUser: User = {
-  id: "123",
-  email: "admin@miim.edu",
-  role: "admin", // try switching to "faculty" or "student"
-  name: "Admin User",
-};
+const defaultUser: User = { id: "", email: "", role: "student", name: "" };
 
-// export const mockUser: User = {
-//   id: "123",
-//   email: "student@miim.edu",
-//   role: "student", // try switching to "faculty" or "student"
-//   name: "Student User",
-// };
-
-// export const mockUser: User = {
-//   id: "123",
-//   email: "facutly@miim.edu",
-//   role: "faculty", // try switching to "faculty" or "student"
-//   name: "Faculty User",
-// };
-
-export const AuthContext = createContext(mockUser);
+export const AuthContext = createContext<User>(defaultUser);
 export const useAuth = () => useContext(AuthContext);
 
 export const links: LinksFunction = () => [
@@ -55,37 +39,23 @@ export const links: LinksFunction = () => [
   },
 ];
 
-function LandingPage({ handleLogin }: { handleLogin: () => void }) {
-  return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-2">
-      <img src="/images/logo.png" alt="Logo" width="500" />
-      <button onClick={handleLogin} className="px-6 py-2 btn-primary">
-        Log In
-      </button>
-    </div>
-  );
+export async function loader({ request }: LoaderFunctionArgs) {
+  const user = getUserFromRequest(request);
+  return { user };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState(mockUser);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-
-  const handleLogin = () => {
-    console.log("Logging in...");
-    setIsLoggedIn(true);
-  };
+  const { user } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    console.log("Logging out...");
-    setIsLoggedIn(false);
+    navigate("/logout");
   };
 
-  const switchRole = (newRole: UserRole) => {
-    setUser({ ...user, role: newRole });
-  };
+  const isLoggedIn = !!user;
 
   return (
-    <AuthContext.Provider value={user}>
+    <AuthContext.Provider value={user ?? defaultUser}>
       <html lang="en">
         <head>
           <meta charSet="utf-8" />
@@ -97,17 +67,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
           {isLoggedIn ? (
             <>
               <Navbar
-                handleLogin={handleLogin}
+                handleLogin={() => navigate("/login")}
                 handleLogout={handleLogout}
                 user={user}
-                switchRole={switchRole}
+                switchRole={(_newRole: UserRole) => navigate("/logout")}
               />
               <Toaster position="top-right" reverseOrder={false} />
               <div className="flex-grow">{children}</div>
               <Footer />
             </>
           ) : (
-            <LandingPage handleLogin={handleLogin} />
+            <>{children}</>
           )}
           <ScrollRestoration />
           <Scripts />

@@ -1,9 +1,9 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 
 import { CourseDetailContainer } from "~/components/Course/CourseDetailContainer";
 import { getCoursePageData } from "~/loaders/courses";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { getTokenFromRequest } from "~/lib/auth";
+import { useLoaderData } from "react-router";
 
 export const meta: MetaFunction = ({ params }) => {
   return [
@@ -16,10 +16,11 @@ export const meta: MetaFunction = ({ params }) => {
   ];
 };
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   if (!params.id) throw new Response("Missing course id", { status: 400 });
-  const data = await getCoursePageData(params.id);
-  return json(data);
+  const token = getTokenFromRequest(request) ?? undefined;
+  const data = await getCoursePageData(params.id, token);
+  return data;
 }
 
 export default function CourseDetailPage() {

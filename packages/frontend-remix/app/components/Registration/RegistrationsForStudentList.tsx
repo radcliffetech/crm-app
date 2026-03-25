@@ -6,7 +6,7 @@ import {
 
 import { BasicTable } from "~/components/Common/BasicTable";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import type { Registration } from "~/types";
 import { RegistrationDropdownActions } from "./RegistrationDropdownActions";
 import { useMemo } from "react";

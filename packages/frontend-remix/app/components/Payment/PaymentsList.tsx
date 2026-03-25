@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-table";
 
 import { BasicTable } from "~/components/Common/BasicTable";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import type { PaymentWithLabels } from "~/types/Payment";
 import { useMemo } from "react";
 

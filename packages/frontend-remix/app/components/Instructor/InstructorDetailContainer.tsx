@@ -15,7 +15,7 @@ import { toast } from "react-hot-toast";
 import { updateInstructor } from "~/loaders/instructors";
 import { useAuth } from "~/root";
 import { useEditState } from "~/components/Common/useEditState";
-import { useRevalidator } from "@remix-run/react";
+import { useRevalidator } from "react-router";
 
 type InstructorDetailContainerProps = {
   loaderData: {

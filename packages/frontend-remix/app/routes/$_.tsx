@@ -1,10 +1,10 @@
-import { Link, isRouteErrorResponse, useRouteError } from "@remix-run/react";
+import { Link, isRouteErrorResponse, useRouteError } from "react-router";
 
 import { PageFrame } from "~/components/Common/PageFrame";
 import { PageHeader } from "~/components/Common/PageHeader";
 import { PageSubheader } from "~/components/Common/PageSubheader";
 
-export function CatchBoundary() {
+export function ErrorBoundary() {
   const error = useRouteError();
 
   return (

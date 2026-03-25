@@ -33,7 +33,36 @@ class Command(BaseCommand):
         # set up some course prerequisites
         self.stdout.write("Setting up course prerequisites...")
 
+        self.stdout.write("Creating auth groups and demo users...")
+        self._create_demo_users()
+
         self.stdout.write(self.style.SUCCESS("Sample data reset and loaded successfully."))
+
+    def _create_demo_users(self):
+        from django.contrib.auth.models import User, Group
+
+        admin_group, _ = Group.objects.get_or_create(name='admin')
+        faculty_group, _ = Group.objects.get_or_create(name='faculty')
+        student_group, _ = Group.objects.get_or_create(name='student')
+
+        User.objects.filter(username__in=['admin', 'faculty', 'student']).delete()
+
+        User.objects.create_superuser(
+            'admin', 'admin@miim.edu', 'admin123',
+            first_name='Admin', last_name='User'
+        )
+
+        faculty_user = User.objects.create_user(
+            'faculty', 'faculty@miim.edu', 'faculty123',
+            first_name='Faculty', last_name='User'
+        )
+        faculty_user.groups.add(faculty_group)
+
+        student_user = User.objects.create_user(
+            'student', 'student@miim.edu', 'student123',
+            first_name='Student', last_name='User'
+        )
+        student_user.groups.add(student_group)
 
     def load_data(self, filename, loader):
         path = os.path.join(settings.BASE_DIR, "data", filename)

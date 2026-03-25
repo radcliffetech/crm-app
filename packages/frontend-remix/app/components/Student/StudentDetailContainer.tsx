@@ -17,7 +17,7 @@ import { toast } from "react-hot-toast";
 import { updateStudent } from "~/loaders/students";
 import { useAuth } from "~/root";
 import { useEditState } from "~/components/Common/useEditState";
-import { useRevalidator } from "@remix-run/react";
+import { useRevalidator } from "react-router";
 import { useState } from "react";
 
 type StudentDetailContainerProps = {
@@ -91,7 +91,6 @@ export function StudentDetailContainer({
 
       <PageSection title="Registration">
         <RegisterStudentForCourseForm
-          student_id={student.id}
           courses={courses}
           registrations={registrations}
           onRegister={async (courseId: string) => {

@@ -7,7 +7,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import { BasicTable } from "~/components/Common/BasicTable";
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 import { getStudentsForInstructor } from "~/loaders/students";
 
 const columnHelper = createColumnHelper<Student>();

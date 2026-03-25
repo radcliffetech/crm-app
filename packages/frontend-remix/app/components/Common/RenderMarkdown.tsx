@@ -1,13 +1,8 @@
-import Markdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import remarkBreaks from "remark-breaks";
-
 export default function RenderMarkdown({ children }: { children: string }) {
-  const processedChildren = children.replace(/\n/gi, "&nbsp; \n");
+  const html = children
+    .replace(/\n/g, "<br />")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>");
 
-  return (
-    <Markdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkBreaks]}>
-      {processedChildren}
-    </Markdown>
-  );
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
